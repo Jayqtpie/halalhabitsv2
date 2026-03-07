@@ -136,12 +136,12 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Feature | Reason |
 |---------|--------|
-| Public worship leaderboards | Violates Islamic adab — riya (showing off worship) is spiritually harmful |
+| Public worship leaderboards | Violates Islamic adab -- riya (showing off worship) is spiritually harmful |
 | Iman/taqwa scoring | No app can measure spiritual state; theologically problematic |
 | Fatwa engine or religious rulings | Requires scholarly authority; app stays in "motivation" lane |
 | Full Quran reader | Muslim Pro and Quran.com do this well; don't compete on utility |
 | AI-generated Islamic content | Hallucination risk with religious content is unacceptable |
-| Social feed / timeline | Attracts doomscrolling — the exact problem the audience wants to escape |
+| Social feed / timeline | Attracts doomscrolling -- the exact problem the audience wants to escape |
 | Ad-supported free tier | Ads break immersion and degrade "Ferrari" brand |
 | Apple Watch / wearable | Scope explosion for solo dev |
 | Tablet-optimized layouts | Phone-first for MVP |
@@ -153,18 +153,18 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BLUE-01 through BLUE-16 | Phase 1 | Pending |
-| FOUN-01 through FOUN-07 | Phase 2 | Pending |
-| HBIT-01 through HBIT-06 | Phase 3 | Pending |
-| PRAY-01 through PRAY-04 | Phase 3 | Pending |
-| STRK-01 through STRK-05 | Phase 3 | Pending |
-| GAME-01 through GAME-06 | Phase 4 | Pending |
-| HUD-01 through HUD-04 | Phase 5 | Pending |
-| MUHA-01 through MUHA-04 | Phase 5 | Pending |
-| ONBR-01 through ONBR-04 | Phase 6 | Pending |
-| PROF-01 through PROF-04 | Phase 6 | Pending |
-| NOTF-01 through NOTF-04 | Phase 6 | Pending |
-| SYNC-01 through SYNC-05 | Phase 7 | Pending |
+| BLUE-01 through BLUE-16 | Phase 1: Master Blueprint | Pending |
+| FOUN-01 through FOUN-07 | Phase 2: Foundation and Data Layer | Pending |
+| HBIT-01 through HBIT-06 | Phase 3: Core Habit Loop | Pending |
+| PRAY-01 through PRAY-04 | Phase 3: Core Habit Loop | Pending |
+| STRK-01 through STRK-05 | Phase 3: Core Habit Loop | Pending |
+| GAME-01 through GAME-06 | Phase 4: Game Engine and Progression | Pending |
+| HUD-01 through HUD-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Pending |
+| MUHA-01 through MUHA-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Pending |
+| ONBR-01 through ONBR-04 | Phase 6: Onboarding, Profile, and Notifications | Pending |
+| PROF-01 through PROF-04 | Phase 6: Onboarding, Profile, and Notifications | Pending |
+| NOTF-01 through NOTF-04 | Phase 6: Onboarding, Profile, and Notifications | Pending |
+| SYNC-01 through SYNC-05 | Phase 7: Backend, Auth, and Sync | Pending |
 
 **Coverage:**
 - v1 requirements: 62 total
@@ -173,4 +173,4 @@ Deferred to future release. Tracked but not in current roadmap.
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-07 after initial definition*
+*Last updated: 2026-03-07 after roadmap creation*
