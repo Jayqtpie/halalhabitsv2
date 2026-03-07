@@ -32,12 +32,16 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Every screen in the app has a written spec with purpose, components, interactions, animation notes, and edge states
   4. The data model defines every entity, relationship, and privacy classification (private vs syncable)
   5. Adab safety rails are documented with specific copy examples showing what language is and is not acceptable
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- [ ] 01-01: TBD
-- [ ] 01-02: TBD
-- [ ] 01-03: TBD
+- [ ] 01-01-PLAN.md — Executive vision, player fantasy, and Game Design Bible (foundation sections)
+- [ ] 01-02-PLAN.md — Worldbuilding/lore framework and feature systems detailed specs
+- [ ] 01-03-PLAN.md — Information architecture and screen-by-screen product spec (14+ screens)
+- [ ] 01-04-PLAN.md — UI design tokens, sound/haptics direction, and tech architecture
+- [ ] 01-05-PLAN.md — Data model and API contract with privacy classifications
+- [ ] 01-06-PLAN.md — Telemetry plan, QA/balance plan, and delivery roadmap
+- [ ] 01-07-PLAN.md — Content pack (130+ copy strings) and final build handoff
 
 ### Phase 2: Foundation and Data Layer
 **Goal**: A running Expo app with navigation, local persistence, state management, and privacy boundaries -- the skeleton everything else plugs into
@@ -144,7 +148,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Master Blueprint | 0/3 | Not started | - |
+| 1. Master Blueprint | 0/7 | Planning complete | - |
 | 2. Foundation and Data Layer | 0/3 | Not started | - |
 | 3. Core Habit Loop | 0/3 | Not started | - |
 | 4. Game Engine and Progression | 0/2 | Not started | - |
