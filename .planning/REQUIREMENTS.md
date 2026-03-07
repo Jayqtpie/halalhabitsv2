@@ -20,11 +20,11 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **BLUE-09**: Sound and haptic direction (sound identity, event map, haptic rules, audio boundaries, focus mode)
 - [ ] **BLUE-10**: Greenfield tech architecture (frontend, backend, data, auth, sync, analytics, notifications, offline, config)
 - [ ] **BLUE-11**: Data model and API contract (entities, relationships, versioning, migration, privacy boundaries, endpoints, schemas)
-- [ ] **BLUE-12**: Telemetry and experimentation plan (privacy-safe events, north-star metric, retention metrics, burnout indicators, A/B tests, anti-metric traps)
-- [ ] **BLUE-13**: QA and balance plan (test strategy, XP/streak simulation, timezone edge cases, exploit testing, accessibility QA, content sensitivity checklist)
-- [ ] **BLUE-14**: Delivery roadmap (Phase 0-4 with deliverables, dependencies, risks, staffing, definition of done)
-- [ ] **BLUE-15**: Content pack (40 microcopy, 20 quest lines, 20 boss encounters, 20 mercy mode, 10 Friday power-ups, 20 notification templates)
-- [ ] **BLUE-16**: Final build handoff (founder brief, task tree, 14-day checklist, 30-day emergency cut plan, top 10 failure risks)
+- [x] **BLUE-12**: Telemetry and experimentation plan (privacy-safe events, north-star metric, retention metrics, burnout indicators, A/B tests, anti-metric traps)
+- [x] **BLUE-13**: QA and balance plan (test strategy, XP/streak simulation, timezone edge cases, exploit testing, accessibility QA, content sensitivity checklist)
+- [x] **BLUE-14**: Delivery roadmap (Phase 0-4 with deliverables, dependencies, risks, staffing, definition of done)
+- [x] **BLUE-15**: Content pack (40 microcopy, 20 quest lines, 20 boss encounters, 20 mercy mode, 10 Friday power-ups, 20 notification templates)
+- [x] **BLUE-16**: Final build handoff (founder brief, task tree, 14-day checklist, 30-day emergency cut plan, top 10 failure risks)
 
 ### Foundation
 
