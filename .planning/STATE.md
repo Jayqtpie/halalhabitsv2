@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-stopped_at: Phase 1 context gathered
-last_updated: "2026-03-07T05:33:41.599Z"
-last_activity: 2026-03-07 -- Roadmap created with 7 phases covering 62 requirements
+status: executing
+stopped_at: Phase 1 Wave 1 complete (plans 01-01, 01-02 done)
+last_updated: "2026-03-07T16:00:00.000Z"
+last_activity: 2026-03-07 -- Wave 1 complete (5 blueprint sections written and committed)
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 7
+  completed_plans: 2
+  percent: 4
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 1 of 7 (Master Blueprint)
-Plan: 0 of 3 in current phase
-Status: Ready to plan
-Last activity: 2026-03-07 -- Roadmap created with 7 phases covering 62 requirements
+Plan: 2 of 7 in current phase (Wave 1 complete)
+Status: Executing — Wave 2 next
+Last activity: 2026-03-07 -- Wave 1 complete (sections 01-05 written)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 4%
 
 ## Performance Metrics
 
@@ -61,6 +61,13 @@ Recent decisions affecting current work:
 - Blueprint-first approach chosen: 16-section design doc before code ensures coherent game design
 - Effort-based XP (not outcome-based): rewards discipline, not perceived piety
 - Local-first worship data: privacy is architectural, not policy
+- XP formula: 40 × level^1.85 — fast early wins, logarithmic long tail
+- Streak multiplier: 1.0x base, +0.1x/day, cap 3.0x per habit
+- Soft daily XP cap at ~500 XP (50% diminishing returns, invisible)
+- Level 5 by week 1, Level 20 by month 2-3, Level 100 aspirational (years)
+- 4 HUD environments: Quiet Study → Growing Garden → Scholar's Courtyard → Living Sanctuary
+- 26 Identity Titles: 10 Common, 10 Rare, 6 Legendary
+- Mercy Mode partial streak credit: 25% of pre-break streak on recovery
 
 ### Pending Todos
 
@@ -74,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-07T05:33:41.597Z
-Stopped at: Phase 1 context gathered
-Resume file: .planning/phases/01-master-blueprint/01-CONTEXT.md
+Last session: 2026-03-07T16:00:00.000Z
+Stopped at: Phase 1 Wave 1 complete — ready for Wave 2
+Resume file: .planning/phases/01-master-blueprint/01-01-SUMMARY.md
