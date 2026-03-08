@@ -56,7 +56,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md — Expo scaffold, design tokens, and i18n infrastructure
+- [x] 02-01-PLAN.md — Expo scaffold, design tokens, and i18n infrastructure (completed 2026-03-08)
 - [ ] 02-02-PLAN.md — SQLite schema with Drizzle ORM, DAO/repository layer, and Privacy Gate
 - [ ] 02-03-PLAN.md — Zustand stores, tab navigation with custom pixel tab bar, and visual spikes
 
@@ -149,7 +149,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Master Blueprint | 7/7 | Complete   | 2026-03-07 |
-| 2. Foundation and Data Layer | 0/3 | Not started | - |
+| 2. Foundation and Data Layer | 1/3 | In progress | - |
 | 3. Core Habit Loop | 0/3 | Not started | - |
 | 4. Game Engine and Progression | 0/2 | Not started | - |
 | 5. HUD, Visual Identity, and Muhasabah | 0/2 | Not started | - |

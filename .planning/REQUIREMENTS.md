@@ -28,13 +28,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Foundation
 
-- [ ] **FOUN-01**: Expo project scaffold with development builds (not Expo Go) and EAS Build pipeline
+- [x] **FOUN-01**: Expo project scaffold with development builds (not Expo Go) and EAS Build pipeline
 - [ ] **FOUN-02**: Expo Router navigation structure with tab-based layout
 - [ ] **FOUN-03**: SQLite database schema with migrations for habits, completions, streaks, XP, titles, quests, muhasabah
 - [ ] **FOUN-04**: Zustand state management with domain-split stores (habits, game, ui, settings)
 - [ ] **FOUN-05**: Privacy Gate module classifying data as private (device-only) vs syncable
-- [ ] **FOUN-06**: Design token system (colors, typography, spacing, 16-bit aesthetic tokens)
-- [ ] **FOUN-07**: i18n infrastructure (i18next) for future RTL/Arabic support
+- [x] **FOUN-06**: Design token system (colors, typography, spacing, 16-bit aesthetic tokens)
+- [x] **FOUN-07**: i18n infrastructure (i18next) for future RTL/Arabic support
 
 ### Habit Tracking
 
