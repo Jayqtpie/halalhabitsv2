@@ -2,7 +2,7 @@
 phase: 2
 slug: foundation-and-data-layer
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-03-08
 ---
@@ -38,13 +38,14 @@ created: 2026-03-08
 
 | Task ID | Plan | Wave | Requirement | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|-----------|-------------------|-------------|--------|
-| 02-01-01 | 01 | 0 | FOUN-01 | smoke | `npx expo export --platform web` | ❌ W0 | ⬜ pending |
-| 02-01-02 | 01 | 0 | FOUN-03 | unit | `npx jest --testPathPattern=database --no-coverage` | ❌ W0 | ⬜ pending |
-| 02-01-03 | 01 | 0 | FOUN-05 | unit | `npx jest --testPathPattern=privacy --no-coverage` | ❌ W0 | ⬜ pending |
-| 02-01-04 | 01 | 0 | FOUN-04 | unit | `npx jest --testPathPattern=stores --no-coverage` | ❌ W0 | ⬜ pending |
-| 02-01-05 | 01 | 0 | FOUN-06 | unit | `npx jest --testPathPattern=tokens --no-coverage` | ❌ W0 | ⬜ pending |
-| 02-01-06 | 01 | 0 | FOUN-07 | unit | `npx jest --testPathPattern=i18n --no-coverage` | ❌ W0 | ⬜ pending |
-| 02-02-01 | 02 | 1 | FOUN-02 | unit | `npx jest --testPathPattern=tabs --no-coverage` | ❌ W0 | ⬜ pending |
+| 02-01-T1 | 01 | 1 | FOUN-01 | smoke | `npx expo export --platform web` | ❌ W0 | ⬜ pending |
+| 02-01-T2 | 01 | 1 | FOUN-06 | unit | `npx jest --testPathPattern=tokens --no-coverage` | ❌ W0 | ⬜ pending |
+| 02-01-T3 | 01 | 1 | FOUN-07 | unit | `npx jest --testPathPattern=i18n --no-coverage` | ❌ W0 | ⬜ pending |
+| 02-02-T1 | 02 | 2 | FOUN-03 | unit | `npx jest --testPathPattern=database --no-coverage` | ❌ W0 | ⬜ pending |
+| 02-02-T2 | 02 | 2 | FOUN-05 | unit | `npx jest --testPathPattern=privacy --no-coverage` | ❌ W0 | ⬜ pending |
+| 02-03-T1 | 03 | 3 | FOUN-04 | unit | `npx jest --testPathPattern=stores --no-coverage` | ❌ W0 | ⬜ pending |
+| 02-03-T2 | 03 | 3 | FOUN-02 | unit | `npx jest --testPathPattern=tabs --no-coverage` | ❌ W0 | ⬜ pending |
+| 02-03-T3 | 03 | 3 | — | checkpoint | checkpoint:human-verify | N/A | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -53,11 +54,11 @@ created: 2026-03-08
 ## Wave 0 Requirements
 
 - [ ] `jest.config.js` — Jest configuration for Expo + TypeScript
-- [ ] `tests/db/database.test.ts` — stubs for FOUN-03 (schema creation, migrations)
-- [ ] `tests/services/privacy-gate.test.ts` — stubs for FOUN-05 (classification, blocking)
-- [ ] `tests/stores/stores.test.ts` — stubs for FOUN-04 (store initialization)
-- [ ] `tests/tokens/tokens.test.ts` — stubs for FOUN-06 (token completeness)
-- [ ] `tests/i18n/i18n.test.ts` — stubs for FOUN-07 (initialization, key resolution)
+- [ ] `__tests__/db/database.test.ts` — stubs for FOUN-03 (schema creation, migrations)
+- [ ] `__tests__/services/privacy-gate.test.ts` — stubs for FOUN-05 (classification, blocking)
+- [ ] `__tests__/stores/stores.test.ts` — stubs for FOUN-04 (store initialization)
+- [ ] `__tests__/tokens/tokens.test.ts` — stubs for FOUN-06 (token completeness)
+- [ ] `__tests__/i18n/i18n.test.ts` — stubs for FOUN-07 (initialization, key resolution)
 - [ ] `npm install -D jest @testing-library/react-native @testing-library/jest-native jest-expo` — test framework install
 
 ---
