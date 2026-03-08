@@ -1,0 +1,24 @@
+{
+  "app": {
+    "name": "HalalHabits",
+    "tagline": "Your discipline grows stronger"
+  },
+  "tabs": {
+    "home": "Home",
+    "habits": "Habits",
+    "quests": "Quests",
+    "profile": "Profile"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete"
+  },
+  "placeholder": {
+    "comingSoon": "Coming in a future update",
+    "phaseIndicator": "Phase {{phase}}"
+  }
+}
