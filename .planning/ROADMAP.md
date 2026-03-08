@@ -53,12 +53,12 @@ Plans:
   3. Data written to SQLite persists across app restarts with no data loss
   4. The Privacy Gate correctly classifies sample data and blocks private data from the sync-eligible path
   5. Design tokens render the 16-bit aesthetic (colors, typography, spacing) consistently across screens
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: TBD
-- [ ] 02-02: TBD
-- [ ] 02-03: TBD
+- [ ] 02-01-PLAN.md — Expo scaffold, design tokens, and i18n infrastructure
+- [ ] 02-02-PLAN.md — SQLite schema with Drizzle ORM, DAO/repository layer, and Privacy Gate
+- [ ] 02-03-PLAN.md — Zustand stores, tab navigation with custom pixel tab bar, and visual spikes
 
 ### Phase 3: Core Habit Loop
 **Goal**: Users can track Islamic habits daily, see prayer-aware time windows, build streaks, and recover compassionately when they miss -- the complete daily discipline loop
