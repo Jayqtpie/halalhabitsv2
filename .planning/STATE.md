@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: in-progress
-stopped_at: Completed 02-02-PLAN.md
-last_updated: "2026-03-08T21:11:22.910Z"
-last_activity: 2026-03-08 -- Plan 02-02 complete (database schema, repos, privacy gate)
+status: planning
+stopped_at: Phase 3 context gathered
+last_updated: "2026-03-09T03:03:55.709Z"
+last_activity: 2026-03-09 -- Phase 2 complete, font/theme decisions made
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 10
-  completed_plans: 9
-  percent: 90
+  completed_plans: 10
+  percent: 100
 ---
 
 # Project State
@@ -21,39 +21,36 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Phase 2: Foundation & Data Layer
+**Current focus:** Phase 3: Core Habit Loop
 
 ## Current Position
 
-Phase: 2 of 7 (Foundation & Data Layer)
-Plan: 2 of 3 in current phase (wave 2 complete)
-Status: Plan 02-02 complete -- ready for Plan 02-03 (Zustand Stores)
-Last activity: 2026-03-08 -- Plan 02-02 complete (database schema, repos, privacy gate)
+Phase: 2 of 7 complete (Foundation & Data Layer)
+Next: Phase 3 (Core Habit Loop)
+Status: Phase 2 fully complete -- ready to plan Phase 3
+Last activity: 2026-03-09 -- Phase 2 complete, font/theme decisions made
 
-Progress: [█████████░] 90% overall (Phase 1 complete + Phase 2 Plan 2 of 3)
+Progress: [██████████] 100% of phases 1-2
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 9min
-- Total execution time: 0.15 hours
+- Total plans completed: 10
+- Total execution time: ~1.5 hours
 
 **By Phase:**
 
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| Phase 02 | 1/3 | 9min | 9min |
-
-**Recent Trend:**
-- Last 5 plans: 9min
-- Trend: --
+| Phase | Plans | Status |
+|-------|-------|--------|
+| Phase 01 | 7/7 | Complete |
+| Phase 02 | 3/3 | Complete |
 
 *Updated after each plan completion*
+| Phase 02 P03 | ~30min | 3 tasks | 15+ files |
+| Phase 02 P02 | 5min | 2 tasks | 15 files |
 | Phase 02 P01 | 9min | 3 tasks | 27 files |
 | Phase 01 P07 | 6min | 2 tasks | 2 files |
 | Phase 01 P06 | 6min | 2 tasks | 3 files |
-| Phase 02 P02 | 5min | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -80,9 +77,11 @@ Recent decisions affecting current work:
 - MVP cut plan: habits + prayer + streaks + XP (priorities 1-2); recommended minimum adds Mercy Mode + Quests + Titles (1-5)
 - Used root app/ directory for expo-router (standard convention)
 - Two-tier token system (palette primitives + dark/light semantic) per user decision
-- Downloaded Inter OTF from GitHub as font files
 - [Phase 02]: Kept Drizzle-generated migration filename (0000_dark_mandrill.sql) -- journal references exact name
 - [Phase 02]: ISO 8601 text strings for all datetime columns in SQLite schema
+- [Phase 02]: Press Start 2P for all headings (pixel aesthetic beyond HUD)
+- [Phase 02]: Dark-only for v1 (light theme tokens kept but unused)
+- [Phase 02]: SDK 54 for Expo Go compatibility (user has iPhone, no Apple Dev account)
 
 ### Pending Todos
 
@@ -90,12 +89,11 @@ None yet.
 
 ### Blockers/Concerns
 
-- WatermelonDB vs expo-sqlite decision unresolved (research disagreed; needs spike in Phase 2)
 - Pixel art asset pipeline not researched (sprite sheets, Arabic pixel fonts, Skia patterns)
-- Adab Copy Guide now exists in blueprint/15-content-pack.md (12 do/don't pairs with reasoning)
+- Success criterion "app builds via EAS Build (not Expo Go)" not yet met — using Expo Go on SDK 54 for now
 
 ## Session Continuity
 
-Last session: 2026-03-08T21:11:22.907Z
-Stopped at: Completed 02-02-PLAN.md
-Resume file: None
+Last session: 2026-03-09T03:03:55.706Z
+Stopped at: Phase 3 context gathered
+Resume file: .planning/phases/03-core-habit-loop/03-CONTEXT.md
