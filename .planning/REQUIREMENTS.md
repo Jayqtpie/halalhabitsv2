@@ -54,10 +54,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Streaks and Recovery
 
-- [ ] **STRK-01**: User can see current streak count for each habit and overall
-- [ ] **STRK-02**: Salah Streak Shield protects streak when prayer is completed within its time window
-- [ ] **STRK-03**: Mercy Mode activates on streak break with compassionate recovery path (not shame)
-- [ ] **STRK-04**: User can recover streak through Mercy Mode completion tasks
+- [x] **STRK-01**: User can see current streak count for each habit and overall
+- [x] **STRK-02**: Salah Streak Shield protects streak when prayer is completed within its time window
+- [x] **STRK-03**: Mercy Mode activates on streak break with compassionate recovery path (not shame)
+- [x] **STRK-04**: User can recover streak through Mercy Mode completion tasks
 - [ ] **STRK-05**: Streak display frames consistency as "momentum" not "perfection"
 
 ### Game Engine

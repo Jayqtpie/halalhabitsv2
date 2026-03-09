@@ -13,7 +13,7 @@ HalalHabits ships in two milestones. First, a 16-section Master Blueprint docume
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Master Blueprint** - Complete 16-section design document that makes every app-build decision upfront (completed 2026-03-07)
-- [ ] **Phase 2: Foundation and Data Layer** - Expo scaffold, navigation, SQLite persistence, state management, privacy boundaries, and design tokens
+- [x] **Phase 2: Foundation and Data Layer** - Expo scaffold, navigation, SQLite persistence, state management, privacy boundaries, and design tokens (completed 2026-03-09)
 - [ ] **Phase 3: Core Habit Loop** - Habit tracking, prayer time integration, streaks, and Mercy Mode recovery -- the product's reason to exist
 - [ ] **Phase 4: Game Engine and Progression** - XP system, leveling, Identity Titles, Quest Board, and balanced game economy
 - [ ] **Phase 5: HUD, Visual Identity, and Muhasabah** - 16-bit Home HUD with Skia rendering, animations, haptics, and nightly reflection
@@ -57,8 +57,8 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md — Expo scaffold, design tokens, and i18n infrastructure (completed 2026-03-08)
-- [ ] 02-02-PLAN.md — SQLite schema with Drizzle ORM, DAO/repository layer, and Privacy Gate
-- [ ] 02-03-PLAN.md — Zustand stores, tab navigation with custom pixel tab bar, and visual spikes
+- [x] 02-02-PLAN.md — SQLite schema with Drizzle ORM, DAO/repository layer, and Privacy Gate (completed 2026-03-08)
+- [x] 02-03-PLAN.md — Zustand stores, tab navigation with custom pixel tab bar, and visual spikes (completed 2026-03-09)
 
 ### Phase 3: Core Habit Loop
 **Goal**: Users can track Islamic habits daily, see prayer-aware time windows, build streaks, and recover compassionately when they miss -- the complete daily discipline loop
@@ -149,7 +149,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Master Blueprint | 7/7 | Complete   | 2026-03-07 |
-| 2. Foundation and Data Layer | 1/3 | In progress | - |
+| 2. Foundation and Data Layer | 3/3 | Complete | 2026-03-09 |
 | 3. Core Habit Loop | 0/3 | Not started | - |
 | 4. Game Engine and Progression | 0/2 | Not started | - |
 | 5. HUD, Visual Identity, and Muhasabah | 0/2 | Not started | - |
