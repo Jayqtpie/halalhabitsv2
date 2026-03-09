@@ -26,9 +26,10 @@ import { colors, typography, spacing } from '../../tokens';
 
 interface HabitListProps {
   userId: string;
+  onLongPressHabit?: (habitId: string) => void;
 }
 
-export function HabitList({ userId }: HabitListProps) {
+export function HabitList({ userId, onLongPressHabit }: HabitListProps) {
   const { loading, habits } = useHabitStore(
     useShallow((s) => ({ loading: s.loading, habits: s.habits })),
   );
@@ -51,9 +52,13 @@ export function HabitList({ userId }: HabitListProps) {
 
   const renderItem = useCallback(
     ({ item }: { item: HabitWithStatus }) => (
-      <HabitCard habit={item} onComplete={handleComplete} />
+      <HabitCard
+        habit={item}
+        onComplete={handleComplete}
+        onLongPress={onLongPressHabit}
+      />
     ),
-    [handleComplete],
+    [handleComplete, onLongPressHabit],
   );
 
   const keyExtractor = useCallback((item: HabitWithStatus) => item.id, []);
