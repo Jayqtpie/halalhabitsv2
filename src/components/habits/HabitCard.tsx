@@ -1,0 +1,280 @@
+/**
+ * HabitCard -- individual habit card with icon, name, streak, time window,
+ * and tap-to-complete button.
+ *
+ * Completion triggers a scale pulse on the checkmark, a brief emerald glow
+ * on the card border, and haptic feedback (if enabled in settings).
+ *
+ * Completed cards show a dimmed state. Streak uses "momentum" framing per
+ * STRK-05 (never "streak" or "perfection").
+ *
+ * Prayer time windows are informational only -- users can always complete.
+ */
+import React, { useCallback } from 'react';
+import {
+  Text,
+  StyleSheet,
+  Pressable,
+  View,
+  AccessibilityInfo,
+} from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSequence,
+  withTiming,
+  withSpring,
+  FadeIn,
+  FadeOut,
+  Layout,
+} from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
+import { useSettingsStore } from '../../stores/settingsStore';
+import type { HabitWithStatus } from '../../types/habits';
+import { colors, palette, typography, spacing, radius, duration } from '../../tokens';
+
+interface HabitCardProps {
+  habit: HabitWithStatus;
+  onComplete: (habitId: string) => void;
+}
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+export function HabitCard({ habit, onComplete }: HabitCardProps) {
+  const hapticEnabled = useSettingsStore((s) => s.hapticEnabled);
+  const completed = habit.completedToday;
+
+  // ── Animations ──────────────────────────────────────────────────────
+  const checkScale = useSharedValue(1);
+  const glowOpacity = useSharedValue(0);
+
+  const checkAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: checkScale.value }],
+  }));
+
+  const glowAnimatedStyle = useAnimatedStyle(() => ({
+    borderColor: `rgba(13, 124, 61, ${glowOpacity.value})`,
+    borderWidth: glowOpacity.value > 0 ? 2 : 1,
+  }));
+
+  const handleComplete = useCallback(() => {
+    if (completed) return;
+
+    // Scale pulse on checkmark: 1.0 -> 1.3 -> 1.0
+    checkScale.value = withSequence(
+      withSpring(1.3, { damping: 8, stiffness: 300 }),
+      withSpring(1.0, { damping: 12, stiffness: 200 }),
+    );
+
+    // Brief emerald glow on card border
+    glowOpacity.value = withSequence(
+      withTiming(0.8, { duration: duration.fast }),
+      withTiming(0, { duration: duration.normal }),
+    );
+
+    // Haptic pulse
+    if (hapticEnabled) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+
+    onComplete(habit.id);
+  }, [completed, hapticEnabled, habit.id, onComplete, checkScale, glowOpacity]);
+
+  // ── Prayer Window Badge ─────────────────────────────────────────────
+  const renderPrayerBadge = () => {
+    if (!habit.prayerWindow) return null;
+    const { status } = habit.prayerWindow;
+
+    const badgeStyles = {
+      active: { color: palette['emerald-400'], label: 'Active' },
+      upcoming: { color: palette['sapphire-400'], label: 'Upcoming' },
+      passed: { color: colors.dark.textMuted, label: 'Passed' },
+    };
+
+    const badge = badgeStyles[status];
+
+    return (
+      <View style={styles.prayerBadge}>
+        <View style={[styles.statusDot, { backgroundColor: badge.color }]} />
+        <Text style={[styles.prayerStatus, { color: badge.color }]}>
+          {badge.label}
+        </Text>
+      </View>
+    );
+  };
+
+  // ── Streak Display ──────────────────────────────────────────────────
+  const renderStreak = () => {
+    const count = habit.streak?.currentCount ?? 0;
+    if (count === 0) return null;
+
+    return (
+      <Text style={styles.streakText}>
+        {count}-day momentum
+      </Text>
+    );
+  };
+
+  // ── Prayer Time Window Line ─────────────────────────────────────────
+  const renderTimeWindow = () => {
+    if (!habit.prayerWindow) return null;
+    const { displayName, start, end } = habit.prayerWindow;
+    const fmt = (d: Date) =>
+      d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+    return (
+      <Text style={styles.timeWindow}>
+        {displayName} -- {fmt(start)} - {fmt(end)}
+      </Text>
+    );
+  };
+
+  return (
+    <AnimatedPressable
+      entering={FadeIn.duration(duration.normal)}
+      exiting={FadeOut.duration(duration.fast)}
+      layout={Layout.springify()}
+      style={[
+        styles.card,
+        completed && styles.cardCompleted,
+        glowAnimatedStyle,
+      ]}
+      onPress={handleComplete}
+      accessibilityRole="button"
+      accessibilityLabel={`${habit.name}${completed ? ', completed' : ''}`}
+      accessibilityHint={completed ? undefined : 'Double tap to complete this habit'}
+    >
+      {/* Left: Icon */}
+      <View style={styles.iconContainer}>
+        <Text style={styles.icon}>{habit.icon || '+'}</Text>
+      </View>
+
+      {/* Center: Name, time window, streak */}
+      <View style={styles.centerContent}>
+        <Text
+          style={[styles.habitName, completed && styles.textCompleted]}
+          numberOfLines={1}
+        >
+          {habit.name}
+        </Text>
+        {renderTimeWindow()}
+        <View style={styles.metaRow}>
+          {renderPrayerBadge()}
+          {renderStreak()}
+        </View>
+      </View>
+
+      {/* Right: Completion circle */}
+      <Animated.View style={[styles.checkContainer, checkAnimatedStyle]}>
+        <View
+          style={[
+            styles.checkCircle,
+            completed && styles.checkCircleComplete,
+          ]}
+        >
+          {completed && <Text style={styles.checkMark}>{'✓'}</Text>}
+        </View>
+      </Animated.View>
+    </AnimatedPressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.dark.surface,
+    borderRadius: radius.lg,
+    borderWidth: 1,
+    borderColor: colors.dark.border,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    marginHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    minHeight: 72,
+  },
+  cardCompleted: {
+    opacity: 0.55,
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: radius.md,
+    backgroundColor: colors.dark.backgroundDeep,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.sm,
+  },
+  icon: {
+    fontSize: 20,
+  },
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  habitName: {
+    fontSize: typography.bodyLg.fontSize,
+    lineHeight: typography.bodyLg.lineHeight,
+    fontFamily: typography.bodyLg.fontFamily,
+    fontWeight: '600',
+    color: colors.dark.textPrimary,
+  },
+  textCompleted: {
+    color: colors.dark.textMuted,
+  },
+  timeWindow: {
+    fontSize: typography.caption.fontSize,
+    lineHeight: typography.caption.lineHeight,
+    fontFamily: typography.caption.fontFamily,
+    color: colors.dark.textMuted,
+    marginTop: 2,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: spacing.xs,
+    gap: spacing.sm,
+  },
+  prayerBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: radius.full,
+  },
+  prayerStatus: {
+    fontSize: typography.caption.fontSize,
+    lineHeight: typography.caption.lineHeight,
+    fontFamily: typography.caption.fontFamily,
+  },
+  streakText: {
+    fontSize: typography.caption.fontSize,
+    lineHeight: typography.caption.lineHeight,
+    fontFamily: typography.caption.fontFamily,
+    color: colors.dark.xp,
+  },
+  checkContainer: {
+    marginLeft: spacing.sm,
+  },
+  checkCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: radius.full,
+    borderWidth: 2,
+    borderColor: colors.dark.textMuted,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkCircleComplete: {
+    backgroundColor: colors.dark.success,
+    borderColor: colors.dark.success,
+  },
+  checkMark: {
+    color: colors.dark.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+});
