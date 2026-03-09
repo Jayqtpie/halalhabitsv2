@@ -36,11 +36,12 @@ import { colors, palette, typography, spacing, radius, duration } from '../../to
 interface HabitCardProps {
   habit: HabitWithStatus;
   onComplete: (habitId: string) => void;
+  onLongPress?: (habitId: string) => void;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export function HabitCard({ habit, onComplete }: HabitCardProps) {
+export function HabitCard({ habit, onComplete, onLongPress }: HabitCardProps) {
   const hapticEnabled = useSettingsStore((s) => s.hapticEnabled);
   const completed = habit.completedToday;
 
@@ -79,6 +80,15 @@ export function HabitCard({ habit, onComplete }: HabitCardProps) {
 
     onComplete(habit.id);
   }, [completed, hapticEnabled, habit.id, onComplete, checkScale, glowOpacity]);
+
+  const handleLongPress = useCallback(() => {
+    if (onLongPress) {
+      if (hapticEnabled) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+      }
+      onLongPress(habit.id);
+    }
+  }, [hapticEnabled, habit.id, onLongPress]);
 
   // ── Prayer Window Badge ─────────────────────────────────────────────
   const renderPrayerBadge = () => {
@@ -140,6 +150,7 @@ export function HabitCard({ habit, onComplete }: HabitCardProps) {
         glowAnimatedStyle,
       ]}
       onPress={handleComplete}
+      onLongPress={handleLongPress}
       accessibilityRole="button"
       accessibilityLabel={`${habit.name}${completed ? ', completed' : ''}`}
       accessibilityHint={completed ? undefined : 'Double tap to complete this habit'}
