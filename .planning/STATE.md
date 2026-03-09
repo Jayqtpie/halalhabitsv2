@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 03-02-PLAN.md (Streak Engine)
-last_updated: "2026-03-09T07:38:27.179Z"
-last_activity: 2026-03-09 -- Phase 2 complete, font/theme decisions made
+stopped_at: Completed 03-03-PLAN.md (Data Wiring - Repos + Store Orchestration)
+last_updated: "2026-03-09T20:33:00.000Z"
+last_activity: 2026-03-09 -- Phase 3 plans 01, 02, and 03 complete
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 16
-  completed_plans: 11
-  percent: 100
+  completed_plans: 13
+  percent: 81
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 3 of 7 in progress (Core Habit Loop)
-Current Plan: 2 of 6 complete
-Status: Executing Phase 3 -- streak engine complete
-Last activity: 2026-03-09 -- Completed 03-02 streak engine (TDD)
+Current Plan: 3 of 6 complete (Plans 01 + 02 + 03)
+Status: Executing Phase 3 -- data wiring layer complete
+Last activity: 2026-03-09 -- Completed 03-03 data wiring (repos + habitStore orchestration)
 
-Progress: [███████░░░] 69% of all plans (11/16)
+Progress: [████████░░] 81% of all plans (13/16)
 
 ## Performance Metrics
 
@@ -51,7 +51,9 @@ Progress: [███████░░░] 69% of all plans (11/16)
 | Phase 02 P01 | 9min | 3 tasks | 27 files |
 | Phase 01 P07 | 6min | 2 tasks | 2 files |
 | Phase 01 P06 | 6min | 2 tasks | 3 files |
+| Phase 03 P01 | 5min | 3 tasks | 10 files |
 | Phase 03 P02 | 2min | 2 tasks | 2 files |
+| Phase 03 P03 | 5min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -84,6 +86,11 @@ Recent decisions affecting current work:
 - [Phase 02]: Dark-only for v1 (light theme tokens kept but unused)
 - [Phase 02]: SDK 54 for Expo Go compatibility (user has iPhone, no Apple Dev account)
 - [Phase 03]: Types defined locally in streak-engine.ts pending Plan 01 consolidation
+- [Phase 03]: Fajr gets highest salah XP (50) due to difficulty of waking early
+- [Phase 03]: Contiguous prayer windows -- each prayer ends when next begins, Isha ends at next Fajr
+- [Phase 03]: 4-group habit sort -- uncompleted salah, uncompleted other, completed salah, completed other
+- [Phase 03]: Mercy Mode persisted as individual columns (mercyRecoveryDay, preBreakStreak) not JSON blob
+- [Phase 03]: Store-repo-engine pattern -- store orchestrates repos for DB and domain engine for logic
 
 ### Pending Todos
 
@@ -96,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-09T07:38:27.176Z
-Stopped at: Completed 03-02-PLAN.md (Streak Engine)
+Last session: 2026-03-09T20:33:00.000Z
+Stopped at: Completed 03-03-PLAN.md (Data Wiring - Repos + Store Orchestration)
 Resume file: None

@@ -40,10 +40,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [ ] **HBIT-01**: User can create habits from preset Islamic library (5 salah, Quran reading, dhikr, fasting, dua)
 - [ ] **HBIT-02**: User can create custom habits with name, frequency, and optional time window
-- [ ] **HBIT-03**: User can complete a habit with single-tap check-in
+- [x] **HBIT-03**: User can complete a habit with single-tap check-in
 - [ ] **HBIT-04**: User can view daily habit list with completion status
 - [ ] **HBIT-05**: User can edit or archive habits
-- [ ] **HBIT-06**: User can view habit history in calendar/heatmap view
+- [x] **HBIT-06**: User can view habit history in calendar/heatmap view
 
 ### Prayer Integration
 
