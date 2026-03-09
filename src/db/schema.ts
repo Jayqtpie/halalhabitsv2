@@ -73,6 +73,8 @@ export const streaks = sqliteTable('streaks', {
   multiplier: real('multiplier').notNull().default(1.0),
   isRebuilt: integer('is_rebuilt', { mode: 'boolean' }).notNull().default(false),
   rebuiltAt: text('rebuilt_at'),
+  mercyRecoveryDay: integer('mercy_recovery_day').notNull().default(0),
+  preBreakStreak: integer('pre_break_streak').notNull().default(0),
   updatedAt: text('updated_at').notNull(),
 }, (table) => ([
   uniqueIndex('idx_streak_habit').on(table.habitId),

@@ -9,3 +9,5 @@ export { habitRepo } from './habitRepo';
 export { xpRepo } from './xpRepo';
 export { questRepo } from './questRepo';
 export { settingsRepo } from './settingsRepo';
+export { completionRepo } from './completionRepo';
+export { streakRepo } from './streakRepo';

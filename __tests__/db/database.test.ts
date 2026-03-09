@@ -114,6 +114,8 @@ describe('Database Schema', () => {
       expect(cols).toHaveProperty('multiplier');
       expect(cols).toHaveProperty('isRebuilt');
       expect(cols).toHaveProperty('rebuiltAt');
+      expect(cols).toHaveProperty('mercyRecoveryDay');
+      expect(cols).toHaveProperty('preBreakStreak');
       expect(cols).toHaveProperty('updatedAt');
     });
   });
