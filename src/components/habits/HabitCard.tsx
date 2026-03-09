@@ -30,6 +30,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useSettingsStore } from '../../stores/settingsStore';
+import { PrayerTimeWindow } from '../prayer/PrayerTimeWindow';
 import type { HabitWithStatus } from '../../types/habits';
 import { colors, palette, typography, spacing, radius, duration } from '../../tokens';
 
@@ -90,54 +91,17 @@ export function HabitCard({ habit, onComplete, onLongPress }: HabitCardProps) {
     }
   }, [hapticEnabled, habit.id, onLongPress]);
 
-  // ── Prayer Window Badge ─────────────────────────────────────────────
-  const renderPrayerBadge = () => {
-    if (!habit.prayerWindow) return null;
-    const { status } = habit.prayerWindow;
-
-    const badgeStyles = {
-      active: { color: palette['emerald-400'], label: 'Active' },
-      upcoming: { color: palette['sapphire-400'], label: 'Upcoming' },
-      passed: { color: colors.dark.textMuted, label: 'Passed' },
-    };
-
-    const badge = badgeStyles[status];
-
-    return (
-      <View style={styles.prayerBadge}>
-        <View style={[styles.statusDot, { backgroundColor: badge.color }]} />
-        <Text style={[styles.prayerStatus, { color: badge.color }]}>
-          {badge.label}
-        </Text>
-      </View>
-    );
-  };
-
   // ── Streak Display ──────────────────────────────────────────────────
-  const renderStreak = () => {
-    const count = habit.streak?.currentCount ?? 0;
-    if (count === 0) return null;
+  const streakCount = habit.streak?.currentCount ?? 0;
 
-    return (
-      <Text style={styles.streakText}>
-        {count}-day momentum
-      </Text>
-    );
-  };
-
-  // ── Prayer Time Window Line ─────────────────────────────────────────
-  const renderTimeWindow = () => {
-    if (!habit.prayerWindow) return null;
-    const { displayName, start, end } = habit.prayerWindow;
-    const fmt = (d: Date) =>
-      d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-
-    return (
-      <Text style={styles.timeWindow}>
-        {displayName} -- {fmt(start)} - {fmt(end)}
-      </Text>
-    );
-  };
+  /**
+   * Streak Shield: purely visual indicator shown when a salah habit is
+   * completed within its prayer window. XP bonus calculation is Phase 4.
+   */
+  const showStreakShield =
+    completed &&
+    habit.prayerWindow?.status === 'active' &&
+    habit.type === 'salah';
 
   return (
     <AnimatedPressable
@@ -168,10 +132,19 @@ export function HabitCard({ habit, onComplete, onLongPress }: HabitCardProps) {
         >
           {habit.name}
         </Text>
-        {renderTimeWindow()}
+        <PrayerTimeWindow prayerWindow={habit.prayerWindow} />
         <View style={styles.metaRow}>
-          {renderPrayerBadge()}
-          {renderStreak()}
+          {streakCount > 0 && (
+            <Text style={styles.streakText}>
+              {streakCount}-day momentum
+            </Text>
+          )}
+          {showStreakShield && (
+            <View style={styles.shieldBadge}>
+              <Text style={styles.shieldIcon}>{'🛡️'}</Text>
+              <Text style={styles.shieldText}>Streak Shield</Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -233,39 +206,31 @@ const styles = StyleSheet.create({
   textCompleted: {
     color: colors.dark.textMuted,
   },
-  timeWindow: {
-    fontSize: typography.caption.fontSize,
-    lineHeight: typography.caption.lineHeight,
-    fontFamily: typography.caption.fontFamily,
-    color: colors.dark.textMuted,
-    marginTop: 2,
-  },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: spacing.xs,
     gap: spacing.sm,
   },
-  prayerBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: radius.full,
-  },
-  prayerStatus: {
-    fontSize: typography.caption.fontSize,
-    lineHeight: typography.caption.lineHeight,
-    fontFamily: typography.caption.fontFamily,
-  },
   streakText: {
     fontSize: typography.caption.fontSize,
     lineHeight: typography.caption.lineHeight,
     fontFamily: typography.caption.fontFamily,
     color: colors.dark.xp,
+  },
+  shieldBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+  },
+  shieldIcon: {
+    fontSize: 11,
+  },
+  shieldText: {
+    fontSize: typography.caption.fontSize,
+    lineHeight: typography.caption.lineHeight,
+    fontFamily: typography.caption.fontFamily,
+    color: palette['emerald-400'],
   },
   checkContainer: {
     marginLeft: spacing.sm,

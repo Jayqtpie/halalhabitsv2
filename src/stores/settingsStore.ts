@@ -18,11 +18,15 @@ interface SettingsState {
   soundEnabled: boolean;
   hapticEnabled: boolean;
   muhasabahReminderTime: string;
+  locationLat: number | null;
+  locationLng: number | null;
+  locationName: string | null;
   setPrayerCalcMethod: (method: string) => void;
   setDarkMode: (mode: DarkMode) => void;
   toggleSound: () => void;
   toggleHaptic: () => void;
   setMuhasabahReminderTime: (time: string) => void;
+  setLocation: (lat: number, lng: number, name?: string) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -33,12 +37,17 @@ export const useSettingsStore = create<SettingsState>()(
       soundEnabled: true,
       hapticEnabled: true,
       muhasabahReminderTime: '21:00',
+      locationLat: null,
+      locationLng: null,
+      locationName: null,
 
       setPrayerCalcMethod: (method) => set({ prayerCalcMethod: method }),
       setDarkMode: (mode) => set({ darkMode: mode }),
       toggleSound: () => set((state) => ({ soundEnabled: !state.soundEnabled })),
       toggleHaptic: () => set((state) => ({ hapticEnabled: !state.hapticEnabled })),
       setMuhasabahReminderTime: (time) => set({ muhasabahReminderTime: time }),
+      setLocation: (lat, lng, name) =>
+        set({ locationLat: lat, locationLng: lng, locationName: name ?? null }),
     }),
     {
       name: 'settings-storage',
@@ -49,6 +58,9 @@ export const useSettingsStore = create<SettingsState>()(
         soundEnabled: state.soundEnabled,
         hapticEnabled: state.hapticEnabled,
         muhasabahReminderTime: state.muhasabahReminderTime,
+        locationLat: state.locationLat,
+        locationLng: state.locationLng,
+        locationName: state.locationName,
       }),
     },
   ),

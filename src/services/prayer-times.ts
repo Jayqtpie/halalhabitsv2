@@ -127,6 +127,9 @@ export function getNextFajr(
   return tomorrowTimes.fajr;
 }
 
+// TODO(Phase 6): Schedule local notifications for prayer time reminders (PRAY-04, NOTF-01).
+// Implementation deferred -- requires notification infrastructure from Phase 6.
+
 /**
  * Format a Date as a human-readable time string (e.g., "5:30 AM").
  */
