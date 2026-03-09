@@ -92,7 +92,7 @@ export default function HabitsScreen() {
   const handleAddHabit = useCallback(() => {
     try {
       router.push('/add-habit' as never);
-    } catch {
+    } catch (_e) {
       Alert.alert('Coming Soon', 'Habit presets will be available shortly.');
     }
   }, [router]);
