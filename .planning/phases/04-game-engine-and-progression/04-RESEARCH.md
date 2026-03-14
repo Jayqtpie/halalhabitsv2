@@ -13,7 +13,7 @@
 
 **XP feedback on completion**
 - Floating number animation rises from the completed card in pixel font (Press Start 2P)
-- Shows full breakdown: "15 x 1.5x = +22 XP" — transparent about multiplier math
+- Shows full breakdown: "15 x 1.5x = +22 XP" -- transparent about multiplier math
 - Emerald/jewel-tone color, fades as it floats up
 - Haptic pulse accompanies the XP float (already exists from Phase 3 completion)
 
@@ -24,8 +24,8 @@
 - Animated transitions on XP gain (bar fills incrementally)
 
 **Active title on habits screen**
-- Active title displayed next to level badge in habits header: "Lv 8 · The Steadfast"
-- Moves to HUD in Phase 5 — habits screen placement is temporary home
+- Active title displayed next to level badge in habits header: "Lv 8 . The Steadfast"
+- Moves to HUD in Phase 5 -- habits screen placement is temporary home
 
 **Level-up celebration**
 - Full-screen modal overlay for every level-up
@@ -49,7 +49,7 @@
 
 **Quest Board layout and behavior**
 - Grouped sections: Daily (3 slots), Weekly (2), Stretch (1)
-- Auto-track progress — no "accept" button
+- Auto-track progress -- no "accept" button
 - Completed quests stay visible as mini-trophy until cycle resets
 - Daily regenerate at midnight local, weekly at Sunday midnight
 - Expired quests silently disappear
@@ -69,9 +69,9 @@
 - Progression engine internal architecture (single module vs split)
 
 ### Deferred Ideas (OUT OF SCOPE)
-- Voice pack system (changeable app personality) — Phase 6 or future
-- Arabic terminology toggle — Phase 6 settings
-- Gear icon redesign on habits screen — future polish
+- Voice pack system (changeable app personality) -- Phase 6 or future
+- Arabic terminology toggle -- Phase 6 settings
+- Gear icon redesign on habits screen -- future polish
 </user_constraints>
 
 ---
@@ -81,25 +81,25 @@
 
 | ID | Description | Research Support |
 |----|-------------|-----------------|
-| GAME-01 | User earns XP for habit completions (effort-based) | xp-engine pure TS module pattern; inject into habitStore.completeHabit() |
-| GAME-02 | User levels up through XP accumulation with logarithmic progression curve | Level formula 40 x level^1.85; levelForXp() binary search or precomputed table |
-| GAME-03 | User unlocks Identity Titles at milestone thresholds | titleRepo + title-engine; event-driven check post-completion |
-| GAME-04 | Quest Board presents daily and weekly quests with rotating variety | quest-engine template system; questStore orchestration; Quests tab implementation |
-| GAME-05 | User can complete quests for bonus XP and progression | Quest progress auto-tracked from completion events; XP reward via xp-engine |
-| GAME-06 | XP economy modeled and balanced (levels 1-100 progression curve) | Simulation shows level 5 in week 1, level 20 in month 2-3; soft cap at 500 XP/day |
+| GAME-01 | User earns XP for habit completions (effort-based) | xp-engine pure TS module; inject into habitStore.completeHabit() at the `xpEarned: 0` placeholder |
+| GAME-02 | User levels up through XP accumulation with logarithmic progression curve | Level formula 40 x level^1.85; levelForXp() binary search; level-up detection in calculateXP() |
+| GAME-03 | User unlocks Identity Titles at milestone thresholds | titleRepo (missing) + title-engine; event-driven check post-completion; 26 titles from blueprint seed data |
+| GAME-04 | Quest Board presents daily and weekly quests with rotating variety | quest-engine template system; questStore orchestration; Quests tab with Titles sub-tab |
+| GAME-05 | User can complete quests for bonus XP and progression | Quest progress auto-tracked from completion events; XP reward via xp-engine on quest complete |
+| GAME-06 | XP economy modeled and balanced (levels 1-100 progression curve) | Blueprint simulation validated; level 5 in week 1, level 20 in month 2-3; soft cap at 500 XP/day |
 </phase_requirements>
 
 ---
 
 ## Summary
 
-Phase 4 builds three interlocking systems: (1) a pure-TypeScript XP/leveling engine, (2) a title unlock engine, and (3) a quest rotation engine — all wired into the existing `habitStore.completeHabit()` flow. The pattern established by `streak-engine.ts` is the template: pure functions, no React imports, fully unit-testable. The Zustand `gameStore` shell already exists with the right fields; Phase 4 fleshes out the actions and wires them to repos.
+Phase 4 builds three interlocking pure-TypeScript domain modules: (1) an XP/leveling engine, (2) a title unlock engine, and (3) a quest rotation engine. These wire into the existing `habitStore.completeHabit()` flow where `xpEarned: 0` is the explicit placeholder waiting for XP injection. The pattern established by `streak-engine.ts` is the template: pure functions, no React imports, fully unit-testable. The Zustand `gameStore` shell already exists with `currentLevel`, `totalXP`, `titles`, `activeTitle` fields and basic setters; Phase 4 adds orchestration actions (awardXP, checkTitles, loadQuests) following the store-repo-engine pattern from `habitStore`.
 
-Animations use React Native Reanimated 4 (already installed, `~4.1.1`). The key finding is that Reanimated 4 on Expo SDK 54 requires `react-native-worklets` as a peer dependency — it is NOT in package.json yet and must be added before any worklet-based animations will work in development builds. For Expo Go compatibility, this must match the version Expo SDK 54 ships. The `babel-preset-expo` handles the Babel plugin automatically; no manual babel.config.js change is needed.
+The UI layer adds: an XP float label animation (Reanimated 4 shared values), a persistent XP progress bar on the habits screen, level-up and title-unlock celebration overlays, and the Quest Board tab (replacing the placeholder). All animations use React Native Reanimated 4.1.1 (already installed). The `react-native-worklets` peer dependency is already installed as a transitive dependency (v0.7.4) but is NOT in package.json -- it must be added explicitly via `npx expo install react-native-worklets` to prevent version drift. New Architecture is already enabled (`newArchEnabled: true` in app.json), which is required for Reanimated 4. These native modules are precompiled in Expo Go SDK 54, so animations will work without a dev build.
 
-Haptics are handled by `expo-haptics` (already installed, `~15.0.8`). The celebration sequence is `notificationAsync(Success)` for quest completion, and a manual sequence of `impactAsync(Heavy)` calls for level-up. The XP float uses `selectionAsync()` as a light acknowledgment already tied to the Phase 3 completion haptic.
+Haptics use `expo-haptics` (already installed, ~15.0.8). The celebration sequence is `notificationAsync(Success)` for quest completion and a manual sequence of `impactAsync(Heavy)` calls for level-up. The XP float uses `selectionAsync()` already tied to the Phase 3 completion haptic.
 
-**Primary recommendation:** Build `src/domain/xp-engine.ts`, `src/domain/title-engine.ts`, and `src/domain/quest-engine.ts` as pure TS modules following the streak-engine template. Wire them through `gameStore` actions that call the repos. Add `react-native-worklets` to dependencies before writing any Reanimated animation code.
+**Primary recommendation:** Build `src/domain/xp-engine.ts`, `src/domain/title-engine.ts`, and `src/domain/quest-engine.ts` as pure TS modules following the streak-engine template. Wire them through `gameStore` actions that call the repos. Add `react-native-worklets` to package.json explicitly before writing any animation code.
 
 ---
 
@@ -113,25 +113,27 @@ Haptics are handled by `expo-haptics` (already installed, `~15.0.8`). The celebr
 | zustand | ^5.0.11 | gameStore orchestration | Already established pattern |
 | drizzle-orm | ^0.45.1 | Typed DB access via repos | Already established pattern |
 | expo-sqlite | ~16.0.10 | Underlying storage | Already established |
+| react-native-worklets | 0.7.4 (transitive) | Peer dep for Reanimated 4 worklets | Installed transitively; needs explicit package.json entry |
 
-### Required Addition (not yet installed)
+### Required Addition
 | Library | Version | Purpose | Why Needed |
 |---------|---------|---------|------------|
-| react-native-worklets | match SDK 54 | Peer dep for Reanimated 4 worklets | Reanimated 4.1+ requires it; missing from package.json causes native crashes |
+| react-native-worklets | (explicit) | Peer dep for Reanimated 4 | Already installed transitively (v0.7.4) but NOT in package.json; must add explicitly to prevent version drift |
 
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
 | Pure TS domain modules | Redux Toolkit + thunks | Over-engineered; TS functions simpler, more testable |
-| Reanimated 4 worklets | CSS transitions (Reanimated 4 new API) | CSS transitions good for simple enter/exit; worklets needed for gesture-driven and XP float |
+| Reanimated 4 worklets | CSS transitions (Reanimated 4 new API) | CSS transitions good for simple enter/exit; worklets needed for XP float positioning |
 | expo-haptics sequences | react-native-haptic-feedback | Not needed; expo-haptics covers all required patterns |
+| Absolute overlay for modals | React Native Modal component | Known Reanimated animation glitches inside RN Modal with react-native-screens |
 
 **Installation:**
 ```bash
 npx expo install react-native-worklets
 ```
 
-Note: `babel-preset-expo` automatically configures the worklets babel plugin. Do NOT manually add `react-native-worklets/plugin` to `babel.config.js` — it causes conflicts.
+Note: `babel-preset-expo` automatically configures the worklets babel plugin. Do NOT manually add `react-native-worklets/plugin` to `babel.config.js` -- adding both causes "Duplicate plugin/preset detected" error.
 
 ---
 
@@ -145,30 +147,34 @@ src/
 │   ├── xp-engine.ts          # XP calculation, level derivation, soft cap
 │   ├── title-engine.ts       # Title unlock condition checking
 │   ├── quest-engine.ts       # Quest template selection, rotation, progress eval
-│   └── streak-engine.ts      # (existing — template for above)
+│   ├── quest-templates.ts    # Static quest template pool (20 daily, 8 weekly, 3 stretch)
+│   ├── title-seed-data.ts    # 26 titles from blueprint with unlock conditions
+│   └── streak-engine.ts      # (existing -- template for above)
 ├── stores/
-│   └── gameStore.ts          # (existing shell — add actions: loadGame, awardXP, checkTitles, loadQuests)
+│   └── gameStore.ts          # (existing shell -- add actions: loadGame, awardXP, checkTitles, loadQuests, generateQuests)
 ├── db/repos/
 │   ├── xpRepo.ts             # (existing)
-│   ├── questRepo.ts          # (existing — add getByUser, getCompleted, getByType)
-│   ├── userRepo.ts           # (existing — updateXP already present)
-│   └── titleRepo.ts          # (MISSING — must create: getAll, getUserTitles, grantTitle, setActive)
+│   ├── questRepo.ts          # (existing -- add getByUser, getCompleted, getByType, getRecentTemplateIds)
+│   ├── userRepo.ts           # (existing -- updateXP already present)
+│   └── titleRepo.ts          # (MISSING -- must create: getAll, getUserTitles, grantTitle)
 └── components/
     ├── game/
     │   ├── XPFloatLabel.tsx   # Floating "+22 XP" animation
     │   ├── XPProgressBar.tsx  # Persistent bar below daily progress bar
-    │   ├── LevelUpModal.tsx   # Full-screen celebration modal
-    │   └── TitleUnlockModal.tsx # Full-screen title unlock modal
+    │   ├── LevelBadge.tsx     # "Lv 8 . The Steadfast" header element
+    │   ├── LevelUpOverlay.tsx # Full-screen celebration overlay (NOT Modal)
+    │   └── TitleUnlockOverlay.tsx # Full-screen title unlock overlay
     └── quests/
         ├── QuestCard.tsx      # Individual quest row with progress bar
         ├── QuestSection.tsx   # Daily/Weekly/Stretch section header + cards
-        └── TitleGrid.tsx      # Rarity-grouped title browser
+        ├── QuestLockedState.tsx # Level < 5 locked state
+        └── TitleGrid.tsx      # Rarity-grouped title browser with progress
 ```
 
 ### Pattern 1: Pure TS Domain Module (XP Engine)
 
 **What:** A module of pure functions with no React, no DB, no side effects. Receives data, returns data.
-**When to use:** All game logic — XP calculation, level derivation, soft cap, title checking.
+**When to use:** All game logic -- XP calculation, level derivation, soft cap, title checking.
 **Example** (modeled on streak-engine.ts):
 
 ```typescript
@@ -178,23 +184,29 @@ src/
 export interface XPResult {
   baseXP: number;
   multiplier: number;
-  earnedXP: number;       // after multiplier
-  cappedXP: number;       // after soft daily cap
+  earnedXP: number;       // after multiplier, before cap
+  cappedXP: number;       // after soft daily cap -- THIS is what UI displays
   dailyTotalAfter: number;
+  newTotalXP: number;
   newLevel: number;
   didLevelUp: boolean;
   previousLevel: number;
 }
 
-/** XP required to REACH a given level from level 1. */
+/** XP required to REACH a given level (cumulative from level 1). */
 export function xpForLevel(level: number): number {
   if (level <= 1) return 0;
-  return Math.floor(40 * Math.pow(level - 1, 1.85));
+  // Sum of xpToNext for levels 1 through level-1
+  let total = 0;
+  for (let l = 1; l < level; l++) {
+    total += Math.floor(40 * Math.pow(l, 1.85));
+  }
+  return total;
 }
 
-/** Total XP required to advance FROM level to level+1. */
-export function xpForNextLevel(level: number): number {
-  return xpForLevel(level + 1) - xpForLevel(level);
+/** XP required to advance FROM current level to level+1. */
+export function xpToNextLevel(level: number): number {
+  return Math.floor(40 * Math.pow(level, 1.85));
 }
 
 /** Derive current level from total accumulated XP. O(log n) binary search. */
@@ -214,9 +226,7 @@ export function applySoftCap(earnedXP: number, dailyTotal: number): number {
   if (dailyTotal >= CAP) return Math.floor(earnedXP * 0.5);
   const headroom = CAP - dailyTotal;
   if (earnedXP <= headroom) return earnedXP;
-  const belowCap = headroom;
-  const aboveCap = earnedXP - headroom;
-  return belowCap + Math.floor(aboveCap * 0.5);
+  return headroom + Math.floor((earnedXP - headroom) * 0.5);
 }
 
 /** Calculate full XP result for a habit completion. */
@@ -237,6 +247,7 @@ export function calculateXP(
     earnedXP: earned,
     cappedXP: capped,
     dailyTotalAfter: dailyTotalXP + capped,
+    newTotalXP: newTotal,
     newLevel,
     didLevelUp: newLevel > previousLevel,
     previousLevel,
@@ -244,18 +255,26 @@ export function calculateXP(
 }
 ```
 
+**IMPORTANT NOTE on XP formula:** The blueprint states `XP_required(level) = floor(base_xp * level^exponent)` which gives XP to advance FROM a level (not cumulative). The `xpForLevel()` cumulative function must SUM these values. The simulation table in the blueprint (Section 03) shows:
+- Level 1 -> 2: 40 XP needed
+- Level 2 -> 3: ~137 XP needed
+- Level 5 cumulative: ~915 XP
+
+These are the authoritative numbers from the locked Game Design Bible.
+
 ### Pattern 2: Title Engine (Event-Driven Unlock Check)
 
-**What:** Pure function that evaluates all title unlock conditions against current completion stats. Returns newly-unlocked titles.
-**When to use:** Called after every habit completion, after gameStore has updated XP/level.
+**What:** Pure function that evaluates all title unlock conditions against current player stats. Returns newly-unlocked title IDs.
+**When to use:** Called after every habit completion and XP award, once stats snapshot is built.
 
 ```typescript
 // src/domain/title-engine.ts
-// Unlock types mirror titles schema: 'level_reach', 'habit_streak', 'total_completions', 'salah_streak'
 
-export interface TitleUnlockCondition {
+export interface TitleCondition {
   id: string;
-  unlockType: string;
+  unlockType: 'level_reach' | 'habit_streak' | 'habit_type_streak' |
+               'total_completions' | 'quest_completions' | 'mercy_recoveries' |
+               'simultaneous_streaks' | 'muhasabah_streak' | 'habit_count';
   unlockValue: number;
   unlockHabitType: string | null;
 }
@@ -263,54 +282,31 @@ export interface TitleUnlockCondition {
 export interface PlayerStats {
   currentLevel: number;
   habitStreaks: Record<string, number>;      // habitId -> currentCount
-  habitTypes: Record<string, string>;        // habitId -> type (salah, custom, etc)
-  salahConsecutiveDays: number;              // derived from salah streak data
+  habitTypes: Record<string, string>;        // habitId -> type
   totalCompletions: number;
+  questCompletions: number;
+  mercyRecoveries: number;
+  muhasabahStreak: number;
+  activeHabitCount: number;
+  simultaneousStreaks14: number;  // how many habits have 14+ day streaks
+  simultaneousStreaks90: number;  // how many habits have 90+ day streaks
 }
 
-/** Returns IDs of titles whose unlock conditions are now met. */
+/** Returns IDs of titles newly unlocked. Pure function, no side effects. */
 export function checkTitleUnlocks(
-  conditions: TitleUnlockCondition[],
+  conditions: TitleCondition[],
   alreadyUnlocked: Set<string>,
   stats: PlayerStats,
 ): string[] {
-  const newlyUnlocked: string[] = [];
-  for (const title of conditions) {
-    if (alreadyUnlocked.has(title.id)) continue;
-    if (isTitleUnlocked(title, stats)) {
-      newlyUnlocked.push(title.id);
-    }
-  }
-  return newlyUnlocked;
-}
-
-function isTitleUnlocked(title: TitleUnlockCondition, stats: PlayerStats): boolean {
-  switch (title.unlockType) {
-    case 'level_reach':
-      return stats.currentLevel >= title.unlockValue;
-    case 'habit_streak': {
-      if (title.unlockHabitType) {
-        // All habits of this type must have streak >= unlockValue
-        const matching = Object.entries(stats.habitTypes)
-          .filter(([, type]) => type === title.unlockHabitType)
-          .map(([id]) => stats.habitStreaks[id] ?? 0);
-        return matching.length > 0 && matching.every(s => s >= title.unlockValue);
-      }
-      return Object.values(stats.habitStreaks).some(s => s >= title.unlockValue);
-    }
-    case 'salah_streak':
-      return stats.salahConsecutiveDays >= title.unlockValue;
-    case 'total_completions':
-      return stats.totalCompletions >= title.unlockValue;
-    default:
-      return false;
-  }
+  return conditions
+    .filter(t => !alreadyUnlocked.has(t.id) && isTitleUnlocked(t, stats))
+    .map(t => t.id);
 }
 ```
 
 ### Pattern 3: Quest Engine (Template-Based Rotation)
 
-**What:** Pure functions for template selection (no-repeat within 7 days) and progress evaluation against completion events.
+**What:** Pure functions for template selection (no-repeat within 7 days) and progress evaluation.
 **When to use:** Quest generation at midnight or first app open of new day. Progress tracking on each habit completion.
 
 ```typescript
@@ -320,95 +316,86 @@ export interface QuestTemplate {
   id: string;
   type: 'daily' | 'weekly' | 'stretch';
   description: string;
-  targetType: 'any_completion' | 'habit_type' | 'streak_reach' | 'daily_complete_all';
+  targetType: 'any_completion' | 'habit_type' | 'all_salah' | 'streak_reach' |
+              'daily_complete_all' | 'muhasabah' | 'total_completions';
   targetValue: number;
   targetHabitType?: string;
-  minLevel: number;    // quest only available if player >= minLevel
+  minLevel: number;
   xpReward: number;
 }
 
-/** Select N templates avoiding recentlyUsedIds. Falls back to oldest if depleted. */
+/** Select N templates avoiding recentlyUsedIds within 7 days. */
 export function selectQuestTemplates(
   pool: QuestTemplate[],
   type: 'daily' | 'weekly' | 'stretch',
   count: number,
   playerLevel: number,
+  activeHabitTypes: Set<string>,
   recentlyUsedIds: Set<string>,
-  now: Date,
 ): QuestTemplate[] {
-  const eligible = pool.filter(
-    t => t.type === type && t.minLevel <= playerLevel && !recentlyUsedIds.has(t.id)
+  // 1. Filter by type, level, and relevance to active habits
+  const eligible = pool.filter(t =>
+    t.type === type &&
+    t.minLevel <= playerLevel &&
+    !recentlyUsedIds.has(t.id) &&
+    isRelevantToPlayer(t, activeHabitTypes)
   );
-  // If not enough fresh templates, allow repeats from least-recently-used
-  const source = eligible.length >= count ? eligible : pool.filter(
-    t => t.type === type && t.minLevel <= playerLevel
-  );
-  return shuffle(source).slice(0, count);
+  // 2. Ensure at least one "easy" quest (25-30 XP) for daily
+  // 3. Shuffle and take count
+  return shuffle(eligible).slice(0, count);
 }
 
-/** Evaluate how much progress a completion event contributes to a quest. */
+/** Evaluate quest progress increment from a completion event. */
 export function evaluateQuestProgress(
   quest: { targetType: string; targetValue: number; targetHabitType?: string | null; progress: number },
-  event: { habitType: string; completedCount: number; allCompleted: boolean },
+  event: { habitType: string; allSalahComplete: boolean; allHabitsComplete: boolean },
 ): number {
-  switch (quest.targetType) {
-    case 'any_completion': return Math.min(quest.targetValue, quest.progress + 1);
-    case 'habit_type':
-      if (event.habitType === quest.targetHabitType) return Math.min(quest.targetValue, quest.progress + 1);
-      return quest.progress;
-    case 'daily_complete_all': return event.allCompleted ? quest.targetValue : quest.progress;
-    default: return quest.progress;
-  }
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+  // Returns new progress value (clamped to targetValue)
 }
 ```
 
 ### Pattern 4: Store-Repo-Engine Wiring (gameStore actions)
 
-**What:** gameStore orchestrates the engine functions and repos. Follows the established pattern from habitStore.
+**What:** gameStore orchestrates engine functions and repos, following habitStore pattern.
 **When to use:** All game state mutations go through gameStore actions.
 
 ```typescript
 // src/stores/gameStore.ts (additions to existing shell)
-// Pattern: same as habitStore.completeHabit() structure
 
 awardXP: async (userId, baseXP, multiplier, sourceType, sourceId) => {
   const state = get();
-  const dailyTotal = await xpRepo.getDailyTotal(userId, today());
+  const today = new Date().toISOString().split('T')[0];
+  const dailyTotal = await xpRepo.getDailyTotal(userId, today);
   const result = calculateXP(baseXP, multiplier, state.totalXP, dailyTotal);
 
-  // 1. Write to ledger
-  await xpRepo.create({ userId, amount: result.cappedXP, sourceType, sourceId, earnedAt: now(), createdAt: now() });
+  // 1. Write to ledger (source of truth)
+  await xpRepo.create({
+    id: generateId(), userId, amount: result.cappedXP,
+    sourceType, sourceId, earnedAt: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+  });
 
-  // 2. Update user record
-  await userRepo.updateXP(userId, state.totalXP + result.cappedXP, result.newLevel);
+  // 2. Update denormalized user record
+  await userRepo.updateXP(userId, result.newTotalXP, result.newLevel);
 
   // 3. Update local state
-  set({ totalXP: state.totalXP + result.cappedXP, currentLevel: result.newLevel });
+  set({ totalXP: result.newTotalXP, currentLevel: result.newLevel });
 
-  // 4. Return result so habitStore can trigger celebration
+  // 4. Return result for celebration triggers
   return result;
 },
 ```
 
-### Pattern 5: XP Float Animation (Reanimated 4 Worklet)
+### Pattern 5: XP Float Animation (Reanimated 4)
 
 **What:** A positioned `Animated.View` that floats upward and fades out over ~1.2s.
 **When to use:** Immediately after `completeHabit()` resolves, positioned over the tapped card.
 
 ```typescript
 // src/components/game/XPFloatLabel.tsx
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS } from 'react-native-reanimated';
-
-// Source: Reanimated 4 docs - useSharedValue + useAnimatedStyle pattern
+import Animated, {
+  useSharedValue, useAnimatedStyle, withTiming, withDelay, runOnJS
+} from 'react-native-reanimated';
 
 export function XPFloatLabel({ xpText, onDone }: { xpText: string; onDone: () => void }) {
   const translateY = useSharedValue(0);
@@ -416,8 +403,8 @@ export function XPFloatLabel({ xpText, onDone }: { xpText: string; onDone: () =>
 
   useEffect(() => {
     translateY.value = withTiming(-80, { duration: 1200 });
-    opacity.value = withDelay(600, withTiming(0, { duration: 600, }, () => {
-      runOnJS(onDone)(); // NOTE: in Reanimated 4, runOnJS is re-exported but scheduleOnRN is the new name
+    opacity.value = withDelay(600, withTiming(0, { duration: 600 }, () => {
+      runOnJS(onDone)();
     }));
   }, []);
 
@@ -430,44 +417,44 @@ export function XPFloatLabel({ xpText, onDone }: { xpText: string; onDone: () =>
     <Animated.Text style={[styles.xpFloat, style]}>{xpText}</Animated.Text>
   );
 }
-// Position with absolute layout over the habit card using onLayout to measure card position
+// Position with absolute layout; use ref.measureInWindow() for screen coords
 ```
 
 ### Pattern 6: XP Progress Bar Animation
 
-**What:** A shared-value-driven width animation using `useAnimatedStyle`. On level-up, sequence: fill to 100% → flash → reset to 0% → fill from new base.
-**When to use:** XPProgressBar component, persistent on habits screen.
+**What:** Shared-value-driven width animation. On level-up: fill to 100% -> flash -> reset -> fill from new base.
 
 ```typescript
-// Core animation pattern
-const progress = useSharedValue(currentProgress); // 0.0 to 1.0
+import { withSequence, withTiming, withDelay, Easing } from 'react-native-reanimated';
 
-// On XP gain:
+// Normal XP gain:
 progress.value = withTiming(newProgress, { duration: 800, easing: Easing.out(Easing.cubic) });
 
-// On level-up (sequence):
+// Level-up sequence:
 progress.value = withSequence(
-  withTiming(1.0, { duration: 400 }),               // fill to 100%
-  withDelay(200, withTiming(1.0, { duration: 100 })), // glow hold (CSS glow via Reanimated)
-  withTiming(0, { duration: 0 }),                   // instant reset
-  withTiming(newProgressInNewLevel, { duration: 600 }), // fill from new base
+  withTiming(1.0, { duration: 400 }),                    // fill to 100%
+  withDelay(200, withTiming(1.0, { duration: 100 })),    // glow hold
+  withTiming(0, { duration: 0 }),                        // instant reset
+  withTiming(newProgressInNewLevel, { duration: 600 }),   // fill from new base
 );
 ```
 
-### Pattern 7: Level-Up Modal
+### Pattern 7: Celebration Overlays (NOT React Native Modal)
 
-**What:** React Native `Modal` with `Animated.View` using Reanimated entering/exiting presets. The Modal's visible prop controls mount/unmount; the Animated.View handles the animation.
-**When to use:** When `XPResult.didLevelUp === true` after an award.
+**What:** State-driven full-screen overlay using absolute positioning and Reanimated layout animations.
+**Why not Modal:** Known interaction issue between `react-native-screens` and Reanimated entering/exiting inside RN Modal (animations may not fire on iOS).
 
 ```typescript
-// Known issue: Reanimated entering/exiting inside RN Modal has reported glitches on
-// react-native-screens. Prefer custom overlay (absolute positioned View over full screen)
-// over Modal component if glitches appear.
+import Animated, { ZoomIn, FadeOut } from 'react-native-reanimated';
 
-// Safe pattern: use a state-driven full-screen overlay with ZoomIn entering:
+// In root layout or habits screen:
 {showLevelUp && (
-  <Animated.View entering={ZoomIn.duration(400)} style={styles.overlay}>
-    <LevelUpContent level={newLevel} onContinue={() => setShowLevelUp(false)} />
+  <Animated.View
+    entering={ZoomIn.duration(350).springify()}
+    exiting={FadeOut.duration(200)}
+    style={StyleSheet.absoluteFillObject}
+  >
+    <LevelUpContent level={newLevel} unlockedTitles={unlocked} onContinue={dismiss} />
   </Animated.View>
 )}
 ```
@@ -475,11 +462,12 @@ progress.value = withSequence(
 ### Anti-Patterns to Avoid
 
 - **Reading shared values during render:** `sharedValue.value` in JSX causes re-render loops. Only read in `useAnimatedStyle` or worklets.
-- **Two celebration modals at once:** If title unlocks during level-up, bundle into LevelUpModal. Never stack modals.
-- **runOnJS for every animation callback:** Only use `runOnJS`/`scheduleOnRN` when you need to call non-worklet JS code (like setState) from a worklet.
-- **Animating layout properties (width/height as absolute px):** Animate `scaleX` or use a fixed-width container with an inner View whose width changes. Layout thrash kills 60fps.
-- **Quest "accept" button:** Auto-track by design. No accept button. This is an intentional UX decision (adab: no pressure mechanics).
-- **Shame copy on expired quests:** Expired quests must disappear silently. No "You missed it" state.
+- **Two celebration modals at once:** If title unlocks during level-up, bundle into LevelUpOverlay. Never stack overlays.
+- **runOnJS for every animation callback:** Only use `runOnJS` when calling non-worklet JS from a worklet (like setState).
+- **Animating layout properties (width/height as absolute px):** Use a percentage-width inner View or `scaleX` transform. Layout thrash kills 60fps.
+- **Quest "accept" button:** Auto-track by design. No accept button (adab: no pressure mechanics).
+- **Shame copy on expired quests:** Expired quests silently disappear. No "You missed it" message.
+- **Showing earnedXP instead of cappedXP in float:** The XP float MUST show the post-cap amount. The soft cap is invisible.
 
 ---
 
@@ -487,59 +475,66 @@ progress.value = withSequence(
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Smooth XP bar animation | Custom Animated API animations | `useSharedValue` + `useAnimatedStyle` in Reanimated 4 | Runs on UI thread; JS Animated API is slower, janky on older devices |
-| Haptic patterns | Custom vibration timing loops | `expo-haptics` with `impactAsync(Heavy)` repeated | iOS Taptic Engine requires system APIs; direct vibration API only on Android |
-| Level derivation performance | Linear scan from level 1 to 100 | Binary search `levelForXP()` or precomputed lookup table | With 100 levels, linear scan is negligible; but binary search is O(log n) and cleaner |
-| Quest no-repeat tracking | Full DB query per template check | In-memory Set of last 7 days' used template IDs | Simple, fast; persist to AsyncStorage or SQLite settings column |
-| Animation entering/exiting on modals | Manual opacity/scale sequencing | Reanimated `ZoomIn`, `FadeIn` layout animation presets | Tested, composable, handles interruption correctly |
+| Smooth XP bar animation | Custom RN Animated API | `useSharedValue` + `useAnimatedStyle` (Reanimated 4) | UI-thread execution; JS Animated API drops frames on older devices |
+| Haptic patterns | Custom vibration timing | `expo-haptics` with `impactAsync(Heavy)` repeated | iOS Taptic Engine requires system APIs |
+| Level derivation | Linear scan 1-100 | Binary search `levelForXP()` | Cleaner code; same practical speed |
+| Quest no-repeat tracking | Full DB query per template | In-memory Set of last 7 days' template IDs from `questRepo` | Simple, fast |
+| Modal enter/exit animation | Manual opacity/scale sequencing | Reanimated `ZoomIn`, `FadeIn` layout animation presets | Handles interruption correctly |
+| UUID generation | Math.random-based IDs | `uuid` library (v13, already installed) via `generateId()` | Collision-safe, established pattern |
 
-**Key insight:** Game logic in this domain is deceptively simple to get wrong (soft caps, streak multiplier rounding, level boundary conditions). Pure TS functions with full unit test coverage catch edge cases before they reach users.
+**Key insight:** Game logic in this domain is deceptively simple to get wrong (soft caps, streak multiplier rounding, level boundary conditions, XP formula interpretation as per-level vs cumulative). Pure TS functions with full unit test coverage catch edge cases before they reach users.
 
 ---
 
 ## Common Pitfalls
 
-### Pitfall 1: react-native-worklets Missing
-**What goes wrong:** App starts, Reanimated animations throw native crash: "Native part of Worklets module was not initialized." or similar.
-**Why it happens:** Reanimated 4.1+ depends on `react-native-worklets` as a peer dep. It is NOT in this project's package.json yet.
-**How to avoid:** Run `npx expo install react-native-worklets` before writing any animation code. Do NOT add the babel plugin manually — `babel-preset-expo` handles it.
-**Warning signs:** Any Reanimated import crashes immediately; native logs show worklets module not found.
+### Pitfall 1: react-native-worklets Not in package.json
+**What goes wrong:** Version drift -- Reanimated upgrades but worklets stays at old transitive version, causing native crashes.
+**Why it happens:** `react-native-worklets` (v0.7.4) is installed as a transitive dep of `react-native-reanimated` but not declared in package.json.
+**How to avoid:** Run `npx expo install react-native-worklets` to pin it in package.json at the SDK 54-compatible version. Do NOT add the babel plugin manually -- `babel-preset-expo` handles it automatically.
+**Warning signs:** "Duplicate plugin/preset detected" error if babel plugin added manually.
 
-### Pitfall 2: Level-Up Modal Glitches Inside React Native Modal
+### Pitfall 2: Level-Up Overlay Glitches Inside React Native Modal
 **What goes wrong:** Reanimated entering/exiting animations on `Animated.View` inside a `<Modal>` component cause visual glitches or animation doesn't fire on iOS.
-**Why it happens:** Known interaction issue between `react-native-screens` and Reanimated layout animations inside RN Modal (GitHub issue #2545 on react-native-screens).
-**How to avoid:** Use an absolute-positioned full-screen overlay View in the component tree (not inside Modal) with a high zIndex. Control visibility with state, not Modal's visible prop.
+**Why it happens:** Known interaction between `react-native-screens` and Reanimated layout animations inside RN Modal.
+**How to avoid:** Use an absolute-positioned full-screen overlay View in the component tree with `StyleSheet.absoluteFillObject`. Control visibility with state, not Modal's visible prop.
 **Warning signs:** Animation fires on Android but not iOS, or first animation is skipped.
 
 ### Pitfall 3: Floating XP Label Position Drift
-**What goes wrong:** The XP float label appears at (0, 0) or in the wrong position when habits are scrolled.
-**Why it happens:** Measuring position with `onLayout` gives position relative to the component's parent, not the screen. With FlatList, items scroll off screen so positions change.
-**How to avoid:** Use `ref.current.measureInWindow(callback)` (not `measure`) to get absolute screen coordinates. Position the float label in a portal-like overlay at the root layout level.
-**Warning signs:** Float label appears at top-left or jumps to wrong location on scroll.
+**What goes wrong:** XP float label appears at (0, 0) or wrong position when habits are scrolled in FlatList.
+**Why it happens:** `onLayout` gives position relative to parent, not screen. FlatList items scroll.
+**How to avoid:** Use `ref.current.measureInWindow(callback)` to get absolute screen coordinates. Position the float label in a portal-like overlay at the root layout level.
+**Warning signs:** Float label appears at top-left or jumps on scroll.
 
 ### Pitfall 4: XP Double-Counting on Retry
 **What goes wrong:** If `completeHabit()` throws after writing to `xp_ledger` but before updating `users.totalXp`, a retry creates a second XP ledger entry.
 **Why it happens:** Two separate DB writes with no transaction.
-**How to avoid:** The XP ledger is the source of truth. `users.totalXp` is a denormalized cache. On app load, always recompute from `xpRepo.getLifetimeTotal()` and reconcile. Use `userRepo.updateXP` after the ledger write succeeds.
+**How to avoid:** The XP ledger is the source of truth. `users.totalXp` is a denormalized cache. On app load, always recompute from `xpRepo.getLifetimeTotal()` and reconcile.
 **Warning signs:** Player's displayed XP doesn't match ledger sum.
 
 ### Pitfall 5: Quest Progress Race on Fast Completions
 **What goes wrong:** User completes 3 habits in rapid succession; quest progress updates step on each other.
-**Why it happens:** Each `completeHabit()` call reads quest progress, increments, and writes — concurrent calls can read stale values.
-**How to avoid:** Run quest progress updates sequentially inside the store action. The existing `habitStore` is not concurrent (Zustand actions are synchronous), but async DB writes can interleave. Use `questRepo.updateProgress()` with an atomic increment at SQL level if needed: `SET progress = MIN(progress + 1, target_value)`.
+**Why it happens:** Concurrent async DB writes can read stale progress values.
+**How to avoid:** Use atomic increment at SQL level: `SET progress = MIN(progress + 1, target_value)`. Or serialize quest updates within the store action.
 **Warning signs:** Quest shows "2/5" when 3 completions have fired.
 
-### Pitfall 6: Soft Cap Invisible to Player but Visible in Ledger
-**What goes wrong:** Player notices their XP sometimes doesn't match their mental math ("I should have gotten 30 XP but only got 15").
-**Why it happens:** Soft cap is invisible by design, but the XP float shows the uncapped amount.
-**How to avoid:** The XP float label MUST show the capped amount (`cappedXP`, not `earnedXP`). The breakdown format "15 x 1.5x = +22 XP" should use the final capped number. The cap itself is never mentioned in UI.
-**Warning signs:** Player posts confusion about XP math — check if float shows earnedXP vs cappedXP.
+### Pitfall 6: Soft Cap Visible in XP Float
+**What goes wrong:** Player notices XP doesn't match mental math ("I should have gotten 30 XP but only got 15").
+**Why it happens:** XP float shows pre-cap `earnedXP` instead of post-cap `cappedXP`.
+**How to avoid:** The float label MUST display `cappedXP`. The breakdown format "15 x 1.5x = +22 XP" should use the final capped number. The cap itself is never mentioned in UI.
+**Warning signs:** Player confusion about XP math.
 
-### Pitfall 7: Title Check Performance on Every Completion
-**What goes wrong:** Checking all 26 titles after every completion is slow if it requires DB queries for each condition.
-**Why it happens:** Naive implementation queries streak counts, completion totals per-title check.
-**How to avoid:** Build a `PlayerStats` snapshot once per completion event (collect all needed data in one round-trip), then run `checkTitleUnlocks()` synchronously against that snapshot. The 26-title check is O(26) pure computation once stats are loaded.
+### Pitfall 7: Title Check Performance
+**What goes wrong:** Checking 26 titles after every completion is slow if it queries DB per-title.
+**Why it happens:** Naive implementation runs separate queries for each title condition.
+**How to avoid:** Build a `PlayerStats` snapshot once per completion event (one round-trip), then run `checkTitleUnlocks()` synchronously against it. The 26-title check is O(26) pure computation.
 **Warning signs:** Habit completion feels laggy after adding title check.
+
+### Pitfall 8: XP Formula Interpretation
+**What goes wrong:** Confusing "XP required to reach level N" (cumulative) with "XP to advance from level N to N+1" (per-level).
+**Why it happens:** The blueprint formula `40 * level^1.85` gives the per-level XP cost. The cumulative function must sum these.
+**How to avoid:** Unit tests that verify cumulative XP against the blueprint simulation table values (Level 5 = 915 cumulative, Level 10 = 7,232 cumulative, etc.).
+**Warning signs:** Players level up way too fast or too slow compared to blueprint targets.
 
 ---
 
@@ -547,21 +542,18 @@ progress.value = withSequence(
 
 Verified patterns from official sources and established project patterns:
 
-### XP Formula Verification (Formula Balancing)
+### XP Formula Verification
 ```typescript
-// Verified against locked formula: 40 * level^1.85
-// Level thresholds (XP needed to REACH each level):
-// Level 1:   0 XP       (starting)
-// Level 2:   40 XP      (first milestone)
-// Level 5:   ~540 XP    (achievable in week 1 at 5 habits/day)
-// Level 10:  ~2,900 XP
-// Level 20:  ~13,000 XP (~month 2-3)
-// Level 50:  ~110,000 XP
-// Level 100: ~610,000 XP (aspirational)
-//
-// At 5 habits/day, avg 25 XP each, 1.5x avg multiplier = ~187 XP/day
-// Soft cap: effectively ~350-450 XP/day at 5 habits
-// Level 5 in ~4 days is achievable — validates game balance
+// Verified against Game Design Bible (blueprint/03-game-design-bible.md)
+// Formula: xp_to_next(level) = floor(40 * level^1.85)
+// Cumulative thresholds from blueprint simulation table:
+//   Level 1:     0 XP (starting)
+//   Level 2:    40 XP
+//   Level 5:   915 XP (achievable in week 1 at 5 habits/day)
+//   Level 10: 7,232 XP
+//   Level 20: 47,816 XP (~month 2-3 for consistent player)
+//   Level 50: 427,628 XP
+//   Level 100: 1,918,688 XP (aspirational -- years)
 ```
 
 ### Haptic Sequences
@@ -569,13 +561,13 @@ Verified patterns from official sources and established project patterns:
 // Source: expo-haptics docs (docs.expo.dev/versions/latest/sdk/haptics/)
 import * as Haptics from 'expo-haptics';
 
-// Habit completion (already in Phase 3 — keep as-is):
+// Habit completion (already in Phase 3 -- keep as-is):
 await Haptics.selectionAsync();
 
 // Quest completion:
 await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-// Level-up (heavy burst — fire 3x with delay for dramatic effect):
+// Level-up (heavy burst -- fire 3x with delay for dramatic effect):
 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
 await new Promise(r => setTimeout(r, 100));
 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
@@ -586,10 +578,10 @@ await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Rigid);
 await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 ```
 
-### titleRepo (Missing — Must Create)
+### titleRepo (Missing -- Must Create)
 ```typescript
-// src/db/repos/titleRepo.ts — pattern follows xpRepo.ts
-import { eq, and } from 'drizzle-orm';
+// src/db/repos/titleRepo.ts -- pattern follows xpRepo.ts
+import { eq } from 'drizzle-orm';
 import { getDb } from '../client';
 import { titles, userTitles } from '../schema';
 import type { NewUserTitle } from '../../types/database';
@@ -604,48 +596,98 @@ export const titleRepo = {
   async grantTitle(data: NewUserTitle) {
     return getDb().insert(userTitles).values(data).onConflictDoNothing().returning();
   },
-  async setActive(userId: string, titleId: string | null) {
-    // Delegates to userRepo.setActiveTitle — keep in userRepo
-  },
 };
 ```
 
-### Quest Expiry (Midnight Reset)
+### Title Seed Data (26 Titles from Blueprint)
+```typescript
+// src/domain/title-seed-data.ts
+// Source: blueprint/04-worldbuilding.md -- Identity Titles section
+// All 26 titles with unlock conditions mapped to schema's unlockType enum
+
+export const TITLE_SEED_DATA = [
+  // --- Common (10) ---
+  { name: 'The Beginner', rarity: 'common', unlockType: 'onboarding', unlockValue: 1, unlockHabitType: null,
+    flavorText: 'Every journey of a thousand miles begins with a single step.', sortOrder: 1 },
+  { name: 'The Willing', rarity: 'common', unlockType: 'total_completions', unlockValue: 1, unlockHabitType: null,
+    flavorText: 'The intention has become action. This is where discipline begins.', sortOrder: 2 },
+  { name: 'The Early Riser', rarity: 'common', unlockType: 'habit_type_streak', unlockValue: 3, unlockHabitType: 'fajr',
+    flavorText: 'You chose dawn over comfort. Your discipline is stirring.', sortOrder: 3 },
+  // ... (remaining 23 titles follow same pattern)
+  // --- Rare (10) ---
+  { name: 'The Steadfast (Al-Sabir)', rarity: 'rare', unlockType: 'habit_type_streak', unlockValue: 40, unlockHabitType: 'fajr',
+    flavorText: 'Forty dawns. The sun rose and you rose with it. Steadfastness is yours.', sortOrder: 11 },
+  // ...
+  // --- Legendary (6) ---
+  { name: 'The Unbreakable', rarity: 'legendary', unlockType: 'habit_streak', unlockValue: 100, unlockHabitType: null,
+    flavorText: 'One hundred days without breaking. Your word to yourself is iron.', sortOrder: 21 },
+  // ...
+];
+```
+
+### Quest Template Pool Structure
+```typescript
+// src/domain/quest-templates.ts
+// Source: blueprint/05-feature-systems.md -- Quest Board section
+
+export const QUEST_TEMPLATES: QuestTemplate[] = [
+  // --- Daily (20 templates, 3 active per day, 25-50 XP) ---
+  { id: 'daily-all-salah', type: 'daily', description: 'Complete all 5 salah today',
+    targetType: 'all_salah', targetValue: 5, minLevel: 1, xpReward: 50 },
+  { id: 'daily-3-habits', type: 'daily', description: 'Complete 3 habits today',
+    targetType: 'any_completion', targetValue: 3, minLevel: 1, xpReward: 30 },
+  // ...
+  // --- Weekly (8 templates, 2 active per week, 100-200 XP) ---
+  { id: 'weekly-7-streak', type: 'weekly', description: 'Maintain a 7-day streak on any habit',
+    targetType: 'streak_reach', targetValue: 7, minLevel: 5, xpReward: 150 },
+  // ...
+  // --- Stretch (3 templates, 1 active per week, 300-500 XP) ---
+  { id: 'stretch-50-completions', type: 'stretch', description: 'Complete 50 total habit check-ins this week',
+    targetType: 'total_completions', targetValue: 50, minLevel: 8, xpReward: 500 },
+  // ...
+];
+```
+
+### Quest Expiry and Regeneration
 ```typescript
 // Called on app foreground / first render of quests tab
-// 1. expire old quests (silent)
+// 1. Expire old quests (silent -- no shame copy)
 await questRepo.expireOld();
 
 // 2. Check if daily quests need regeneration
 const active = await questRepo.getActive(userId);
 const dailyActive = active.filter(q => q.type === 'daily');
 if (dailyActive.length < 3) {
-  // Generate new daily quests
-  const recentIds = await getRecentTemplateIds(userId, 7); // last 7 days
-  const templates = selectQuestTemplates(DAILY_TEMPLATES, 'daily', 3, level, recentIds, new Date());
+  const recentIds = await questRepo.getRecentTemplateIds(userId, 7);
+  const templates = selectQuestTemplates(
+    QUEST_TEMPLATES, 'daily', 3, level, activeHabitTypes, recentIds
+  );
   for (const t of templates) {
-    await questRepo.create({ ...questFromTemplate(t, userId) });
+    await questRepo.create(questFromTemplate(t, userId));
   }
 }
 ```
 
-### Entering/Exiting Modal Animation (Reanimated 4)
+### Level-Up Mentor Copy
 ```typescript
-// Source: Reanimated 4 docs - layout animations
-// Use absolute overlay, NOT React Native Modal, to avoid known glitch
+// src/domain/level-copy.ts
+// Source: CONTEXT.md locked decisions + Claude's discretion for non-milestone levels
 
-import Animated, { ZoomIn, FadeOut } from 'react-native-reanimated';
+export function getLevelUpCopy(level: number): string {
+  // Milestone copy (locked from CONTEXT.md):
+  if (level === 5) return 'Your discipline grows stronger.';
+  if (level === 10) return 'A new horizon opens before you.';
+  if (level === 20) return 'Consistency is becoming your nature.';
+  if (level === 50) return 'Few have walked this far. MashaAllah.';
 
-// In root layout or habits screen:
-{showLevelUp && (
-  <Animated.View
-    entering={ZoomIn.duration(350).springify()}
-    exiting={FadeOut.duration(200)}
-    style={StyleSheet.absoluteFillObject} // covers full screen
-  >
-    <LevelUpModal level={newLevel} unlockedTitles={unlocked} onContinue={dismiss} />
-  </Animated.View>
-)}
+  // Range copy (Claude's discretion):
+  if (level <= 3) return 'The journey has begun. Keep going.';
+  if (level <= 7) return 'Momentum is building. You can feel it.';
+  if (level <= 15) return 'Your path is becoming clear.';
+  if (level <= 30) return 'Discipline is becoming habit.';
+  if (level <= 75) return 'The mountain bows to the persistent.';
+  return 'You walk where few dare to tread.';
+}
 ```
 
 ---
@@ -654,35 +696,41 @@ import Animated, { ZoomIn, FadeOut } from 'react-native-reanimated';
 
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
-| `runOnJS()` for JS callbacks from worklets | `scheduleOnRN()` (new name) | Reanimated 4.x | `runOnJS` still re-exported, not urgent to change yet |
-| `restDisplacementThreshold` on withSpring | `energyThreshold` (single param) | Reanimated 4.x | Remove old params; new default behavior is safe |
-| Reanimated babel plugin in babel.config.js | `babel-preset-expo` handles automatically | Expo SDK 54 | Do NOT add plugin manually — causes conflicts |
-| Modal for celebrations | Absolute-positioned overlay with zIndex | Community pattern 2024+ | Avoids known react-native-screens glitch with Reanimated in Modal |
-| Linear level scan | Binary search `levelForXP()` | Always best practice | Cleaner, no practical perf difference at 100 levels |
+| `runOnJS()` for JS callbacks from worklets | `scheduleOnRN()` (new name) | Reanimated 4.x | `runOnJS` still re-exported as alias, not urgent |
+| `restDisplacementThreshold` on withSpring | `energyThreshold` (single param) | Reanimated 4.x | Remove old params if used |
+| Reanimated babel plugin in babel.config.js | `babel-preset-expo` handles automatically | Expo SDK 54 | Do NOT add plugin manually -- causes conflicts |
+| Modal for celebrations | Absolute-positioned overlay with zIndex | Community pattern 2024+ | Avoids react-native-screens glitch with Reanimated in Modal |
+| Old Architecture | New Architecture (required for Reanimated 4) | Expo SDK 54 | Already enabled in app.json |
 
-**Deprecated/outdated:**
-- `addWhitelistedNativeProps`/`addWhitelistedUIProps`: Removed in Reanimated 4, were no-ops
-- `useWorkletCallback`: Removed in Reanimated 4
-- `combineTransition`: Removed in Reanimated 4
+**Deprecated/outdated in Reanimated 4:**
+- `addWhitelistedNativeProps`/`addWhitelistedUIProps`: Removed, were no-ops
+- `useWorkletCallback`: Removed
+- `combineTransition`: Removed
+- Old Architecture support: Removed from Reanimated 4
 
 ---
 
 ## Open Questions
 
-1. **Quest template dataset**
-   - What we know: Quest engine architecture is clear; `targetType` enum defined
-   - What's unclear: The full set of 20+ quest templates (descriptions, difficulty tiers, minLevel gates) needs to be written as seed data. This is content work, not engineering.
-   - Recommendation: Write 20 daily templates, 8 weekly templates, 3 stretch templates as a TypeScript constant in `src/domain/quest-templates.ts`. Scale XP rewards by type: daily 25-50 XP, weekly 80-150 XP, stretch 200-400 XP.
+1. **Quest template dataset completeness**
+   - What we know: Architecture is clear; 3 example categories from blueprint; targetType enum defined
+   - What's unclear: Full set of 20+ quest templates needs writing as content
+   - Recommendation: Write 20 daily, 8 weekly, 3 stretch templates in `quest-templates.ts`. Ensure templates reference only habits the player has (filter by `activeHabitTypes`). Scale: daily 25-50 XP, weekly 100-200 XP, stretch 300-500 XP.
 
-2. **Title seed data migration**
-   - What we know: 26 titles exist in Blueprint (10 Common, 10 Rare, 6 Legendary); `titles` table schema is defined
-   - What's unclear: Exact unlock conditions for all 26 titles haven't been enumerated in code
-   - Recommendation: Create a new Drizzle migration that seeds all 26 titles. Title unlock conditions must map to the four `unlockType` values in the schema.
+2. **Title seed data migration approach**
+   - What we know: 26 titles fully defined in blueprint; `titles` table exists; schema has all needed columns
+   - What's unclear: Whether to use Drizzle migration or runtime seed check
+   - Recommendation: Runtime seed check in `gameStore.loadGame()` -- if `titles` table is empty, insert all 26. This avoids migration ordering issues and works for both fresh installs and existing users. The titles table is "seed data" (game config, not user data), so idempotent insert is clean.
 
-3. **PlayerStats data collection for title checks**
-   - What we know: We need `salahConsecutiveDays` (consecutive days all 5 salah completed) — this doesn't directly exist in current schema
-   - What's unclear: Whether to derive this from streak data or add a dedicated column
-   - Recommendation: Derive from streak data: a "salah consecutive days" counter = min streak count among all active salah habits. This is computable without a new column.
+3. **Quests that depend on streak data (e.g., "Maintain a 7-day streak")**
+   - What we know: `streak_reach` quest type needs to evaluate current streak state
+   - What's unclear: Whether to check once daily or on every completion
+   - Recommendation: Check on every completion -- streaks only change on completion events anyway. Build the quest progress evaluation into the same post-completion flow that handles XP and titles.
+
+4. **Integration point for XP into completeHabit()**
+   - What we know: `habitStore.completeHabit()` has `xpEarned: 0` placeholder at line 222
+   - What's unclear: Whether to call `gameStore.awardXP()` from within `habitStore.completeHabit()` (cross-store call) or have the UI layer orchestrate
+   - Recommendation: Have `habitStore.completeHabit()` return the completion result, then the UI layer (or a coordinating action) calls `gameStore.awardXP()`. This keeps stores decoupled. Alternatively, `habitStore.completeHabit()` can call `gameStore.getState().awardXP()` directly -- Zustand allows cross-store access via `getState()`.
 
 ---
 
@@ -692,19 +740,19 @@ import Animated, { ZoomIn, FadeOut } from 'react-native-reanimated';
 | Property | Value |
 |----------|-------|
 | Framework | jest-expo ~54.0.17 |
-| Config file | jest.config.js (or package.json jest field) |
-| Quick run command | `npm test -- --testPathPattern=domain/xp-engine` |
+| Config file | jest.config.js |
+| Quick run command | `npm test -- --testPathPattern=domain/` |
 | Full suite command | `npm test` |
 
-### Phase Requirements → Test Map
+### Phase Requirements -> Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| GAME-01 | XP calculation with multiplier and soft cap | unit | `npm test -- --testPathPattern=domain/xp-engine` | ❌ Wave 0 |
-| GAME-02 | Level derivation from total XP; level-up detection | unit | `npm test -- --testPathPattern=domain/xp-engine` | ❌ Wave 0 |
-| GAME-03 | Title unlock condition evaluation | unit | `npm test -- --testPathPattern=domain/title-engine` | ❌ Wave 0 |
-| GAME-04 | Quest template selection (no repeat within 7 days) | unit | `npm test -- --testPathPattern=domain/quest-engine` | ❌ Wave 0 |
-| GAME-05 | Quest progress evaluation per completion event | unit | `npm test -- --testPathPattern=domain/quest-engine` | ❌ Wave 0 |
-| GAME-06 | XP economy simulation (level thresholds match design targets) | unit | `npm test -- --testPathPattern=domain/xp-engine` | ❌ Wave 0 |
+| GAME-01 | XP calculation with multiplier and soft cap | unit | `npm test -- --testPathPattern=domain/xp-engine` | No -- Wave 0 |
+| GAME-02 | Level derivation from total XP; level-up detection | unit | `npm test -- --testPathPattern=domain/xp-engine` | No -- Wave 0 |
+| GAME-03 | Title unlock condition evaluation for all 26 titles | unit | `npm test -- --testPathPattern=domain/title-engine` | No -- Wave 0 |
+| GAME-04 | Quest template selection (no repeat within 7 days, level-gated) | unit | `npm test -- --testPathPattern=domain/quest-engine` | No -- Wave 0 |
+| GAME-05 | Quest progress evaluation per completion event | unit | `npm test -- --testPathPattern=domain/quest-engine` | No -- Wave 0 |
+| GAME-06 | XP economy simulation matches blueprint targets | unit | `npm test -- --testPathPattern=domain/xp-engine` | No -- Wave 0 |
 
 ### Sampling Rate
 - **Per task commit:** `npm test -- --testPathPattern=domain/` (runs all domain tests, < 5s)
@@ -712,40 +760,45 @@ import Animated, { ZoomIn, FadeOut } from 'react-native-reanimated';
 - **Phase gate:** Full suite green before `/gsd:verify-work`
 
 ### Wave 0 Gaps
-- [ ] `__tests__/domain/xp-engine.test.ts` — covers GAME-01, GAME-02, GAME-06
-- [ ] `__tests__/domain/title-engine.test.ts` — covers GAME-03
-- [ ] `__tests__/domain/quest-engine.test.ts` — covers GAME-04, GAME-05
+- [ ] `__tests__/domain/xp-engine.test.ts` -- covers GAME-01, GAME-02, GAME-06
+- [ ] `__tests__/domain/title-engine.test.ts` -- covers GAME-03
+- [ ] `__tests__/domain/quest-engine.test.ts` -- covers GAME-04, GAME-05
 
-*(No framework gaps — jest-expo already installed and working from Phase 2/3)*
+*(No framework gaps -- jest-expo already installed and working from Phase 2/3 with 6 existing test files)*
 
 ---
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Reanimated 4 Migration Guide: https://docs.swmansion.com/react-native-reanimated/docs/guides/migration-from-3.x/ — confirmed useSharedValue/withTiming/useAnimatedStyle are unchanged; withSpring parameter changes documented
-- Expo Haptics docs: https://docs.expo.dev/versions/latest/sdk/haptics/ — all haptic types and enums verified
-- Expo SDK 54 changelog: https://expo.dev/changelog/sdk-54 — confirmed Reanimated v4 + react-native-worklets requirement
-- Project codebase: streak-engine.ts, gameStore.ts, xpRepo.ts, questRepo.ts, schema.ts — all read directly
+- Project codebase: streak-engine.ts, gameStore.ts, xpRepo.ts, questRepo.ts, schema.ts, habitStore.ts, habits.tsx -- all read directly
+- Blueprint: 03-game-design-bible.md -- XP formula, simulation table, streak model, quest types, anti-burnout mechanics
+- Blueprint: 04-worldbuilding.md -- All 26 Identity Titles with unlock conditions and flavor text
+- Blueprint: 05-feature-systems.md -- Quest Board spec, quest examples, states, edge cases
+- app.json -- confirmed `newArchEnabled: true`
+- package.json -- confirmed all dependency versions
 
 ### Secondary (MEDIUM confidence)
-- FreeCodeCamp Reanimated v4 guide: https://www.freecodecamp.org/news/how-to-create-fluid-animations-with-react-native-reanimated-v4/ — CSS transition vs worklet guidance verified against official docs
-- Reanimated discussion #8778: https://github.com/software-mansion/react-native-reanimated/discussions/8778 — react-native-worklets version matching in Expo Go
-- Reanimated entering/exiting docs: https://docs.swmansion.com/react-native-reanimated/docs/layout-animations/entering-exiting-animations/ — FadeIn, ZoomIn, SlideIn confirmed available
+- [Expo SDK 54 changelog](https://expo.dev/changelog/sdk-54) -- confirmed Reanimated 4 + react-native-worklets pairing
+- [Reanimated Getting Started](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/) -- babel-preset-expo auto-configuration
+- [Expo Haptics docs](https://docs.expo.dev/versions/latest/sdk/haptics/) -- all haptic types and enums verified
+- [Reanimated entering/exiting docs](https://docs.swmansion.com/react-native-reanimated/docs/layout-animations/entering-exiting-animations/) -- ZoomIn, FadeIn, FadeOut confirmed
+- [Reanimated Discussion #8778](https://github.com/software-mansion/react-native-reanimated/discussions/8778) -- worklets version matching in Expo Go
 
 ### Tertiary (LOW confidence)
-- react-native-screens issue #2545 (Modal + Reanimated glitch): GitHub — community-reported, not official doc. Warrants testing before committing to Modal approach.
+- react-native-screens interaction with Reanimated in Modal: Community-reported pattern, not official doc. Warrants testing before committing to overlay approach; overlay is safer default.
 
 ---
 
 ## Metadata
 
 **Confidence breakdown:**
-- Standard stack: HIGH — verified from package.json and official docs
-- Architecture: HIGH — directly modeled on existing streak-engine.ts and store patterns in this codebase
-- Animation APIs: HIGH — Reanimated 4 docs and migration guide verified
-- Pitfalls: MEDIUM/HIGH — react-native-worklets gap verified from Expo SDK 54 changelog; Modal glitch LOW (community-reported)
-- XP balance numbers: MEDIUM — formula is locked; simulation math is straightforward arithmetic
+- Standard stack: HIGH -- verified from package.json, node_modules, and official docs
+- Architecture: HIGH -- directly modeled on existing streak-engine.ts and store patterns in codebase
+- Animation APIs: HIGH -- Reanimated 4 docs verified; worklets confirmed installed
+- Pitfalls: HIGH -- worklets gap verified; Modal glitch is community-reported but overlay pattern is safe default
+- XP balance numbers: HIGH -- formula locked; blueprint simulation table provides authoritative checkpoints
+- Title/Quest content: HIGH -- all 26 titles and quest specs come from blueprint docs in this repo
 
 **Research date:** 2026-03-14
-**Valid until:** 2026-06-14 (Reanimated and Expo stable ecosystem — 90 days)
+**Valid until:** 2026-06-14 (Reanimated and Expo stable ecosystem -- 90 days)
