@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Master Blueprint** - Complete 16-section design document that makes every app-build decision upfront (completed 2026-03-07)
 - [x] **Phase 2: Foundation and Data Layer** - Expo scaffold, navigation, SQLite persistence, state management, privacy boundaries, and design tokens (completed 2026-03-09)
-- [ ] **Phase 3: Core Habit Loop** - Habit tracking, prayer time integration, streaks, and Mercy Mode recovery -- the product's reason to exist
+- [x] **Phase 3: Core Habit Loop** - Habit tracking, prayer time integration, streaks, and Mercy Mode recovery -- the product's reason to exist (completed 2026-03-10)
 - [ ] **Phase 4: Game Engine and Progression** - XP system, leveling, Identity Titles, Quest Board, and balanced game economy
 - [ ] **Phase 5: HUD, Visual Identity, and Muhasabah** - 16-bit Home HUD with Skia rendering, animations, haptics, and nightly reflection
 - [ ] **Phase 6: Onboarding, Profile, and Notifications** - First-launch Niyyah flow, profile/settings screens, and notification system
@@ -70,12 +70,15 @@ Plans:
   3. Salah habits display correct prayer time windows based on user location and selected calculation method
   4. User can view their streak count for each habit and see a calendar/heatmap of past completions
   5. When a streak breaks, Mercy Mode activates with a compassionate recovery path (no shame language anywhere)
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 03-01: TBD
-- [ ] 03-02: TBD
-- [ ] 03-03: TBD
+- [x] 03-01-PLAN.md — Domain types, presets, prayer times, location, habit sorter
+- [x] 03-02-PLAN.md — Streak engine with full TDD
+- [x] 03-03-PLAN.md — Data wiring layer (completionRepo, streakRepo, mercy mode migration, habitStore)
+- [x] 03-04-PLAN.md — Daily habit list screen (HabitCard, DailyProgressBar, HabitList, habits tab)
+- [x] 03-05-PLAN.md — Habit creation & management (PresetLibrary, CustomHabitForm, EditHabitSheet)
+- [x] 03-06-PLAN.md — Prayer time windows, Mercy Mode, calendar heatmap, on-device verification
 
 ### Phase 4: Game Engine and Progression
 **Goal**: Habit completions feed a balanced game economy with XP, levels, titles, and quests that motivate discipline without implying spiritual judgment
@@ -87,11 +90,13 @@ Plans:
   3. User unlocks Identity Titles at real consistency milestones (e.g., 40 consecutive Fajr prayers)
   4. Quest Board presents daily and weekly quests that rotate with variety, completable for bonus XP
   5. All XP-related UI uses "discipline" framing, never "worship score" or spiritual judgment language
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 04-01: TBD
-- [ ] 04-02: TBD
+- [ ] 04-01-PLAN.md — Pure TS domain engines (xp-engine, title-engine, quest-engine) with TDD, title seeds, quest templates
+- [ ] 04-02-PLAN.md — Data wiring (titleRepo, title seed migration, gameStore actions, habitStore XP injection)
+- [ ] 04-03-PLAN.md — XP feedback UI (floating XP label, progress bar, level/title header) and celebration overlays (level-up, title unlock)
+- [ ] 04-04-PLAN.md — Quest Board screen with quest display, title browser, locked state, and tab toggle
 
 ### Phase 5: HUD, Visual Identity, and Muhasabah
 **Goal**: The app looks and feels like a premium retro RPG with a game-world Home HUD, smooth animations, haptic feedback, and a private nightly reflection ritual
@@ -150,8 +155,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 1. Master Blueprint | 7/7 | Complete   | 2026-03-07 |
 | 2. Foundation and Data Layer | 3/3 | Complete | 2026-03-09 |
-| 3. Core Habit Loop | 5/6 | In Progress|  |
-| 4. Game Engine and Progression | 0/2 | Not started | - |
+| 3. Core Habit Loop | 6/6 | Complete | 2026-03-10 |
+| 4. Game Engine and Progression | 0/4 | Not started | - |
 | 5. HUD, Visual Identity, and Muhasabah | 0/2 | Not started | - |
 | 6. Onboarding, Profile, and Notifications | 0/3 | Not started | - |
 | 7. Backend, Auth, and Sync | 0/2 | Not started | - |
