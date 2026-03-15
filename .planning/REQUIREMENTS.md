@@ -62,12 +62,12 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Game Engine
 
-- [ ] **GAME-01**: User earns XP for habit completions (effort-based, not outcome-based)
-- [ ] **GAME-02**: User levels up through XP accumulation with logarithmic progression curve
-- [ ] **GAME-03**: User unlocks Identity Titles at milestone thresholds (e.g., "The Steadfast" at 40 consecutive Fajr)
-- [ ] **GAME-04**: Quest Board presents daily and weekly quests with rotating variety
-- [ ] **GAME-05**: User can complete quests for bonus XP and progression
-- [ ] **GAME-06**: XP economy modeled and balanced (levels 1-100 progression curve)
+- [x] **GAME-01**: User earns XP for habit completions (effort-based, not outcome-based)
+- [x] **GAME-02**: User levels up through XP accumulation with logarithmic progression curve
+- [x] **GAME-03**: User unlocks Identity Titles at milestone thresholds (e.g., "The Steadfast" at 40 consecutive Fajr)
+- [x] **GAME-04**: Quest Board presents daily and weekly quests with rotating variety
+- [x] **GAME-05**: User can complete quests for bonus XP and progression
+- [x] **GAME-06**: XP economy modeled and balanced (levels 1-100 progression curve)
 
 ### Home HUD
 
