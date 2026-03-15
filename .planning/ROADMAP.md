@@ -107,11 +107,13 @@ Plans:
   2. XP gain and level-up animations run at smooth 60fps with satisfying haptic feedback
   3. Nightly Muhasabah presents structured reflection prompts completable in 30-60 seconds
   4. Muhasabah data stays on-device only and user can skip reflection without any penalty or shame
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 05-01: TBD
-- [ ] 05-02: TBD
+- [ ] 05-01-PLAN.md — Skia install, test scaffolds, Muhasabah domain (engine, repo, store), HUD environment domain
+- [ ] 05-02-PLAN.md — Home HUD screen: Skia Canvas scene, day/night cycle, character sprite, stat overlay, tap zones, environment reveal
+- [ ] 05-03-PLAN.md — Muhasabah UI flow: 3-screen modal (mood, highlight, focus), closing ayah, root layout mounting
+- [ ] 05-04-PLAN.md — Pixel art icon migration for habit cards + full phase human-verify checkpoint
 
 ### Phase 6: Onboarding, Profile, and Notifications
 **Goal**: New users experience a compelling Niyyah-based first launch, returning users manage their profile and settings, and notifications invite (never guilt) users back
@@ -157,6 +159,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Foundation and Data Layer | 3/3 | Complete | 2026-03-09 |
 | 3. Core Habit Loop | 6/6 | Complete | 2026-03-10 |
 | 4. Game Engine and Progression | 4/4 | Complete   | 2026-03-15 |
-| 5. HUD, Visual Identity, and Muhasabah | 0/2 | Not started | - |
+| 5. HUD, Visual Identity, and Muhasabah | 0/4 | Not started | - |
 | 6. Onboarding, Profile, and Notifications | 0/3 | Not started | - |
 | 7. Backend, Auth, and Sync | 0/2 | Not started | - |
