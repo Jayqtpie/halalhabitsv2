@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 3 of 3 (Phase 4) — complete
-status: verifying
-stopped_at: "05-04 checkpoint: awaiting human verify of pixel art icons + Muhasabah flow"
-last_updated: "2026-03-15T22:57:35.544Z"
-last_activity: "2026-03-15 -- Phase 4 device-verified: XP progress bar, level badge, float label, level-up overlay, haptics all confirmed working"
+current_plan: 2 of 4 (Phase 5) — checkpoint
+status: checkpoint
+stopped_at: "05-02 checkpoint: awaiting human verify of Home HUD on device"
+last_updated: "2026-03-15T23:30:00.000Z"
+last_activity: "2026-03-15 -- 05-02: Home HUD assembled (HudScene, HudStatBar, SceneObjects, EnvironmentReveal, PrayerCountdown)"
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 24
-  completed_plans: 21
-  percent: 90
+  completed_plans: 22
+  percent: 92
 ---
 
 # Project State
@@ -26,13 +26,13 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 4 of 7 (Game Engine & Progression — complete)
-Current Plan: 3 of 3 (Phase 4) — complete
-Status: Phase 4 fully verified — ready for Phase 5 (HUD, Visual Identity & Muhasabah)
-Last activity: 2026-03-15 -- Phase 4 device-verified: XP progress bar, level badge, float label, level-up overlay, haptics all confirmed working
+Phase: 5 of 7 (HUD, Visual Identity & Muhasabah — in progress)
+Current Plan: 2 of 4 (Phase 5) — checkpoint awaiting human verify
+Status: Home HUD assembled, awaiting device verification of visual output and tap zone interactions
+Last activity: 2026-03-15 -- 05-02: Home HUD assembled with HudScene (Skia Canvas), HudStatBar (BlurView), SceneObjects (tap zones), EnvironmentReveal, PrayerCountdown
 
-Progress: [█████████░] 90% overall (18/20 plans complete)
-Overall: 4 complete phases (Phase 01-04)
+Progress: [█████████░] 92% overall (22/24 plans complete)
+Overall: 4 complete phases (Phase 01-04), Phase 05 in progress (2/4 plans done)
 
 ## Performance Metrics
 
@@ -128,14 +128,23 @@ Recent decisions affecting current work:
 ### Pending Todos
 
 - Gear icon redesign (flagged during 03-06 verification)
+- Replace environment PNG placeholders with real AI-generated pixel art assets (after HUD checkpoint approved)
+
+### Decisions (Phase 05)
+
+- [Phase 05-02]: Skia interpolateColors for day/night tint (NOT Reanimated interpolateColor -- incompatible formats)
+- [Phase 05-02]: Manual 4-frame clip cycling for CharacterSprite (not Atlas -- simpler for <=4 frames at MVP)
+- [Phase 05-02]: BlurView (iOS) / rgba fallback (Android) for HudStatBar -- BlurTargetView complexity avoided for MVP
+- [Phase 05-02]: Quest completion haptic added to gameStore.updateQuestProgress (missing from Phase 4)
+- [Phase 05-02]: EnvironmentReveal fires only when isEnvironmentTransition(level-1, level) is true
 
 ### Blockers/Concerns
 
-- Pixel art asset pipeline not researched (sprite sheets, Arabic pixel fonts, Skia patterns)
-- Success criterion "app builds via EAS Build (not Expo Go)" not yet met — using Expo Go on SDK 54 for now
+- Asset placeholders in use -- real pixel art assets needed before product-quality screenshots
+- Success criterion "app builds via EAS Build (not Expo Go)" not yet met -- using Expo Go on SDK 54
 
 ## Session Continuity
 
-Last session: 2026-03-15T22:57:35.541Z
-Stopped at: 05-04 checkpoint: awaiting human verify of pixel art icons + Muhasabah flow
-Resume file: None
+Last session: 2026-03-15T23:30:00.000Z
+Stopped at: 05-02 checkpoint: awaiting human verify of Home HUD on device
+Resume file: .planning/phases/05-hud-visual-identity-and-muhasabah/05-02-SUMMARY.md

@@ -110,10 +110,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 05-01-PLAN.md — Skia install, test scaffolds, Muhasabah domain (engine, repo, store), HUD environment domain
-- [ ] 05-02-PLAN.md — Home HUD screen: Skia Canvas scene, day/night cycle, character sprite, stat overlay, tap zones, environment reveal
+- [x] 05-01-PLAN.md — Skia install, test scaffolds, Muhasabah domain (engine, repo, store), HUD environment domain (completed 2026-03-15)
+- [x] 05-02-PLAN.md — Home HUD screen: Skia Canvas scene, day/night cycle, character sprite, stat overlay, tap zones, environment reveal (checkpoint awaiting verify 2026-03-15)
 - [ ] 05-03-PLAN.md — Muhasabah UI flow: 3-screen modal (mood, highlight, focus), closing ayah, root layout mounting
-- [ ] 05-04-PLAN.md — Pixel art icon migration for habit cards + full phase human-verify checkpoint
+- [x] 05-04-PLAN.md — Pixel art icon migration for habit cards + full phase human-verify checkpoint (completed 2026-03-15)
 
 ### Phase 6: Onboarding, Profile, and Notifications
 **Goal**: New users experience a compelling Niyyah-based first launch, returning users manage their profile and settings, and notifications invite (never guilt) users back
