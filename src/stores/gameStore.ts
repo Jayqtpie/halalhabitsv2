@@ -21,6 +21,7 @@ import { generateId } from '../utils/uuid';
 import type { Title, UserTitle, Quest } from '../types/database';
 import type { PlayerStats } from '../domain/title-engine';
 import type { QuestProgressEvent } from '../domain/quest-engine';
+import * as Haptics from 'expo-haptics';
 
 // ─── Celebration Types ────────────────────────────────────────────────────────
 
@@ -138,8 +139,26 @@ export const useGameStore = create<GameState>((set, get) => ({
   loadGame: async (userId: string) => {
     set({ loading: true });
     try {
-      // 1. Load user record
-      const user = await userRepo.getById(userId);
+      // 1. Load or create user record
+      let user = await userRepo.getById(userId);
+      if (!user) {
+        try {
+          const now = new Date().toISOString();
+          const [created] = await userRepo.create({
+            id: userId,
+            displayName: 'Player',
+            totalXp: 0,
+            currentLevel: 1,
+            activeTitleId: null,
+            createdAt: now,
+            updatedAt: now,
+          });
+          user = created;
+        } catch {
+          // Race condition: another call may have created the user
+          user = await userRepo.getById(userId);
+        }
+      }
       const totalXP = user?.totalXp ?? 0;
       const currentLevel = user?.currentLevel ?? levelForXP(totalXP);
       const xpToNext = xpToNextLevel(currentLevel);
@@ -406,6 +425,9 @@ export const useGameStore = create<GameState>((set, get) => ({
 
           // Award quest XP
           await get().awardXP(userId, quest.xpReward, 1.0, 'quest', quest.id);
+
+          // HUD-04: Haptic feedback on quest completion (Medium)
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
 
           // Update local state
           set((s) => ({
