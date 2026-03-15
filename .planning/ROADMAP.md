@@ -159,6 +159,6 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. Foundation and Data Layer | 3/3 | Complete | 2026-03-09 |
 | 3. Core Habit Loop | 6/6 | Complete | 2026-03-10 |
 | 4. Game Engine and Progression | 4/4 | Complete   | 2026-03-15 |
-| 5. HUD, Visual Identity, and Muhasabah | 0/4 | Not started | - |
+| 5. HUD, Visual Identity, and Muhasabah | 1/4 | In Progress|  |
 | 6. Onboarding, Profile, and Notifications | 0/3 | Not started | - |
 | 7. Backend, Auth, and Sync | 0/2 | Not started | - |

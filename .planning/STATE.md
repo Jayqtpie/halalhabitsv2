@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 current_plan: 3 of 3 (Phase 4) — complete
 status: verifying
-stopped_at: Phase 5 context gathered
-last_updated: "2026-03-15T02:00:25.513Z"
+stopped_at: "05-04 checkpoint: awaiting human verify of pixel art icons + Muhasabah flow"
+last_updated: "2026-03-15T22:57:35.544Z"
 last_activity: "2026-03-15 -- Phase 4 device-verified: XP progress bar, level badge, float label, level-up overlay, haptics all confirmed working"
 progress:
   total_phases: 7
   completed_phases: 4
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 24
+  completed_plans: 21
   percent: 90
 ---
 
@@ -64,6 +64,7 @@ Overall: 4 complete phases (Phase 01-04)
 | 03-05 | 6min | 2 | Habit creation & management |
 | 03-06 | ~15min | 3 | Prayer, Mercy Mode, calendar, verification |
 | Phase 04-game-engine-and-progression P04 | 5 | 2 tasks | 6 files |
+| Phase 05-hud-visual-identity-and-muhasabah P04 | 4min | 1 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,9 @@ Recent decisions affecting current work:
 - [Phase 04]: XP float text derived from totalXP delta via store subscription (not XPResult return value)
 - [Phase 04]: Celebration overlays use StyleSheet.absoluteFillObject absolute Views (not React Native Modal)
 - [Phase 04]: HabitCard exposes onCompleteWithPosition callback with measureInWindow for float positioning
+- [Phase 05-04]: Use RN Image (not Skia Image) in HabitCard -- standard RN view, not inside Skia Canvas
+- [Phase 05-04]: Icons keyed by habit.category, character category maps to custom icon
+- [Phase 05-04]: Pixel art icons at 32x32 source + render size to avoid upscaling antialiasing
 
 ### Pending Todos
 
@@ -132,6 +136,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-15T02:00:25.509Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-hud-visual-identity-and-muhasabah/05-CONTEXT.md
+Last session: 2026-03-15T22:57:35.541Z
+Stopped at: 05-04 checkpoint: awaiting human verify of pixel art icons + Muhasabah flow
+Resume file: None

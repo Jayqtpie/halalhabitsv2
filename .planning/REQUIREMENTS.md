@@ -72,7 +72,7 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Home HUD
 
 - [ ] **HUD-01**: Home screen displays game-world HUD with current level, XP bar, streak count, and active quests
-- [ ] **HUD-02**: HUD uses 16-bit pixel art aesthetic with crisp rendering (Skia FilterQuality.None)
+- [x] **HUD-02**: HUD uses 16-bit pixel art aesthetic with crisp rendering (Skia FilterQuality.None)
 - [ ] **HUD-03**: XP gain and level-up animations are smooth 60fps (Reanimated)
 - [ ] **HUD-04**: Haptic feedback on habit completion, level-up, and quest completion
 
