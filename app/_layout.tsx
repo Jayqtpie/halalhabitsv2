@@ -13,6 +13,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import i18n from '../src/i18n/config';
 import { db } from '../src/db/client';
 import migrations from '../src/db/migrations/migrations';
+import { MuhasabahModal } from '../src/components/muhasabah/MuhasabahModal';
 
 // Keep splash screen visible while loading
 SplashScreen.preventAutoHideAsync();
@@ -47,7 +48,11 @@ export default function RootLayout() {
         screenOptions={{
           headerShown: false,
         }}
-      />
+      >
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
+      {/* MuhasabahModal overlays all screens — mounted outside Stack navigator, zIndex: 100 */}
+      <MuhasabahModal />
     </I18nextProvider>
   );
 }
