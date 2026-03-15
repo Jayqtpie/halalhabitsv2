@@ -73,8 +73,7 @@ export function MuhasabahStep3() {
     setError(null);
     setFocusIntent(intent);
     try {
-      // 'user-1' is the v1 placeholder userId (same pattern as rest of codebase)
-      await submit('user-1');
+      await submit('default-user');
     } catch (err) {
       setError('Something went wrong. Tap to try again.');
     }

@@ -27,12 +27,11 @@ export function MuhasabahStep2() {
     useShallow((s) => ({ habits: s.habits, completions: s.completions, loadHabits: s.loadHabits })),
   );
 
-  // Ensure habits are loaded (user may open Muhasabah from Home without visiting Habits tab)
+  // Always refresh habits + completions when this step mounts
+  // (user may open Muhasabah from Home without visiting Habits tab)
   useEffect(() => {
-    if (habits.length === 0) {
-      loadHabits(DEFAULT_USER_ID);
-    }
-  }, [habits.length, loadHabits]);
+    loadHabits(DEFAULT_USER_ID);
+  }, [loadHabits]);
 
   // Today's completed habits
   const completedHabits = habits.filter((h) => completions[h.id]);
@@ -69,7 +68,7 @@ export function MuhasabahStep2() {
         /* Empty state — warm, no shame */
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>
-            You're doing great — even small steps count.
+            No habits completed today — and that's okay.{'\n'}Even small steps count.
           </Text>
           <Pressable
             style={({ pressed }) => [
