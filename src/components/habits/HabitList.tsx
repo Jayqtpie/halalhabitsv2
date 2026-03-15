@@ -14,6 +14,7 @@ import {
   FlatList,
   View,
   Text,
+  Pressable,
   StyleSheet,
   ActivityIndicator,
   RefreshControl,
@@ -27,9 +28,12 @@ import { colors, typography, spacing } from '../../tokens';
 interface HabitListProps {
   userId: string;
   onLongPressHabit?: (habitId: string) => void;
+  onAddHabit?: () => void;
+  /** Optional: called with screen position for XP float label placement */
+  onCompleteWithPosition?: (habitId: string, x: number, y: number) => void;
 }
 
-export function HabitList({ userId, onLongPressHabit }: HabitListProps) {
+export function HabitList({ userId, onLongPressHabit, onAddHabit, onCompleteWithPosition }: HabitListProps) {
   const { loading, habits } = useHabitStore(
     useShallow((s) => ({ loading: s.loading, habits: s.habits })),
   );
@@ -56,9 +60,10 @@ export function HabitList({ userId, onLongPressHabit }: HabitListProps) {
         habit={item}
         onComplete={handleComplete}
         onLongPress={onLongPressHabit}
+        onCompleteWithPosition={onCompleteWithPosition}
       />
     ),
-    [handleComplete, onLongPressHabit],
+    [handleComplete, onLongPressHabit, onCompleteWithPosition],
   );
 
   const keyExtractor = useCallback((item: HabitWithStatus) => item.id, []);
@@ -75,14 +80,14 @@ export function HabitList({ userId, onLongPressHabit }: HabitListProps) {
   // ── Empty State ─────────────────────────────────────────────────────
   if (!loading && displayHabits.length === 0) {
     return (
-      <View style={styles.centered}>
+      <Pressable style={styles.centered} onPress={onAddHabit}>
         <Text style={styles.emptyIcon}>+</Text>
         <Text style={styles.emptyTitle}>Your journey begins</Text>
         <Text style={styles.emptyBody}>
-          Tap + below to add your first habit.{'\n'}
+          Tap to add your first habit.{'\n'}
           Every step forward builds discipline.
         </Text>
-      </View>
+      </Pressable>
     );
   }
 

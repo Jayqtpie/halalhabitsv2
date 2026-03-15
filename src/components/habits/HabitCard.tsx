@@ -10,24 +10,14 @@
  *
  * Prayer time windows are informational only -- users can always complete.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   Text,
   StyleSheet,
   Pressable,
   View,
-  AccessibilityInfo,
+  Animated,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSequence,
-  withTiming,
-  withSpring,
-  FadeIn,
-  FadeOut,
-  Layout,
-} from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { PrayerTimeWindow } from '../prayer/PrayerTimeWindow';
@@ -38,49 +28,69 @@ interface HabitCardProps {
   habit: HabitWithStatus;
   onComplete: (habitId: string) => void;
   onLongPress?: (habitId: string) => void;
+  /** Optional: called with screen position of the card center for XP float label */
+  onCompleteWithPosition?: (habitId: string, x: number, y: number) => void;
 }
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-export function HabitCard({ habit, onComplete, onLongPress }: HabitCardProps) {
+export function HabitCard({ habit, onComplete, onLongPress, onCompleteWithPosition }: HabitCardProps) {
   const hapticEnabled = useSettingsStore((s) => s.hapticEnabled);
   const completed = habit.completedToday;
 
-  // ── Animations ──────────────────────────────────────────────────────
-  const checkScale = useSharedValue(1);
-  const glowOpacity = useSharedValue(0);
+  // Ref for measuring card position
+  const cardRef = useRef<View>(null);
 
-  const checkAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: checkScale.value }],
-  }));
-
-  const glowAnimatedStyle = useAnimatedStyle(() => ({
-    borderColor: `rgba(13, 124, 61, ${glowOpacity.value})`,
-    borderWidth: glowOpacity.value > 0 ? 2 : 1,
-  }));
+  // ── Animations (RN Animated) ────────────────────────────────────────
+  const checkScale = useRef(new Animated.Value(1)).current;
+  const glowOpacity = useRef(new Animated.Value(0)).current;
 
   const handleComplete = useCallback(() => {
     if (completed) return;
 
     // Scale pulse on checkmark: 1.0 -> 1.3 -> 1.0
-    checkScale.value = withSequence(
-      withSpring(1.3, { damping: 8, stiffness: 300 }),
-      withSpring(1.0, { damping: 12, stiffness: 200 }),
-    );
+    Animated.sequence([
+      Animated.spring(checkScale, {
+        toValue: 1.3,
+        damping: 8,
+        stiffness: 300,
+        useNativeDriver: true,
+      }),
+      Animated.spring(checkScale, {
+        toValue: 1.0,
+        damping: 12,
+        stiffness: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
 
     // Brief emerald glow on card border
-    glowOpacity.value = withSequence(
-      withTiming(0.8, { duration: duration.fast }),
-      withTiming(0, { duration: duration.normal }),
-    );
+    Animated.sequence([
+      Animated.timing(glowOpacity, {
+        toValue: 0.8,
+        duration: duration.fast,
+        useNativeDriver: false,
+      }),
+      Animated.timing(glowOpacity, {
+        toValue: 0,
+        duration: duration.normal,
+        useNativeDriver: false,
+      }),
+    ]).start();
 
     // Haptic pulse
     if (hapticEnabled) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     }
 
+    // Measure card position for XP float label
+    if (onCompleteWithPosition && cardRef.current) {
+      cardRef.current.measureInWindow((x, y, _width, height) => {
+        // Position float at top-center of card
+        onCompleteWithPosition(habit.id, x + 60, y + height * 0.3);
+      });
+    }
+
     onComplete(habit.id);
-  }, [completed, hapticEnabled, habit.id, onComplete, checkScale, glowOpacity]);
+  }, [completed, hapticEnabled, habit.id, onComplete, onCompleteWithPosition, checkScale, glowOpacity]);
 
   const handleLongPress = useCallback(() => {
     if (onLongPress) {
@@ -103,79 +113,94 @@ export function HabitCard({ habit, onComplete, onLongPress }: HabitCardProps) {
     habit.prayerWindow?.status === 'active' &&
     habit.type === 'salah';
 
+  // Interpolate glow opacity to border color
+  const glowBorderColor = glowOpacity.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['rgba(13, 124, 61, 0)', 'rgba(13, 124, 61, 1)'],
+  });
+  const glowBorderWidth = glowOpacity.interpolate({
+    inputRange: [0, 0.01, 1],
+    outputRange: [1, 2, 2],
+  });
+
   return (
-    <AnimatedPressable
-      entering={FadeIn.duration(duration.normal)}
-      exiting={FadeOut.duration(duration.fast)}
-      layout={Layout.springify()}
+    <Animated.View
+      ref={cardRef}
       style={[
         styles.card,
         completed && styles.cardCompleted,
-        glowAnimatedStyle,
+        { borderColor: glowBorderColor, borderWidth: glowBorderWidth },
       ]}
-      onPress={handleComplete}
-      onLongPress={handleLongPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${habit.name}${completed ? ', completed' : ''}`}
-      accessibilityHint={completed ? undefined : 'Double tap to complete this habit'}
     >
-      {/* Left: Icon */}
-      <View style={styles.iconContainer}>
-        <Text style={styles.icon}>{habit.icon || '+'}</Text>
-      </View>
-
-      {/* Center: Name, time window, streak */}
-      <View style={styles.centerContent}>
-        <Text
-          style={[styles.habitName, completed && styles.textCompleted]}
-          numberOfLines={1}
-        >
-          {habit.name}
-        </Text>
-        <PrayerTimeWindow prayerWindow={habit.prayerWindow} />
-        <View style={styles.metaRow}>
-          {streakCount > 0 && (
-            <Text style={styles.streakText}>
-              {streakCount}-day momentum
-            </Text>
-          )}
-          {showStreakShield && (
-            <View style={styles.shieldBadge}>
-              <Text style={styles.shieldIcon}>{'🛡️'}</Text>
-              <Text style={styles.shieldText}>Streak Shield</Text>
-            </View>
-          )}
+      <Pressable
+        style={styles.cardInner}
+        onPress={handleComplete}
+        onLongPress={handleLongPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${habit.name}${completed ? ', completed' : ''}`}
+        accessibilityHint={completed ? undefined : 'Double tap to complete this habit'}
+      >
+        {/* Left: Icon */}
+        <View style={styles.iconContainer}>
+          <Text style={styles.icon}>{habit.icon || '+'}</Text>
         </View>
-      </View>
 
-      {/* Right: Completion circle */}
-      <Animated.View style={[styles.checkContainer, checkAnimatedStyle]}>
-        <View
-          style={[
-            styles.checkCircle,
-            completed && styles.checkCircleComplete,
-          ]}
-        >
-          {completed && <Text style={styles.checkMark}>{'✓'}</Text>}
+        {/* Center: Name, time window, streak */}
+        <View style={styles.centerContent}>
+          <Text
+            style={[styles.habitName, completed && styles.textCompleted]}
+            numberOfLines={1}
+          >
+            {habit.name}
+          </Text>
+          <PrayerTimeWindow prayerWindow={habit.prayerWindow} />
+          <View style={styles.metaRow}>
+            {streakCount > 0 && (
+              <Text style={styles.streakText}>
+                {streakCount}-day momentum
+              </Text>
+            )}
+            {showStreakShield && (
+              <View style={styles.shieldBadge}>
+                <Text style={styles.shieldIcon}>{'🛡️'}</Text>
+                <Text style={styles.shieldText}>Streak Shield</Text>
+              </View>
+            )}
+          </View>
         </View>
-      </Animated.View>
-    </AnimatedPressable>
+
+        {/* Right: Completion circle */}
+        <Animated.View style={[styles.checkContainer, { transform: [{ scale: checkScale }] }]}>
+          <View
+            style={[
+              styles.checkCircle,
+              completed && styles.checkCircleComplete,
+            ]}
+          >
+            {completed && <Text style={styles.checkMark}>{'✓'}</Text>}
+          </View>
+        </Animated.View>
+      </Pressable>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.dark.surface,
     borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.dark.border,
-    paddingVertical: spacing.md,
-    paddingHorizontal: spacing.md,
     marginHorizontal: spacing.md,
     marginBottom: spacing.sm,
     minHeight: 72,
+    overflow: 'hidden',
+  },
+  cardInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
   },
   cardCompleted: {
     opacity: 0.55,

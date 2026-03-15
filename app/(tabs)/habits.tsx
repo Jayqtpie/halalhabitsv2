@@ -3,11 +3,14 @@
  *
  * Layout:
  *   - MercyModeBanner: shown when any habit has active mercy mode
- *   - Header: "Today" in pixel font with current date
+ *   - Header: "Today" in pixel font + LevelBadge + current date
  *   - DailyProgressBar: X of Y complete
+ *   - XPProgressBar: XP gain bar below daily progress
  *   - MercyModeRecoveryTracker: inline for habits mid-recovery
  *   - HabitList: sorted habit cards with tap-to-complete
+ *   - XPFloatLabel: floating XP reward overlay on completion
  *   - FAB: "+" button for adding new habits
+ *   - CelebrationManager: level-up and title-unlock overlays
  *   - Modals: EditHabitSheet, HabitCalendar, CalcMethodPicker
  */
 import React, { useEffect, useCallback, useMemo, useState } from 'react';
@@ -16,6 +19,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useShallow } from 'zustand/react/shallow';
 import { useRouter } from 'expo-router';
 import { useHabitStore } from '../../src/stores/habitStore';
+import { useGameStore } from '../../src/stores/gameStore';
 import { DailyProgressBar } from '../../src/components/habits/DailyProgressBar';
 import { HabitList } from '../../src/components/habits/HabitList';
 import { MercyModeBanner } from '../../src/components/habits/MercyModeBanner';
@@ -23,7 +27,12 @@ import { MercyModeRecoveryTracker } from '../../src/components/habits/MercyModeR
 import { HabitCalendar } from '../../src/components/calendar/HabitCalendar';
 import { EditHabitSheet } from '../../src/components/habits/EditHabitSheet';
 import { CalcMethodPicker } from '../../src/components/prayer/CalcMethodPicker';
+import { XPProgressBar } from '../../src/components/game/XPProgressBar';
+import { LevelBadge } from '../../src/components/game/LevelBadge';
+import { XPFloatLabel } from '../../src/components/game/XPFloatLabel';
+import { CelebrationManager } from '../../src/components/game/CelebrationManager';
 import { colors, typography, spacing, radius } from '../../src/tokens';
+import { PixelGearIcon } from '../../src/components/ui/PixelGearIcon';
 import type { Habit } from '../../src/types/database';
 
 const DEFAULT_USER_ID = 'default-user';
@@ -44,15 +53,52 @@ export default function HabitsScreen() {
   const startRecovery = useHabitStore((s) => s.startRecovery);
   const resetStreak = useHabitStore((s) => s.resetStreak);
 
-  // ── Modal states ─────────────────────────────────────────────────────
+  // ── Game store ────────────────────────────────────────────────────────
+  const { loadGame, totalXP: gameTotalXP, currentMultiplier } = useGameStore(
+    useShallow((s) => ({
+      loadGame: s.loadGame,
+      totalXP: s.totalXP,
+      currentMultiplier: s.currentMultiplier,
+    })),
+  );
+
+  // ── Modal and XP float states ────────────────────────────────────────
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [calendarHabitId, setCalendarHabitId] = useState<string | null>(null);
   const [showCalcPicker, setShowCalcPicker] = useState(false);
   const [dismissedBanner, setDismissedBanner] = useState(false);
+  const [floatXP, setFloatXP] = useState<{ text: string; x: number; y: number } | null>(null);
+
+  // Track pending float position: set on tap, float shown when XP updates
+  const pendingFloatRef = React.useRef<{ x: number; y: number; baseXP: number } | null>(null);
+  const prevTotalXPRef = React.useRef(gameTotalXP);
 
   useEffect(() => {
     loadDailyState(DEFAULT_USER_ID);
-  }, [loadDailyState]);
+    loadGame(DEFAULT_USER_ID);
+  }, [loadDailyState, loadGame]);
+
+  // Watch for XP changes to show float label
+  useEffect(() => {
+    const delta = gameTotalXP - prevTotalXPRef.current;
+    if (delta > 0 && pendingFloatRef.current) {
+      const { x, y, baseXP } = pendingFloatRef.current;
+      const mult = currentMultiplier > 1 ? ` x ${currentMultiplier.toFixed(1)}x` : '';
+      const text = `+${delta} XP${mult}`;
+      setFloatXP({ text, x, y });
+      pendingFloatRef.current = null;
+    }
+    prevTotalXPRef.current = gameTotalXP;
+  }, [gameTotalXP, currentMultiplier]);
+
+  // ── XP Float position handler ────────────────────────────────────────
+  const handleCompleteWithPosition = useCallback(
+    (_habitId: string, x: number, y: number) => {
+      // Store position so the XP-change effect can show the float
+      pendingFloatRef.current = { x, y, baseXP: 15 }; // baseXP approximated; actual delta from store
+    },
+    [],
+  );
 
   // ── Mercy Mode ───────────────────────────────────────────────────────
   const mercyEntries = useMemo(
@@ -158,6 +204,8 @@ export default function HabitsScreen() {
             <Text style={styles.headerTitle}>Today</Text>
             <Text style={styles.headerDate}>{dateString}</Text>
           </View>
+          {/* Level badge in header */}
+          <LevelBadge />
           {/* Settings gear for calc method picker */}
           <Pressable
             style={styles.settingsButton}
@@ -165,16 +213,19 @@ export default function HabitsScreen() {
             accessibilityRole="button"
             accessibilityLabel="Prayer settings"
           >
-            <Text style={styles.settingsIcon}>{'⚙️'}</Text>
+            <PixelGearIcon />
           </Pressable>
         </View>
       </View>
 
-      {/* Progress */}
+      {/* Daily completion progress */}
       <DailyProgressBar
         completed={dailyProgress.completed}
         total={dailyProgress.total}
       />
+
+      {/* XP progress bar */}
+      <XPProgressBar />
 
       {/* Recovery trackers for habits mid-recovery */}
       {recoveringEntries.map(([habitId, mercyState]) => {
@@ -199,8 +250,20 @@ export default function HabitsScreen() {
         <HabitList
           userId={DEFAULT_USER_ID}
           onLongPressHabit={handleLongPressHabit}
+          onAddHabit={handleAddHabit}
+          onCompleteWithPosition={handleCompleteWithPosition}
         />
       </View>
+
+      {/* XP Float Label overlay */}
+      {floatXP ? (
+        <XPFloatLabel
+          xpText={floatXP.text}
+          startX={floatXP.x}
+          startY={floatXP.y}
+          onDone={() => setFloatXP(null)}
+        />
+      ) : null}
 
       {/* Floating Action Button */}
       <Pressable
@@ -234,6 +297,9 @@ export default function HabitsScreen() {
         visible={showCalcPicker}
         onClose={() => setShowCalcPicker(false)}
       />
+
+      {/* Celebration overlays -- rendered last so they appear above all other content */}
+      <CelebrationManager />
     </SafeAreaView>
   );
 }
@@ -270,9 +336,7 @@ const styles = StyleSheet.create({
   settingsButton: {
     padding: spacing.xs,
   },
-  settingsIcon: {
-    fontSize: 22,
-  },
+  // settingsIcon style removed -- using PixelGearIcon component
   listContainer: {
     flex: 1,
   },
