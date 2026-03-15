@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 1 of 2 complete (Phase 4)
-status: in-progress
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-03-15T00:17:00.000Z"
-last_activity: 2026-03-15 -- Phase 4 Plan 1 complete (game engine domain modules)
+current_plan: 2 of 2 complete (Phase 4)
+status: completed
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-03-15T00:24:49.778Z"
+last_activity: 2026-03-15 -- Game engine domain modules complete (xp-engine, title-engine, quest-engine)
 progress:
   total_phases: 7
   completed_phases: 3
-  total_plans: 18
-  completed_plans: 17
-  percent: 24
+  total_plans: 20
+  completed_plans: 18
+  percent: 90
 ---
 
 # Project State
@@ -22,17 +22,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Phase 4 in progress (Game Engine & Progression) -- Plan 1 complete
+**Current focus:** Phase 4 complete (Game Engine & Progression) -- ready for Phase 5
 
 ## Current Position
 
-Phase: 4 of 7 in progress (Game Engine & Progression)
-Current Plan: 1 of 2 complete (Phase 4)
-Status: Phase 4 Plan 01 complete — ready for Phase 4 Plan 02
-Last activity: 2026-03-15 -- Game engine domain modules complete (xp-engine, title-engine, quest-engine)
+Phase: 4 of 7 complete (Game Engine & Progression)
+Current Plan: 2 of 2 complete (Phase 4)
+Status: Phase 4 complete — ready for Phase 5
+Last activity: 2026-03-15 -- Game engine data layer wired (titleRepo, gameStore orchestration, habitStore XP injection)
 
-Progress: [█████░░░░░] 50% of Phase 4 plans (1/2)
-Overall: 3 complete phases + 1 plan in Phase 4
+Progress: [█████████░] 90% overall (18/20 plans complete)
+Overall: 4 complete phases (Phase 01-04)
 
 ## Performance Metrics
 
@@ -43,13 +43,14 @@ Overall: 3 complete phases + 1 plan in Phase 4
 | Phase 01 | 7/7 | Complete | 2026-03-07 |
 | Phase 02 | 3/3 | Complete | 2026-03-09 |
 | Phase 03 | 6/6 | Complete | 2026-03-10 |
-| Phase 04 | 1/2 | In Progress | -- |
+| Phase 04 | 2/2 | Complete | 2026-03-15 |
 
 **Phase 4 Plan Breakdown:**
 
 | Plan | Duration | Tasks | Description |
 |------|----------|-------|-------------|
 | 04-01 | 13min | 2 | XP engine, title engine, quest engine (pure TS domain modules, TDD) |
+| 04-02 | 4min 28sec | 2 | titleRepo, gameStore orchestration, habitStore XP injection |
 
 **Phase 3 Plan Breakdown:**
 
@@ -109,6 +110,8 @@ Recent decisions affecting current work:
 - [Phase 04]: Per-level XP costs for levels 1-10 hardcoded from blueprint table; levels 11+ use floor(40*level^1.85) formula
 - [Phase 04]: simultaneous_streaks title condition checks both simultaneousStreaks14 and simultaneousStreaks90
 - [Phase 04]: Quest Board locked until Level 5 (minLevel enforced in selectQuestTemplates)
+- [Phase 04]: targetHabitId column reused to store targetHabitType string for quest templates (avoids extra migration)
+- [Phase 04]: Dynamic import for habitStore in checkTitles to break circular reference between game/habit stores
 
 ### Pending Todos
 
@@ -121,6 +124,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-15T00:17:00.000Z
-Stopped at: Completed 04-01-PLAN.md
-Resume file: .planning/phases/04-game-engine-and-progression/04-02-PLAN.md
+Last session: 2026-03-15T00:24:49.775Z
+Stopped at: Completed 04-02-PLAN.md
+Resume file: None
