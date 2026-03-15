@@ -21,6 +21,34 @@ import {
 } from '../domain/streak-engine';
 import { sortHabitsForDisplay } from '../domain/habit-sorter';
 import { generateId } from '../utils/uuid';
+import { useGameStore } from './gameStore';
+
+// ─── Base XP Map ──────────────────────────────────────────────────────────────
+
+/**
+ * Base XP values per habit type, from blueprint section 03.
+ * Fajr gets 50 XP (highest salah) due to difficulty of waking early.
+ * All other salah: 15 XP. Custom habits default to 15 XP.
+ */
+function getBaseXP(habitType: string): number {
+  const XP_MAP: Record<string, number> = {
+    salah_fajr: 50,
+    salah_dhuhr: 15,
+    salah_asr: 15,
+    salah_maghrib: 15,
+    salah_isha: 15,
+    quran: 20,
+    dhikr: 10,
+    adhkar: 10,
+    adhkar_evening: 10,
+    fasting: 25,
+    sadaqah: 15,
+    tahajjud: 20,
+    dua: 10,
+    muhasabah: 20,
+  };
+  return XP_MAP[habitType] ?? 15; // Default 15 XP for custom habits
+}
 
 // ─── Date Helpers ─────────────────────────────────────────────────────
 
@@ -212,17 +240,29 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       // 3. Process completion via streak engine
       const newStreakState = processCompletion(currentStreakState, now);
 
-      // 4. Create completion record
+      // 4. Award XP via game store (before creating completion record so xpEarned is correct)
+      const habit = state.habits.find(h => h.id === habitId);
+      const baseXP = habit ? (habit.baseXp || getBaseXP(habit.type)) : getBaseXP('custom');
+      const xpResult = await useGameStore.getState().awardXP(
+        userId,
+        baseXP,
+        newStreakState.multiplier,
+        'habit',
+        habitId,
+      );
+      const xpEarned = xpResult?.cappedXP ?? 0;
+
+      // 5. Create completion record with real XP
       await completionRepo.create({
         id: generateId(),
         habitId,
         completedAt: now,
-        xpEarned: 0, // Phase 4 adds XP calculation
+        xpEarned,
         streakMultiplier: newStreakState.multiplier,
         createdAt: now,
       });
 
-      // 5. Persist streak to DB
+      // 6. Persist streak to DB
       await streakRepo.upsert(habitId, {
         currentCount: newStreakState.currentCount,
         longestCount: newStreakState.longestCount,
@@ -277,6 +317,44 @@ export const useHabitStore = create<HabitState>((set, get) => ({
           mercyModes: updatedMercyModes,
           dailyProgress: { completed: completedCount, total: s.habits.length },
         };
+      });
+
+      // 8. Title unlock check (non-fatal)
+      await useGameStore.getState().checkTitles(userId);
+
+      // 9. Quest progress update (non-fatal)
+      const latestState = get();
+      const newCompletions = { ...latestState.completions, [habitId]: true };
+      const completedHabitIds = new Set(
+        Object.entries(newCompletions)
+          .filter(([, done]) => done)
+          .map(([id]) => id)
+      );
+
+      // Check if all salah are complete today
+      const salahTypes = ['salah_fajr', 'salah_dhuhr', 'salah_asr', 'salah_maghrib', 'salah_isha'];
+      const salahHabits = latestState.habits.filter(h => salahTypes.includes(h.type));
+      const allSalahComplete =
+        salahHabits.length >= 5 && salahHabits.every(h => completedHabitIds.has(h.id));
+
+      // Check if all habits are complete today
+      const allHabitsComplete =
+        latestState.habits.length > 0 &&
+        latestState.habits.every(h => completedHabitIds.has(h.id));
+
+      // Build current streaks snapshot
+      const currentStreaks: Record<string, number> = {};
+      for (const [hId, sState] of Object.entries(latestState.streaks)) {
+        currentStreaks[hId] = sState.currentCount;
+      }
+      // Include just-updated streak for this habit
+      currentStreaks[habitId] = newStreakState.currentCount;
+
+      await useGameStore.getState().updateQuestProgress(userId, {
+        habitType: habit?.type ?? 'custom',
+        allSalahComplete,
+        allHabitsComplete,
+        currentStreaks,
       });
     } catch (e) {
       set({ error: (e as Error).message });
