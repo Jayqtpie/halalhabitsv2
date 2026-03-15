@@ -9,6 +9,18 @@
  * STRK-05 (never "streak" or "perfection").
  *
  * Prayer time windows are informational only -- users can always complete.
+ *
+ * Icon rendering: pixel art PNGs via React Native Image (not Skia -- this
+ * component is a standard RN view, not inside a Skia Canvas). Icons are
+ * rendered at 32x32 matching the source PNG size for crisp pixel art.
+ *
+ * Icon design intent (for future asset creation with pixel art tool):
+ *   habit-salah.png   — Mihrab arch / prayer rug silhouette (emerald tones)
+ *   habit-quran.png   — Open book with gold star (sapphire blue + gold)
+ *   habit-dhikr.png   — Tasbih beads in a loop (violet / amethyst)
+ *   habit-fasting.png — Crescent moon + stars (deep blue / golden)
+ *   habit-dua.png     — Raised open hands (warm amber)
+ *   habit-custom.png  — 4-pointed sparkle star (bright gold)
  */
 import React, { useCallback, useRef } from 'react';
 import {
@@ -17,12 +29,28 @@ import {
   Pressable,
   View,
   Animated,
+  Image,
+  type ImageSourcePropType,
 } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useSettingsStore } from '../../stores/settingsStore';
 import { PrayerTimeWindow } from '../prayer/PrayerTimeWindow';
 import type { HabitWithStatus } from '../../types/habits';
 import { colors, palette, typography, spacing, radius, duration } from '../../tokens';
+
+// ── Pixel art icon map ───────────────────────────────────────────────────────
+// Keyed by habit.category (PresetCategory) with 'custom' as fallback.
+// Uses React Native Image — NOT Skia Image (this component is a standard RN view).
+// Render at 32x32 matching source PNG size for crisp pixel art (no upscaling blur).
+const HABIT_ICONS: Record<string, ImageSourcePropType> = {
+  salah:     require('../../../assets/icons/habit-salah.png'),
+  quran:     require('../../../assets/icons/habit-quran.png'),
+  dhikr:     require('../../../assets/icons/habit-dhikr.png'),
+  fasting:   require('../../../assets/icons/habit-fasting.png'),
+  dua:       require('../../../assets/icons/habit-dua.png'),
+  character: require('../../../assets/icons/habit-custom.png'), // character habits use generic icon
+  custom:    require('../../../assets/icons/habit-custom.png'),
+};
 
 interface HabitCardProps {
   habit: HabitWithStatus;
@@ -140,9 +168,14 @@ export function HabitCard({ habit, onComplete, onLongPress, onCompleteWithPositi
         accessibilityLabel={`${habit.name}${completed ? ', completed' : ''}`}
         accessibilityHint={completed ? undefined : 'Double tap to complete this habit'}
       >
-        {/* Left: Icon */}
+        {/* Left: Pixel art icon */}
         <View style={styles.iconContainer}>
-          <Text style={styles.icon}>{habit.icon || '+'}</Text>
+          <Image
+            source={HABIT_ICONS[habit.category] ?? HABIT_ICONS.custom}
+            style={styles.icon}
+            resizeMode="contain"
+            accessibilityLabel={`${habit.name} icon`}
+          />
         </View>
 
         {/* Center: Name, time window, streak */}
@@ -215,7 +248,8 @@ const styles = StyleSheet.create({
     marginRight: spacing.sm,
   },
   icon: {
-    fontSize: 20,
+    width: 32,
+    height: 32,
   },
   centerContent: {
     flex: 1,
