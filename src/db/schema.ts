@@ -133,6 +133,7 @@ export const quests = sqliteTable('quests', {
   targetType: text('target_type').notNull(),
   targetValue: integer('target_value').notNull(),
   targetHabitId: text('target_habit_id'),
+  templateId: text('template_id'),
   progress: integer('progress').notNull().default(0),
   status: text('status').notNull().default('available'),
   expiresAt: text('expires_at').notNull(),
