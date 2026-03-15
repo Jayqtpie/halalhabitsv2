@@ -48,7 +48,7 @@ export function HudScene({ level }: HudSceneProps) {
   if (!bg) return null;
 
   return (
-    <Canvas style={StyleSheet.absoluteFill}>
+    <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
       {/* Layer 1: Environment background */}
       <Image
         image={bg}

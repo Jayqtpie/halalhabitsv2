@@ -7,7 +7,7 @@
  * Adab: Skip always visible, no penalty, no shame.
  * MUHA-02: Reads today's completed habits from habitStore.
  */
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import { useMuhasabahStore } from '../../stores/muhasabahStore';
@@ -16,15 +16,23 @@ import { colors } from '../../tokens/colors';
 import { fontFamilies } from '../../tokens/typography';
 import type { Habit } from '../../types/database';
 
+const DEFAULT_USER_ID = 'default-user';
 const c = colors.dark;
 
 // ─── Component ─────────────────────────────────────────────────────────────
 
 export function MuhasabahStep2() {
   const { close, setHighlight, nextStep } = useMuhasabahStore();
-  const { habits, completions } = useHabitStore(
-    useShallow((s) => ({ habits: s.habits, completions: s.completions })),
+  const { habits, completions, loadHabits } = useHabitStore(
+    useShallow((s) => ({ habits: s.habits, completions: s.completions, loadHabits: s.loadHabits })),
   );
+
+  // Ensure habits are loaded (user may open Muhasabah from Home without visiting Habits tab)
+  useEffect(() => {
+    if (habits.length === 0) {
+      loadHabits(DEFAULT_USER_ID);
+    }
+  }, [habits.length, loadHabits]);
 
   // Today's completed habits
   const completedHabits = habits.filter((h) => completions[h.id]);
