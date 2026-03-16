@@ -6,7 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "halalhabits",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "splash": {
       "backgroundColor": "#0F172A"
@@ -28,13 +28,19 @@
     },
     "plugins": [
       "expo-router",
-      "expo-dev-client",
       "expo-font",
       "expo-localization",
-      "expo-sqlite"
+      "expo-sqlite",
+      ["expo-notifications", { "icon": "./assets/icon.png", "color": "#0a0a14", "defaultChannel": "default", "enableBackgroundRemoteNotifications": false }]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8de4f8d4-7ef2-4493-a524-84fd338a8a91"
+      }
     }
   }
 }
