@@ -8,13 +8,25 @@
  * MUHA-02: Reads today's completed habits from habitStore.
  */
 import React, { useEffect } from 'react';
-import { View, Text, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, Pressable, ScrollView, Image, StyleSheet } from 'react-native';
+import type { ImageSourcePropType } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import { useMuhasabahStore } from '../../stores/muhasabahStore';
 import { useHabitStore } from '../../stores/habitStore';
 import { colors } from '../../tokens/colors';
 import { fontFamilies } from '../../tokens/typography';
 import type { Habit } from '../../types/database';
+
+// Pixel art icon map — same as HabitCard (keyed by habit.category)
+const HABIT_ICONS: Record<string, ImageSourcePropType> = {
+  salah:     require('../../../assets/icons/habit-salah.png'),
+  quran:     require('../../../assets/icons/habit-quran.png'),
+  dhikr:     require('../../../assets/icons/habit-dhikr.png'),
+  fasting:   require('../../../assets/icons/habit-fasting.png'),
+  dua:       require('../../../assets/icons/habit-dua.png'),
+  character: require('../../../assets/icons/habit-custom.png'),
+  custom:    require('../../../assets/icons/habit-custom.png'),
+};
 
 const DEFAULT_USER_ID = 'default-user';
 const c = colors.dark;
@@ -69,17 +81,6 @@ export function MuhasabahStep2() {
           <Text style={styles.emptyText}>
             No habits completed today — and that's okay.{'\n'}Even small steps count.
           </Text>
-          <Pressable
-            style={({ pressed }) => [
-              styles.continueButton,
-              pressed && styles.continueButtonPressed,
-            ]}
-            onPress={handleContinueWithoutHighlight}
-            accessibilityRole="button"
-            accessibilityLabel="Continue to next step"
-          >
-            <Text style={styles.continueButtonText}>Continue</Text>
-          </Pressable>
         </View>
       ) : (
         /* Habit cards */
@@ -99,12 +100,30 @@ export function MuhasabahStep2() {
               accessibilityRole="button"
               accessibilityLabel={`Select ${habit.name} as your highlight`}
             >
+              <Image
+                source={HABIT_ICONS[habit.category] ?? HABIT_ICONS.custom}
+                style={styles.habitIcon}
+                resizeMode="contain"
+              />
               <Text style={styles.habitName}>{habit.name}</Text>
               <Text style={styles.habitChevron}>›</Text>
             </Pressable>
           ))}
         </ScrollView>
       )}
+
+      {/* Continue — always visible, advances without selecting a highlight */}
+      <Pressable
+        style={({ pressed }) => [
+          styles.continueButton,
+          pressed && styles.continueButtonPressed,
+        ]}
+        onPress={handleContinueWithoutHighlight}
+        accessibilityRole="button"
+        accessibilityLabel="Continue to next step"
+      >
+        <Text style={styles.continueButtonText}>Continue</Text>
+      </Pressable>
     </View>
   );
 }
@@ -116,7 +135,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     paddingTop: 20,
-    flex: 1,
   },
   skipButton: {
     position: 'absolute',
@@ -175,10 +193,15 @@ const styles = StyleSheet.create({
     borderColor: c.primary,
     backgroundColor: 'rgba(13, 124, 61, 0.1)',
   },
+  habitIcon: {
+    width: 32,
+    height: 32,
+    marginRight: 14,
+  },
   habitName: {
-    fontFamily: fontFamilies.interSemiBold,
-    fontSize: 15,
-    lineHeight: 22,
+    fontFamily: fontFamilies.pixelFont,
+    fontSize: 11,
+    lineHeight: 18,
     color: c.textPrimary,
     flex: 1,
   },
@@ -191,7 +214,6 @@ const styles = StyleSheet.create({
   emptyState: {
     width: '100%',
     alignItems: 'center',
-    gap: 24,
     paddingTop: 8,
   },
   emptyText: {
@@ -210,6 +232,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 24,
+    width: '100%',
   },
   continueButtonPressed: {
     backgroundColor: c.primaryPressed,

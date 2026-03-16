@@ -39,6 +39,7 @@ export interface ClosingContent {
   id: string;
   type: 'ayah' | 'hadith';
   arabic: string;
+  transliteration: string;
   translation: string;
   source: string;
 }
@@ -53,6 +54,7 @@ export const CLOSING_CONTENT: readonly ClosingContent[] = [
     id: 'quran_2_286',
     type: 'ayah',
     arabic: 'لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا',
+    transliteration: 'Laa yukalliful-laahu nafsan illaa wus\'ahaa',
     translation: 'Allah does not burden a soul beyond that it can bear.',
     source: 'Quran 2:286',
   },
@@ -60,6 +62,7 @@ export const CLOSING_CONTENT: readonly ClosingContent[] = [
     id: 'quran_3_200',
     type: 'ayah',
     arabic: 'يَا أَيُّهَا الَّذِينَ آمَنُوا اصْبِرُوا وَصَابِرُوا',
+    transliteration: 'Yaa ayyuhal-ladheena aamanus-biroo wa saabiroo',
     translation: 'O you who have believed, persevere and endure and remain stationed.',
     source: 'Quran 3:200',
   },
@@ -67,6 +70,7 @@ export const CLOSING_CONTENT: readonly ClosingContent[] = [
     id: 'hadith_bukhari_consistency',
     type: 'hadith',
     arabic: 'أَحَبُّ الأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ',
+    transliteration: 'Ahabbul-a\'maali ilal-laahi adwamuhaa wa in qall',
     translation:
       'The most beloved deeds to Allah are those done consistently, even if they are small.',
     source: 'Bukhari 6464',
@@ -75,6 +79,7 @@ export const CLOSING_CONTENT: readonly ClosingContent[] = [
     id: 'quran_94_5_6',
     type: 'ayah',
     arabic: 'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا إِنَّ مَعَ الْعُسْرِ يُسْرًا',
+    transliteration: 'Fa inna ma\'al-\'usri yusraa, inna ma\'al-\'usri yusraa',
     translation: 'For indeed, with hardship will be ease. Indeed, with hardship will be ease.',
     source: 'Quran 94:5-6',
   },
@@ -82,6 +87,7 @@ export const CLOSING_CONTENT: readonly ClosingContent[] = [
     id: 'hadith_muslim_ability',
     type: 'hadith',
     arabic: 'تَكَلَّفُوا مِنَ الأَعْمَالِ مَا تُطِيقُونَ',
+    transliteration: 'Takallafoo minal-a\'maali maa tuteeqoon',
     translation:
       'Take up good deeds only as much as you are able, for the best deeds are those done consistently.',
     source: 'Muslim 782',
@@ -90,13 +96,15 @@ export const CLOSING_CONTENT: readonly ClosingContent[] = [
     id: 'quran_39_53',
     type: 'ayah',
     arabic: 'لَا تَقْنَطُوا مِنْ رَحْمَةِ اللَّهِ',
+    transliteration: 'Laa taqnatoo mir-rahmatil-laah',
     translation: 'Do not despair of the mercy of Allah.',
     source: 'Quran 39:53',
   },
   {
-    id: 'hadith_tirmidhi_dhikr',
-    type: 'hadith',
+    id: 'quran_13_28',
+    type: 'ayah',
     arabic: 'أَلاَ بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ',
+    transliteration: 'Alaa bi dhikril-laahi tatma\'innul-quloob',
     translation: 'Verily, in the remembrance of Allah do hearts find rest.',
     source: 'Quran 13:28',
   },

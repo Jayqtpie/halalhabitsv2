@@ -51,6 +51,9 @@ export function MuhasabahClosing() {
         {content.arabic}
       </Text>
 
+      {/* Transliteration */}
+      <Text style={styles.transliteration}>{content.transliteration}</Text>
+
       {/* Divider */}
       <View style={styles.divider} />
 
@@ -107,11 +110,21 @@ const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 38,
     color: c.textPrimary,
-    textAlign: 'right',
+    textAlign: 'center',
     writingDirection: 'rtl',
     width: '100%',
     marginBottom: 16,
     letterSpacing: 0.5,
+  },
+  transliteration: {
+    fontFamily: fontFamilies.inter,
+    fontSize: 14,
+    lineHeight: 22,
+    color: c.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginBottom: 16,
+    paddingHorizontal: 8,
   },
   divider: {
     width: 48,
