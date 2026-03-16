@@ -69,26 +69,42 @@ interface TitleItemProps {
   name: string;
   rarity: Rarity;
   isUnlocked: boolean;
+  isEquipped: boolean;
   flavorText?: string | null;
+  onEquip?: (titleId: string) => void;
+  onUnequip?: () => void;
 }
 
-function TitleItem({ titleId, name, rarity, isUnlocked, flavorText }: TitleItemProps) {
+function TitleItem({ titleId, name, rarity, isUnlocked, isEquipped, flavorText, onEquip, onUnequip }: TitleItemProps) {
   const [expanded, setExpanded] = useState(false);
   const rarityColor = RARITY_COLORS[rarity];
   const rarityGlow = RARITY_GLOW[rarity];
+
+  const handlePress = () => {
+    if (!isUnlocked) {
+      setExpanded((v) => !v);
+    } else if (isEquipped) {
+      onUnequip?.();
+    } else {
+      onEquip?.(titleId);
+    }
+  };
 
   return (
     <Pressable
       style={[
         styles.titleItem,
         isUnlocked && { borderColor: rarityGlow, shadowColor: rarityGlow },
+        isEquipped && styles.titleItemEquipped,
         !isUnlocked && styles.titleItemLocked,
       ]}
-      onPress={() => !isUnlocked && setExpanded((v) => !v)}
+      onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={
-        isUnlocked
-          ? `${name}, ${rarity} title unlocked`
+        isEquipped
+          ? `${name}, ${rarity} title equipped. Tap to unequip.`
+          : isUnlocked
+          ? `${name}, ${rarity} title unlocked. Tap to equip.`
           : `${name}, ${rarity} title, locked. Tap for hint.`
       }
     >
@@ -103,10 +119,21 @@ function TitleItem({ titleId, name, rarity, isUnlocked, flavorText }: TitleItemP
         >
           {name}
         </Text>
+        {isEquipped && (
+          <Text style={styles.equippedBadge}>Equipped</Text>
+        )}
         {!isUnlocked && (
           <Text style={styles.lockIcon}>🔒</Text>
         )}
       </View>
+
+      {/* Unlocked: show action hint */}
+      {isUnlocked && !isEquipped && (
+        <Text style={styles.equipHint}>Tap to equip</Text>
+      )}
+      {isEquipped && (
+        <Text style={styles.equipHint}>Tap to unequip</Text>
+      )}
 
       {/* Locked: show hint on tap */}
       {!isUnlocked && expanded && (
@@ -123,14 +150,20 @@ function TitleItem({ titleId, name, rarity, isUnlocked, flavorText }: TitleItemP
 
 interface TrophyCaseProps {
   unlockedTitleIds: Set<string>;
+  activeTitleId: string | null;
+  onEquipTitle: (titleId: string) => void;
+  onUnequipTitle: () => void;
 }
 
 interface RarityTierProps {
   rarity: Rarity;
   unlockedTitleIds: Set<string>;
+  activeTitleId: string | null;
+  onEquipTitle: (titleId: string) => void;
+  onUnequipTitle: () => void;
 }
 
-function RarityTier({ rarity, unlockedTitleIds }: RarityTierProps) {
+function RarityTier({ rarity, unlockedTitleIds, activeTitleId, onEquipTitle, onUnequipTitle }: RarityTierProps) {
   const titlesInRarity = TITLE_SEED_DATA.filter((t) => t.rarity === rarity).sort(
     (a, b) => a.sortOrder - b.sortOrder
   );
@@ -165,20 +198,30 @@ function RarityTier({ rarity, unlockedTitleIds }: RarityTierProps) {
             name={title.name}
             rarity={title.rarity as Rarity}
             isUnlocked={unlockedTitleIds.has(title.id)}
+            isEquipped={activeTitleId === title.id}
             flavorText={title.flavorText}
+            onEquip={onEquipTitle}
+            onUnequip={onUnequipTitle}
           />
         ))}
     </View>
   );
 }
 
-export function TrophyCase({ unlockedTitleIds }: TrophyCaseProps) {
+export function TrophyCase({ unlockedTitleIds, activeTitleId, onEquipTitle, onUnequipTitle }: TrophyCaseProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionHeading}>Identity Titles</Text>
 
       {RARITY_ORDER.map((rarity) => (
-        <RarityTier key={rarity} rarity={rarity} unlockedTitleIds={unlockedTitleIds} />
+        <RarityTier
+          key={rarity}
+          rarity={rarity}
+          unlockedTitleIds={unlockedTitleIds}
+          activeTitleId={activeTitleId}
+          onEquipTitle={onEquipTitle}
+          onUnequipTitle={onUnequipTitle}
+        />
       ))}
     </View>
   );
@@ -241,6 +284,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
+  titleItemEquipped: {
+    borderWidth: 2,
+    backgroundColor: 'rgba(16, 185, 129, 0.08)',
+  },
   titleItemLocked: {
     opacity: 0.4,
   },
@@ -260,6 +307,19 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyMd.fontSize,
     lineHeight: typography.bodyMd.lineHeight,
     fontFamily: typography.bodyMd.fontFamily,
+  },
+  equippedBadge: {
+    fontSize: 10,
+    fontFamily: typography.headingMd.fontFamily,
+    color: colors.dark.primary,
+    letterSpacing: 0.5,
+  },
+  equipHint: {
+    marginTop: spacing.xs,
+    fontSize: typography.caption.fontSize,
+    lineHeight: typography.caption.lineHeight,
+    fontFamily: typography.caption.fontFamily,
+    color: colors.dark.textMuted,
   },
   lockIcon: {
     fontSize: 12,

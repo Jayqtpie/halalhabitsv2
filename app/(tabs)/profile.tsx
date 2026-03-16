@@ -7,7 +7,7 @@
  * Top-right gear icon navigates to settings.
  * "Your Data" link navigates to data management.
  */
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -34,13 +34,15 @@ const USER_ID = 'local-user';
 export default function ProfileScreen() {
   const router = useRouter();
 
-  const { currentLevel, totalXP, xpToNext, activeTitle, titles } = useGameStore(
+  const { currentLevel, totalXP, xpToNext, activeTitle, titles, equipTitle, setActiveTitle } = useGameStore(
     useShallow((s) => ({
       currentLevel: s.currentLevel,
       totalXP: s.totalXP,
       xpToNext: s.xpToNext,
       activeTitle: s.activeTitle,
       titles: s.titles,
+      equipTitle: s.equipTitle,
+      setActiveTitle: s.setActiveTitle,
     }))
   );
 
@@ -89,6 +91,16 @@ export default function ProfileScreen() {
     const diffMs = Date.now() - new Date(oldest).getTime();
     return Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1);
   })();
+
+  const handleEquipTitle = useCallback((titleId: string) => {
+    equipTitle(USER_ID, titleId);
+  }, [equipTitle]);
+
+  const handleUnequipTitle = useCallback(async () => {
+    const { userRepo } = await import('../../src/db/repos/userRepo');
+    await userRepo.setActiveTitle(USER_ID, null);
+    setActiveTitle(null);
+  }, [setActiveTitle]);
 
   // Build habit streak list for StreakBars
   const habitStreaks = habits.map((h) => ({
@@ -160,7 +172,12 @@ export default function ProfileScreen() {
 
         {/* Trophy Case */}
         <View style={styles.section}>
-          <TrophyCase unlockedTitleIds={unlockedTitleIds} />
+          <TrophyCase
+            unlockedTitleIds={unlockedTitleIds}
+            activeTitleId={activeTitle?.id ?? null}
+            onEquipTitle={handleEquipTitle}
+            onUnequipTitle={handleUnequipTitle}
+          />
         </View>
 
         {/* Bottom padding */}
