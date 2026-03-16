@@ -10,6 +10,7 @@
  */
 import React from 'react';
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useShallow } from 'zustand/react/shallow';
 import { useMuhasabahStore } from '../../stores/muhasabahStore';
 import { getClosingContent, CLOSING_CONTENT } from '../../domain/muhasabah-engine';
 import { colors } from '../../tokens/colors';
@@ -20,10 +21,12 @@ const c = colors.dark;
 // ─── Component ─────────────────────────────────────────────────────────────
 
 export function MuhasabahClosing() {
-  const { close, closingContentIndex } = useMuhasabahStore((s) => ({
-    close: s.close,
-    closingContentIndex: s.closingContentIndex,
-  }));
+  const { close, closingContentIndex } = useMuhasabahStore(
+    useShallow((s) => ({
+      close: s.close,
+      closingContentIndex: s.closingContentIndex,
+    })),
+  );
 
   // Rotate content by today's date + the closingContentIndex counter
   const dateIndex = new Date().getDate() % CLOSING_CONTENT.length;

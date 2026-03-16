@@ -23,15 +23,14 @@ const c = colors.dark;
 
 export function MuhasabahStep2() {
   const { close, setHighlight, nextStep } = useMuhasabahStore();
-  const { habits, completions, loadHabits } = useHabitStore(
-    useShallow((s) => ({ habits: s.habits, completions: s.completions, loadHabits: s.loadHabits })),
+  const { habits, completions, loadDailyState } = useHabitStore(
+    useShallow((s) => ({ habits: s.habits, completions: s.completions, loadDailyState: s.loadDailyState })),
   );
 
-  // Always refresh habits + completions when this step mounts
-  // (user may open Muhasabah from Home without visiting Habits tab)
+  // Refresh habits + completions when this step mounts
   useEffect(() => {
-    loadHabits(DEFAULT_USER_ID);
-  }, [loadHabits]);
+    loadDailyState(DEFAULT_USER_ID);
+  }, [loadDailyState]);
 
   // Today's completed habits
   const completedHabits = habits.filter((h) => completions[h.id]);
