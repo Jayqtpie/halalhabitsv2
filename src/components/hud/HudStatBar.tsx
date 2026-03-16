@@ -33,9 +33,12 @@ function BestStreakDisplay() {
   if (bestStreak === 0) return null;
 
   return (
-    <Text style={styles.streakText} numberOfLines={1}>
-      {'\u{1F525}'} {bestStreak}d
-    </Text>
+    <View style={styles.streakContainer}>
+      <Text style={styles.streakEmoji}>🔥</Text>
+      <Text style={styles.streakText} numberOfLines={1}>
+        {bestStreak}d
+      </Text>
+    </View>
   );
 }
 
@@ -110,11 +113,20 @@ const styles = StyleSheet.create({
     height: 16,
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
+  streakContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    flexShrink: 0,
+  },
+  streakEmoji: {
+    fontSize: 12,
+    lineHeight: 16,
+  },
   streakText: {
     fontSize: typography.caption.fontSize,
     fontFamily: typography.caption.fontFamily,
     lineHeight: typography.caption.lineHeight,
     color: colors.dark.xp,
-    flexShrink: 1,
   },
 });

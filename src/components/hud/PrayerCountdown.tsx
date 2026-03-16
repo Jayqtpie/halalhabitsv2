@@ -61,8 +61,20 @@ export function PrayerCountdown() {
       // Find next upcoming prayer
       const upcoming = windows.find((w) => w.status === 'upcoming');
       if (upcoming) return upcoming;
-      // If all prayers have passed today, show the first of tomorrow (Fajr)
-      return windows[0] ?? null;
+      // Find active prayer (currently in its window)
+      const active = windows.find((w) => w.status === 'active');
+      if (active) return active;
+      // All prayers passed today — calculate tomorrow's Fajr
+      const tomorrow = new Date(now);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowWindows = getPrayerWindows(
+        locationLat!,
+        locationLng!,
+        tomorrow,
+        prayerCalcMethod as CalcMethodKey,
+        now,
+      );
+      return tomorrowWindows[0] ?? null;
     } catch {
       return null;
     }
