@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 1 of 4 (Phase 6) — plan 01 complete
+current_plan: 2 of 4 (Phase 6) — plan 02 at checkpoint (awaiting human-verify)
 status: in_progress
-stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-03-16T19:56:00Z"
-last_activity: "2026-03-16 -- 06-01: Domain modules (niyyah-options, starter-packs, notification-copy), NotificationService, settingsStore extended"
+stopped_at: Checkpoint - 06-02 human verification of onboarding flow on device
+last_updated: "2026-03-16T20:06:00Z"
+last_activity: "2026-03-16 -- 06-02: 5-screen onboarding flow (Welcome, Character, Niyyah, Habits, Tour), Stack.Protected hydration gate"
 progress:
   total_phases: 7
   completed_phases: 5
@@ -27,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 6 of 7 (Onboarding, Profile & Notifications — in progress)
-Current Plan: 1 of 4 (Phase 6) — plan 01 complete
-Status: Domain modules and notification foundation complete, ready for onboarding UI (plan 02)
-Last activity: 2026-03-16 -- 06-01: Domain modules (niyyah-options, starter-packs, notification-copy), NotificationService, settingsStore extended with 10+ fields
+Current Plan: 2 of 4 (Phase 6) — plan 02 at human-verify checkpoint
+Status: Onboarding flow built (Task 1 complete), awaiting device verification before proceeding to plans 03-04
+Last activity: 2026-03-16 -- 06-02: 5-screen onboarding flow with Stack.Protected hydration gate
 
 Progress: [█████████░] 93% overall (25/28 plans complete)
-Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (1/4 plans done)
+Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (2/4 plans — 1 complete, 1 at checkpoint)
 
 ## Performance Metrics
 
@@ -45,7 +45,7 @@ Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (1/4 plans done)
 | Phase 03 | 6/6 | Complete | 2026-03-10 |
 | Phase 04 | 3/3 | Complete | 2026-03-15 |
 | Phase 05 | 4/4 | Complete | 2026-03-16 |
-| Phase 06 | 1/4 | In Progress | — |
+| Phase 06 | 2/4 | In Progress (checkpoint) | — |
 
 **Phase 4 Plan Breakdown:**
 
@@ -60,6 +60,7 @@ Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (1/4 plans done)
 | Plan | Duration | Tasks | Description |
 |------|----------|-------|-------------|
 | 06-01 | ~18min | 2 | Domain modules (niyyah-options, starter-packs, notification-copy), NotificationService, settingsStore +10 fields |
+| 06-02 | ~20min | 1+checkpoint | 5-screen onboarding (Welcome, Character, Niyyah, Habits, Tour), Stack.Protected hydration gate |
 
 **Phase 3 Plan Breakdown:**
 
@@ -138,6 +139,11 @@ Recent decisions affecting current work:
 - [Phase 06-01]: hydrated flag NOT persisted — resets to false on cold start, set to true via onRehydrateStorage
 - [Phase 06-01]: morningMotivationEnabled, streakMilestonesEnabled, questExpiringEnabled default to false (opt-in)
 - [Phase 06-01]: muhasabahNotifEnabled defaults to true; arabicTermsEnabled defaults to true (adab-safe defaults)
+- [Phase 06-02]: Stack.Protected guard with guard={!onboardingComplete} — declarative route gating, no manual redirect
+- [Phase 06-02]: Hydration gate: app renders null until fontsLoaded + migrationsComplete + hydrated all true
+- [Phase 06-02]: Character customization encoded as compound string in characterPresetId field (no DB change)
+- [Phase 06-02]: Tour background uses simplified HUD preview (not real store context) — keeps onboarding self-contained
+- [Phase 06-02]: as never cast for expo-router typed routes (type generation runs at build time, not TS compile)
 
 ### Pending Todos
 
@@ -159,6 +165,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-16T01:38:40.778Z
-Stopped at: Phase 6 context gathered
-Resume file: .planning/phases/06-onboarding-profile-and-notifications/06-CONTEXT.md
+Last session: 2026-03-16T20:06:00Z
+Stopped at: Phase 6 plan 02 — human-verify checkpoint (onboarding flow on device)
+Resume file: .planning/phases/06-onboarding-profile-and-notifications/06-02-PLAN.md
