@@ -85,15 +85,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Onboarding
 
-- [ ] **ONBR-01**: First-launch onboarding includes Niyyah (intention setting) flow
-- [ ] **ONBR-02**: User selects initial habits from preset library during onboarding
+- [x] **ONBR-01**: First-launch onboarding includes Niyyah (intention setting) flow
+- [x] **ONBR-02**: User selects initial habits from preset library during onboarding
 - [ ] **ONBR-03**: Onboarding communicates game metaphor and XP philosophy clearly
 - [ ] **ONBR-04**: Onboarding is completable in under 2 minutes
 
 ### Profile and Settings
 
 - [ ] **PROF-01**: User can view profile with title, level, XP, streak history, and achievements
-- [ ] **PROF-02**: User can access settings for notifications, prayer calculation method, and privacy controls
+- [x] **PROF-02**: User can access settings for notifications, prayer calculation method, and privacy controls
 - [ ] **PROF-03**: User can export or delete all personal data
 - [ ] **PROF-04**: Dark mode supported (default or system-auto)
 
@@ -107,10 +107,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Notifications
 
-- [ ] **NOTF-01**: User receives prayer time reminders
-- [ ] **NOTF-02**: User receives gentle evening Muhasabah reminder
-- [ ] **NOTF-03**: Notification copy is invitational, never guilt-based ("Ready for Dhuhr?" not "You missed Dhuhr!")
-- [ ] **NOTF-04**: User can configure or disable any notification category
+- [x] **NOTF-01**: User receives prayer time reminders
+- [x] **NOTF-02**: User receives gentle evening Muhasabah reminder
+- [x] **NOTF-03**: Notification copy is invitational, never guilt-based ("Ready for Dhuhr?" not "You missed Dhuhr!")
+- [x] **NOTF-04**: User can configure or disable any notification category
 
 ## v2 Requirements
 

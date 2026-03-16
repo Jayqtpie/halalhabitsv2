@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 2 of 4 (Phase 5) — checkpoint awaiting human verify
-status: verifying
-stopped_at: Phase 6 context gathered
-last_updated: "2026-03-16T01:38:40.781Z"
-last_activity: "2026-03-15 -- 05-02: Home HUD assembled with HudScene (Skia Canvas), HudStatBar (BlurView), SceneObjects (tap zones), EnvironmentReveal, PrayerCountdown"
+current_plan: 1 of 4 (Phase 6) — plan 01 complete
+status: in_progress
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-03-16T19:56:00Z"
+last_activity: "2026-03-16 -- 06-01: Domain modules (niyyah-options, starter-packs, notification-copy), NotificationService, settingsStore extended"
 progress:
   total_phases: 7
   completed_phases: 5
@@ -26,13 +26,13 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 5 of 7 (HUD, Visual Identity & Muhasabah — in progress)
-Current Plan: 2 of 4 (Phase 5) — checkpoint awaiting human verify
-Status: Home HUD assembled, awaiting device verification of visual output and tap zone interactions
-Last activity: 2026-03-15 -- 05-02: Home HUD assembled with HudScene (Skia Canvas), HudStatBar (BlurView), SceneObjects (tap zones), EnvironmentReveal, PrayerCountdown
+Phase: 6 of 7 (Onboarding, Profile & Notifications — in progress)
+Current Plan: 1 of 4 (Phase 6) — plan 01 complete
+Status: Domain modules and notification foundation complete, ready for onboarding UI (plan 02)
+Last activity: 2026-03-16 -- 06-01: Domain modules (niyyah-options, starter-packs, notification-copy), NotificationService, settingsStore extended with 10+ fields
 
-Progress: [█████████░] 92% overall (22/24 plans complete)
-Overall: 4 complete phases (Phase 01-04), Phase 05 in progress (2/4 plans done)
+Progress: [█████████░] 93% overall (25/28 plans complete)
+Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (1/4 plans done)
 
 ## Performance Metrics
 
@@ -44,6 +44,8 @@ Overall: 4 complete phases (Phase 01-04), Phase 05 in progress (2/4 plans done)
 | Phase 02 | 3/3 | Complete | 2026-03-09 |
 | Phase 03 | 6/6 | Complete | 2026-03-10 |
 | Phase 04 | 3/3 | Complete | 2026-03-15 |
+| Phase 05 | 4/4 | Complete | 2026-03-16 |
+| Phase 06 | 1/4 | In Progress | — |
 
 **Phase 4 Plan Breakdown:**
 
@@ -52,6 +54,12 @@ Overall: 4 complete phases (Phase 01-04), Phase 05 in progress (2/4 plans done)
 | 04-01 | 13min | 2 | XP engine, title engine, quest engine (pure TS domain modules, TDD) |
 | 04-02 | 4min 28sec | 2 | titleRepo, gameStore orchestration, habitStore XP injection |
 | 04-03 | ~15min | 2+checkpoint | XP feedback UI layer (6 game components + habits screen integration) |
+
+**Phase 6 Plan Breakdown:**
+
+| Plan | Duration | Tasks | Description |
+|------|----------|-------|-------------|
+| 06-01 | ~18min | 2 | Domain modules (niyyah-options, starter-packs, notification-copy), NotificationService, settingsStore +10 fields |
 
 **Phase 3 Plan Breakdown:**
 
@@ -124,6 +132,12 @@ Recent decisions affecting current work:
 - [Phase 05-04]: Use RN Image (not Skia Image) in HabitCard -- standard RN view, not inside Skia Canvas
 - [Phase 05-04]: Icons keyed by habit.category, character category maps to custom icon
 - [Phase 05-04]: Pixel art icons at 32x32 source + render size to avoid upscaling antialiasing
+- [Phase 06-01]: Fail-open for Hijri month — if Intl.DateTimeFormat('en-u-ca-islamic') throws, show all niyyah options
+- [Phase 06-01]: Runtime key validation in starter-packs.ts — throws at module load if habitKey doesn't match a preset
+- [Phase 06-01]: Only today's prayer notifications scheduled (iOS 64-limit strategy); reschedule on each app launch
+- [Phase 06-01]: hydrated flag NOT persisted — resets to false on cold start, set to true via onRehydrateStorage
+- [Phase 06-01]: morningMotivationEnabled, streakMilestonesEnabled, questExpiringEnabled default to false (opt-in)
+- [Phase 06-01]: muhasabahNotifEnabled defaults to true; arabicTermsEnabled defaults to true (adab-safe defaults)
 
 ### Pending Todos
 
