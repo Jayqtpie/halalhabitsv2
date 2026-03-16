@@ -125,12 +125,13 @@ Plans:
   3. User can configure notification preferences, prayer calculation method, dark mode, and privacy controls
   4. User can export or delete all personal data from settings
   5. All notification copy is invitational ("Ready for Dhuhr?") never guilt-based ("You missed Dhuhr!")
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 06-01: TBD
-- [ ] 06-02: TBD
-- [ ] 06-03: TBD
+- [ ] 06-01-PLAN.md — Domain modules (niyyah, starter packs, notification copy), NotificationService, settingsStore extension
+- [ ] 06-02-PLAN.md — 5-screen onboarding flow (Welcome, Character, Niyyah, Habits, HUD Tour) with Stack.Protected guard
+- [ ] 06-03-PLAN.md — Profile screen (RPG character sheet), Settings, Prayer Reminders, Your Data (export/delete)
+- [ ] 06-04-PLAN.md — Notification lifecycle wiring (startup schedule, response listeners) and Muhasabah HUD cue
 
 ### Phase 7: Backend, Auth, and Sync
 **Goal**: Users can create accounts, sync non-private data across devices, and receive push notifications -- all while the app continues working perfectly offline
@@ -160,5 +161,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. Core Habit Loop | 6/6 | Complete | 2026-03-10 |
 | 4. Game Engine and Progression | 4/4 | Complete   | 2026-03-15 |
 | 5. HUD, Visual Identity, and Muhasabah | 1/4 | In Progress|  |
-| 6. Onboarding, Profile, and Notifications | 0/3 | Not started | - |
+| 6. Onboarding, Profile, and Notifications | 0/4 | Not started | - |
 | 7. Backend, Auth, and Sync | 0/2 | Not started | - |
