@@ -125,41 +125,61 @@ interface TrophyCaseProps {
   unlockedTitleIds: Set<string>;
 }
 
+interface RarityTierProps {
+  rarity: Rarity;
+  unlockedTitleIds: Set<string>;
+}
+
+function RarityTier({ rarity, unlockedTitleIds }: RarityTierProps) {
+  const titlesInRarity = TITLE_SEED_DATA.filter((t) => t.rarity === rarity).sort(
+    (a, b) => a.sortOrder - b.sortOrder
+  );
+  const unlockedCount = titlesInRarity.filter((t) => unlockedTitleIds.has(t.id)).length;
+  const [isExpanded, setIsExpanded] = useState(unlockedCount > 0);
+
+  return (
+    <View style={styles.rarityGroup}>
+      <Pressable
+        style={styles.rarityHeader}
+        onPress={() => setIsExpanded((v) => !v)}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: isExpanded }}
+        accessibilityLabel={`${RARITY_LABELS[rarity]} titles, ${unlockedCount} of ${titlesInRarity.length} unlocked`}
+      >
+        <View style={styles.rarityHeaderLeft}>
+          <Text style={styles.chevron}>{isExpanded ? '▲' : '▼'}</Text>
+          <Text style={[styles.rarityLabel, { color: RARITY_COLORS[rarity] }]}>
+            {RARITY_LABELS[rarity].toUpperCase()}
+          </Text>
+        </View>
+        <Text style={styles.rarityCount}>
+          {unlockedCount}/{titlesInRarity.length}
+        </Text>
+      </Pressable>
+
+      {isExpanded &&
+        titlesInRarity.map((title) => (
+          <TitleItem
+            key={title.id}
+            titleId={title.id}
+            name={title.name}
+            rarity={title.rarity as Rarity}
+            isUnlocked={unlockedTitleIds.has(title.id)}
+            flavorText={title.flavorText}
+          />
+        ))}
+    </View>
+  );
+}
+
 export function TrophyCase({ unlockedTitleIds }: TrophyCaseProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.sectionHeading}>Identity Titles</Text>
 
-      {RARITY_ORDER.map((rarity) => {
-        const titlesInRarity = TITLE_SEED_DATA.filter((t) => t.rarity === rarity).sort(
-          (a, b) => a.sortOrder - b.sortOrder
-        );
-
-        return (
-          <View key={rarity} style={styles.rarityGroup}>
-            <View style={styles.rarityHeader}>
-              <Text style={[styles.rarityLabel, { color: RARITY_COLORS[rarity] }]}>
-                {RARITY_LABELS[rarity].toUpperCase()}
-              </Text>
-              <Text style={styles.rarityCount}>
-                {titlesInRarity.filter((t) => unlockedTitleIds.has(t.id)).length}/
-                {titlesInRarity.length}
-              </Text>
-            </View>
-
-            {titlesInRarity.map((title) => (
-              <TitleItem
-                key={title.id}
-                titleId={title.id}
-                name={title.name}
-                rarity={title.rarity as Rarity}
-                isUnlocked={unlockedTitleIds.has(title.id)}
-                flavorText={title.flavorText}
-              />
-            ))}
-          </View>
-        );
-      })}
+      {RARITY_ORDER.map((rarity) => (
+        <RarityTier key={rarity} rarity={rarity} unlockedTitleIds={unlockedTitleIds} />
+      ))}
     </View>
   );
 }
@@ -182,10 +202,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    minHeight: 44,
     paddingBottom: spacing.xs,
     marginBottom: spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: colors.dark.border,
+  },
+  rarityHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  chevron: {
+    fontSize: 10,
+    color: colors.dark.textSecondary,
   },
   rarityLabel: {
     fontSize: 10,
