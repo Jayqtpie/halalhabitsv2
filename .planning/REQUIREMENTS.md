@@ -163,7 +163,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | MUHA-01 through MUHA-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Pending |
 | ONBR-01 through ONBR-04 | Phase 6: Onboarding, Profile, and Notifications | Pending |
 | PROF-01 through PROF-04 | Phase 6: Onboarding, Profile, and Notifications | Pending |
-| NOTF-01 through NOTF-04 | Phase 6: Onboarding, Profile, and Notifications | Pending |
+| NOTF-01 through NOTF-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-04) |
 | SYNC-01 through SYNC-05 | Phase 7: Backend, Auth, and Sync | Pending |
 
 **Coverage:**

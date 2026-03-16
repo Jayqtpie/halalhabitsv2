@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 2 of 4 (Phase 6) — plan 02 at human-verify checkpoint
-status: verifying
-stopped_at: Phase 6 plan 03 human-verify checkpoint - Profile, Settings, Prayer Reminders, Your Data, data-export TDD
-last_updated: "2026-03-16T20:05:02.932Z"
-last_activity: "2026-03-16 -- 06-02: 5-screen onboarding flow with Stack.Protected hydration gate"
+current_plan: 4 of 4 (Phase 6)
+status: checkpoint
+stopped_at: Phase 6 plan 04 human-verify checkpoint - Full Phase 6 verification (onboarding + profile + settings + notifications)
+last_updated: "2026-03-16T20:26:00Z"
+last_activity: "2026-03-16 -- 06-04: notification lifecycle wiring in root layout"
 progress:
   total_phases: 7
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 28
   completed_plans: 27
-  percent: 93
+  percent: 96
 ---
 
 # Project State
@@ -22,17 +22,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Phase 4 complete (Game Engine & Progression) -- ready for Phase 5
+**Current focus:** Phase 6 in progress — notification lifecycle wiring done, awaiting full Phase 6 verification
 
 ## Current Position
 
 Phase: 6 of 7 (Onboarding, Profile & Notifications — in progress)
-Current Plan: 2 of 4 (Phase 6) — plan 02 at human-verify checkpoint
-Status: Onboarding flow built (Task 1 complete), awaiting device verification before proceeding to plans 03-04
-Last activity: 2026-03-16 -- 06-02: 5-screen onboarding flow with Stack.Protected hydration gate
+Current Plan: 4 of 4 (Phase 6) — plan 04 at human-verify checkpoint
+Status: All Phase 6 tasks implemented, awaiting full device verification of onboarding + profile + settings + notifications
+Last activity: 2026-03-16 -- 06-04: notification lifecycle wiring in root layout
 
-Progress: [█████████░] 93% overall (25/28 plans complete)
-Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (2/4 plans — 1 complete, 1 at checkpoint)
+Progress: [██████████] 96% overall (27/28 plans complete)
+Overall: 5 complete phases (Phase 01-05), Phase 06 nearly complete (3/4 plans done, 1 at checkpoint)
 
 ## Performance Metrics
 
@@ -45,7 +45,7 @@ Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (2/4 plans — 1 
 | Phase 03 | 6/6 | Complete | 2026-03-10 |
 | Phase 04 | 3/3 | Complete | 2026-03-15 |
 | Phase 05 | 4/4 | Complete | 2026-03-16 |
-| Phase 06 | 2/4 | In Progress (checkpoint) | — |
+| Phase 06 | 4/4 | Checkpoint (awaiting verification) | — |
 
 **Phase 4 Plan Breakdown:**
 
@@ -61,6 +61,8 @@ Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (2/4 plans — 1 
 |------|----------|-------|-------------|
 | 06-01 | ~18min | 2 | Domain modules (niyyah-options, starter-packs, notification-copy), NotificationService, settingsStore +10 fields |
 | 06-02 | ~20min | 1+checkpoint | 5-screen onboarding (Welcome, Character, Niyyah, Habits, Tour), Stack.Protected hydration gate |
+| 06-03 | ~13min | 2+checkpoint | Profile RPG screen, Settings 4-section, Prayer Reminders sub-screen, Your Data with export/delete TDD |
+| 06-04 | ~8min | 1+checkpoint | Notification lifecycle wiring (startup reschedule, settings-change reschedule, tap routing) |
 
 **Phase 3 Plan Breakdown:**
 
@@ -149,6 +151,10 @@ Recent decisions affecting current work:
 - [Phase 06-03]: deleteAllUserData uses raw execSync SQL -- no new deleteAll repo methods needed, wrapped in try/catch for store resets
 - [Phase 06-03]: TrophyCase renders all titles from TITLE_SEED_DATA client-side (static data, no DB query)
 - [Phase 06-03]: ProfileHeader uses RN Image not Skia -- standard View context, not inside Skia Canvas
+- [Phase 06-04]: shouldShowBanner + shouldShowList (not deprecated shouldShowAlert) for foreground notification handler in SDK 0.31
+- [Phase 06-04]: Notification tap routing via title+body keyword matching -- no custom data payload needed, consistent with notification-copy.ts patterns
+- [Phase 06-04]: rescheduleAll effect dependency array includes all 9 notification settings -- settings screen changes apply immediately without restart
+- [Phase 06-04]: Non-fatal try/catch on rescheduleAll -- notifications are enhancement not core function
 
 ### Pending Todos
 
