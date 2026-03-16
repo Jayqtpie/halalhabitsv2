@@ -21,7 +21,7 @@ import { useRouter } from 'expo-router';
 import { colors, typography, fontFamilies, spacing } from '../src/tokens';
 import { exportUserData, deleteAllUserData } from '../src/services/data-export';
 
-const USER_ID = 'local-user';
+const USER_ID = 'default-user';
 
 const DATA_CATEGORIES = [
   { key: 'habits', label: 'Habits', description: 'Your habit names, types, and settings' },

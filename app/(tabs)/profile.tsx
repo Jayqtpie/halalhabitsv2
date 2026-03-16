@@ -29,7 +29,7 @@ import { NiyyahDisplay } from '../../src/components/profile/NiyyahDisplay';
 import { colors, typography, spacing } from '../../src/tokens';
 import { xpForLevel, xpToNextLevel } from '../../src/domain/xp-engine';
 
-const USER_ID = 'local-user';
+const USER_ID = 'default-user';
 
 export default function ProfileScreen() {
   const router = useRouter();

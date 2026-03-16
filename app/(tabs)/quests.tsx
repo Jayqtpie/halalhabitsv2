@@ -68,7 +68,7 @@ export default function QuestsScreen() {
   );
 
   // Placeholder user ID (Phase 6 will wire real auth)
-  const USER_ID = 'local-user';
+  const USER_ID = 'default-user';
 
   // Load game data on mount
   useEffect(() => {
