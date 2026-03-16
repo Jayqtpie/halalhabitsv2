@@ -110,19 +110,8 @@ export function HudTourOverlay({
       {/* Dark overlay background */}
       <View style={styles.dimLayer} pointerEvents="none" />
 
-      {/* Spotlight cutout simulation using opacity trick */}
-      <View
-        style={[
-          styles.spotlight,
-          {
-            left: step.spotlightArea.x,
-            top: step.spotlightArea.y,
-            width: step.spotlightArea.width,
-            height: step.spotlightArea.height,
-          },
-        ]}
-        pointerEvents="none"
-      />
+      {/* Spotlight removed — dim layer can't be cut through without SVG masks.
+         Tooltips are self-explanatory without highlighting. */}
 
       {/* Skip button */}
       <Pressable
@@ -176,19 +165,6 @@ const styles = StyleSheet.create({
   dimLayer: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(11, 17, 32, 0.85)',
-  },
-  spotlight: {
-    position: 'absolute',
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 2,
-    borderColor: c.primary,
-    // Glow effect via shadow
-    shadowColor: c.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 12,
-    elevation: 8,
   },
   skipButton: {
     position: 'absolute',
