@@ -11,6 +11,7 @@ import { create } from 'zustand';
 import { muhasabahRepo } from '../db/repos';
 import { generateId } from '../utils/uuid';
 import { getClosingContent } from '../domain/muhasabah-engine';
+import { useGameStore } from './gameStore';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -90,14 +91,13 @@ export const useMuhasabahStore = create<MuhasabahState>((set, get) => ({
 
       await muhasabahRepo.create(entry);
 
-      // Lazy require to avoid circular dependency (same pattern as checkTitles → habitStore)
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { useGameStore } = require('./gameStore');
+      // Award XP — awardXP has its own try-catch, returns null on failure
       await useGameStore.getState().awardXP(userId, 12, 1.0, 'muhasabah');
 
       const idx = closingCounter++;
       set({ currentStep: 'closing', loading: false, closingContentIndex: idx });
     } catch (error) {
+      console.warn('[muhasabahStore] submit error:', error);
       set({ loading: false });
       throw error;
     }
