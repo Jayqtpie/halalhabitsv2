@@ -1,100 +1,240 @@
 /**
- * Profile tab - Profile and settings placeholder (Phase 6).
- * Includes links to spike screens for development review.
+ * Profile tab -- RPG character sheet.
+ *
+ * Shows: character sprite, active title, level + XP bar,
+ * stats grid, trophy case, streak bars, niyyah display.
+ *
+ * Top-right gear icon navigates to settings.
+ * "Your Data" link navigates to data management.
  */
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  Pressable,
+  SafeAreaView,
+} from 'react-native';
 import { useRouter } from 'expo-router';
-import { useTranslation } from 'react-i18next';
-import { colors, typography, spacing, radius } from '../../src/tokens';
+import { useShallow } from 'zustand/react/shallow';
+import { useGameStore } from '../../src/stores/gameStore';
+import { useHabitStore } from '../../src/stores/habitStore';
+import { useSettingsStore } from '../../src/stores/settingsStore';
+import { ProfileHeader } from '../../src/components/profile/ProfileHeader';
+import { StatsGrid } from '../../src/components/profile/StatsGrid';
+import { TrophyCase } from '../../src/components/profile/TrophyCase';
+import { StreakBars } from '../../src/components/profile/StreakBars';
+import { NiyyahDisplay } from '../../src/components/profile/NiyyahDisplay';
+import { colors, typography, spacing } from '../../src/tokens';
+import { xpForLevel, xpToNextLevel } from '../../src/domain/xp-engine';
+
+const USER_ID = 'local-user';
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+
+  const { currentLevel, totalXP, xpToNext, activeTitle, titles } = useGameStore(
+    useShallow((s) => ({
+      currentLevel: s.currentLevel,
+      totalXP: s.totalXP,
+      xpToNext: s.xpToNext,
+      activeTitle: s.activeTitle,
+      titles: s.titles,
+    }))
+  );
+
+  const { habits, streaks } = useHabitStore(
+    useShallow((s) => ({
+      habits: s.habits,
+      streaks: s.streaks,
+    }))
+  );
+
+  const { selectedNiyyahs, characterPresetId } = useSettingsStore(
+    useShallow((s) => ({
+      selectedNiyyahs: s.selectedNiyyahs,
+      characterPresetId: s.characterPresetId,
+    }))
+  );
+
+  // Load game data on mount
+  useEffect(() => {
+    useGameStore.getState().loadGame(USER_ID);
+    useHabitStore.getState().loadDailyState(USER_ID);
+  }, []);
+
+  // Compute XP progress within current level
+  const xpAtCurrentLevel = xpForLevel(currentLevel);
+  const xpCostForCurrentLevel = xpToNextLevel(currentLevel);
+  const xpEarnedThisLevel = totalXP - xpAtCurrentLevel;
+  const xpProgress = xpCostForCurrentLevel > 0
+    ? Math.min(1, xpEarnedThisLevel / xpCostForCurrentLevel)
+    : 1;
+
+  // Compute unlocked title IDs set
+  const unlockedTitleIds = new Set(titles.map((t) => t.titleId));
+
+  // Compute best streak across all habits
+  const bestStreak = habits.length > 0
+    ? Math.max(0, ...habits.map((h) => streaks[h.id]?.currentCount ?? 0))
+    : 0;
+
+  // Compute days active: find oldest habit creation date
+  const daysActive = (() => {
+    if (habits.length === 0) return 1;
+    const oldest = habits.reduce((min, h) =>
+      h.createdAt < min ? h.createdAt : min, habits[0].createdAt
+    );
+    const diffMs = Date.now() - new Date(oldest).getTime();
+    return Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1);
+  })();
+
+  // Build habit streak list for StreakBars
+  const habitStreaks = habits.map((h) => ({
+    habitId: h.id,
+    habitName: h.name,
+    streak: streaks[h.id] ?? null,
+  }));
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>{t('tabs.profile')}</Text>
-      <Text style={styles.phase}>{t('placeholder.phaseIndicator', { phase: 6 })}</Text>
-      <Text style={styles.description}>Profile and settings coming in Phase 6</Text>
-
-      <View style={styles.spikeSection}>
-        <Text style={styles.spikeLabel}>Development Spikes</Text>
-        <TouchableOpacity
-          style={styles.spikeButton}
-          onPress={() => router.push('/_spike/fonts')}
-        >
-          <Text style={styles.spikeButtonText}>Font Comparison</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.spikeButton}
-          onPress={() => router.push('/_spike/theme')}
-        >
-          <Text style={styles.spikeButtonText}>Theme Comparison</Text>
-        </TouchableOpacity>
+    <SafeAreaView style={styles.safeArea}>
+      {/* Header bar */}
+      <View style={styles.topBar}>
+        <Text style={styles.screenTitle}>Profile</Text>
+        <View style={styles.topBarActions}>
+          <Pressable
+            style={styles.dataLink}
+            onPress={() => router.push('/your-data' as any)}
+            accessibilityRole="link"
+            accessibilityLabel="Your Data"
+            hitSlop={8}
+          >
+            <Text style={styles.dataLinkText}>Your Data</Text>
+          </Pressable>
+          <Pressable
+            style={styles.gearButton}
+            onPress={() => router.push('/settings' as any)}
+            accessibilityRole="button"
+            accessibilityLabel="Open settings"
+            hitSlop={8}
+          >
+            <Text style={styles.gearIcon}>⚙️</Text>
+          </Pressable>
+        </View>
       </View>
-    </View>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Profile Header: sprite, title, level, XP bar */}
+        <ProfileHeader
+          characterPresetId={characterPresetId}
+          activeTitle={activeTitle?.name ?? null}
+          currentLevel={currentLevel}
+          totalXP={totalXP}
+          xpToNext={xpToNext}
+        />
+
+        {/* Stats Grid */}
+        <View style={styles.section}>
+          <StatsGrid
+            totalXP={totalXP}
+            bestStreak={bestStreak}
+            daysActive={daysActive}
+          />
+        </View>
+
+        {/* Streak Bars */}
+        <View style={styles.section}>
+          <Text style={styles.sectionHeading}>Active Streaks</Text>
+          <StreakBars habitStreaks={habitStreaks} />
+        </View>
+
+        {/* Niyyah Display */}
+        <View style={styles.section}>
+          <NiyyahDisplay selectedNiyyahs={selectedNiyyahs} />
+        </View>
+
+        {/* Trophy Case */}
+        <View style={styles.section}>
+          <TrophyCase unlockedTitleIds={unlockedTitleIds} />
+        </View>
+
+        {/* Bottom padding */}
+        <View style={styles.bottomPad} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: colors.dark.background,
-    paddingStart: spacing.lg,
-    paddingEnd: spacing.lg,
   },
-  heading: {
-    fontSize: typography.headingLg.fontSize,
-    lineHeight: typography.headingLg.lineHeight,
-    fontWeight: typography.headingLg.fontWeight as '700',
-    fontFamily: typography.headingLg.fontFamily,
+  topBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.dark.border,
+  },
+  screenTitle: {
+    fontSize: typography.headingMd.fontSize,
+    lineHeight: typography.headingMd.lineHeight,
+    fontFamily: typography.headingMd.fontFamily,
     color: colors.dark.textPrimary,
-    marginBottom: spacing.sm,
   },
-  phase: {
+  topBarActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  dataLink: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  dataLinkText: {
     fontSize: typography.bodySm.fontSize,
     lineHeight: typography.bodySm.lineHeight,
     fontFamily: typography.bodySm.fontFamily,
-    color: colors.dark.primary,
+    color: colors.dark.secondary,
+    textDecorationLine: 'underline',
+  },
+  gearButton: {
+    minWidth: 44,
+    minHeight: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  gearIcon: {
+    fontSize: 22,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: spacing.xxl,
+  },
+  section: {
+    marginTop: spacing.lg,
+  },
+  sectionHeading: {
+    fontSize: typography.headingMd.fontSize,
+    lineHeight: typography.headingMd.lineHeight,
+    fontFamily: typography.headingMd.fontFamily,
+    color: colors.dark.textPrimary,
+    paddingHorizontal: spacing.md,
     marginBottom: spacing.md,
   },
-  description: {
-    fontSize: typography.bodyMd.fontSize,
-    lineHeight: typography.bodyMd.lineHeight,
-    fontFamily: typography.bodyMd.fontFamily,
-    color: colors.dark.textMuted,
-    textAlign: 'center',
-    marginBottom: spacing.xxl,
-  },
-  spikeSection: {
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  spikeLabel: {
-    fontSize: typography.caption.fontSize,
-    lineHeight: typography.caption.lineHeight,
-    fontFamily: typography.caption.fontFamily,
-    color: colors.dark.textSecondary,
-    letterSpacing: typography.caption.letterSpacing,
-    textTransform: 'uppercase',
-    marginBottom: spacing.xs,
-  },
-  spikeButton: {
-    backgroundColor: colors.dark.surface,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.md,
-    borderWidth: 1,
-    borderColor: colors.dark.border,
-    minWidth: 200,
-    alignItems: 'center',
-  },
-  spikeButtonText: {
-    fontSize: typography.bodyMd.fontSize,
-    fontFamily: typography.bodyMd.fontFamily,
-    color: colors.dark.primary,
+  bottomPad: {
+    height: spacing.xxl,
   },
 });
