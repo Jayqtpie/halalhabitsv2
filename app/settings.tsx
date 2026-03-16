@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useShallow } from 'zustand/react/shallow';
+import * as Location from 'expo-location';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { colors, typography, spacing } from '../src/tokens';
 import ExpoConstants from 'expo-constants';
@@ -114,6 +115,7 @@ export default function SettingsScreen() {
     prayerCalcMethod,
     setPrayerCalcMethod,
     locationName,
+    setLocation,
     muhasabahNotifEnabled,
     setMuhasabahNotifEnabled,
     streakMilestonesEnabled,
@@ -133,6 +135,7 @@ export default function SettingsScreen() {
       prayerCalcMethod: s.prayerCalcMethod,
       setPrayerCalcMethod: s.setPrayerCalcMethod,
       locationName: s.locationName,
+      setLocation: s.setLocation,
       muhasabahNotifEnabled: s.muhasabahNotifEnabled,
       setMuhasabahNotifEnabled: s.setMuhasabahNotifEnabled,
       streakMilestonesEnabled: s.streakMilestonesEnabled,
@@ -199,15 +202,26 @@ export default function SettingsScreen() {
           <NavRow
             label="Location"
             value={locationName ?? 'Not set'}
-            onPress={() => {
-              // Location re-request is handled by prayer-times service
-              // For now show informational alert
-              Alert.alert(
-                'Location',
-                locationName
-                  ? `Current: ${locationName}\n\nLocation updates automatically from your device.`
-                  : 'Location not set. Prayer times require location access.'
-              );
+            onPress={async () => {
+              const { status } = await Location.requestForegroundPermissionsAsync();
+              if (status !== 'granted') {
+                Alert.alert(
+                  'Location Permission',
+                  'Location access is needed for accurate prayer times. You can enable it in your device settings.'
+                );
+                return;
+              }
+              try {
+                const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+                const [geo] = await Location.reverseGeocodeAsync({
+                  latitude: loc.coords.latitude,
+                  longitude: loc.coords.longitude,
+                });
+                const name = geo ? [geo.city, geo.region].filter(Boolean).join(', ') : 'Location set';
+                setLocation(loc.coords.latitude, loc.coords.longitude, name);
+              } catch {
+                Alert.alert('Location Error', 'Could not determine your location. Please try again.');
+              }
             }}
             isLast
           />
