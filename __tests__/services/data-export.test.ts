@@ -7,7 +7,7 @@
  */
 
 // Mock expo modules before imports
-jest.mock('expo-file-system', () => ({
+jest.mock('expo-file-system/legacy', () => ({
   cacheDirectory: 'file:///cache/',
   writeAsStringAsync: jest.fn().mockResolvedValue(undefined),
 }));
@@ -16,77 +16,80 @@ jest.mock('expo-sharing', () => ({
   shareAsync: jest.fn().mockResolvedValue(undefined),
 }));
 
-// Mock repos
+// Mock repos — using actual method names from the repos
 jest.mock('../../src/db/repos', () => ({
   habitRepo: {
     getActive: jest.fn().mockResolvedValue([
       { id: 'h1', name: 'Fajr', type: 'salah_fajr', userId: 'local-user' },
     ]),
-    deleteAll: jest.fn().mockResolvedValue(undefined),
   },
   completionRepo: {
-    getAll: jest.fn().mockResolvedValue([
+    getAllForDate: jest.fn().mockResolvedValue([
       { id: 'c1', habitId: 'h1', completedAt: '2026-01-01T00:00:00Z', xpEarned: 50 },
     ]),
-    deleteAll: jest.fn().mockResolvedValue(undefined),
   },
   streakRepo: {
     getAllForUser: jest.fn().mockResolvedValue([
       { habitId: 'h1', currentCount: 5, longestCount: 10, multiplier: 1.5 },
     ]),
-    deleteAll: jest.fn().mockResolvedValue(undefined),
   },
   xpRepo: {
-    getAllForUser: jest.fn().mockResolvedValue([
+    getByUser: jest.fn().mockResolvedValue([
       { id: 'x1', userId: 'local-user', amount: 50, sourceType: 'habit', earnedAt: '2026-01-01' },
     ]),
-    deleteAll: jest.fn().mockResolvedValue(undefined),
   },
   titleRepo: {
     getUserTitles: jest.fn().mockResolvedValue([
       { titleId: 'the-seeker', userId: 'local-user', earnedAt: '2026-01-01' },
     ]),
-    deleteAll: jest.fn().mockResolvedValue(undefined),
   },
   questRepo: {
-    getAll: jest.fn().mockResolvedValue([
+    getByUser: jest.fn().mockResolvedValue([
       { id: 'q1', userId: 'local-user', type: 'daily', status: 'completed' },
     ]),
-    deleteAll: jest.fn().mockResolvedValue(undefined),
   },
   muhasabahRepo: {
-    getAll: jest.fn().mockResolvedValue([
-      { id: 'm1', userId: 'local-user', createdAt: '2026-01-01', content: 'Reflection' },
+    getByUserId: jest.fn().mockResolvedValue([
+      { id: 'm1', userId: 'local-user', createdAt: '2026-01-01', prompt1Text: 'Reflection' },
     ]),
-    deleteAll: jest.fn().mockResolvedValue(undefined),
   },
 }));
 
+// Mock DB client (for deleteAllUserData)
+jest.mock('../../src/db/client', () => ({
+  getDb: jest.fn().mockReturnValue({
+    $client: {
+      execSync: jest.fn(),
+    },
+  }),
+}));
+
 // Mock stores
-const mockGameStoreReset = jest.fn();
-const mockHabitStoreReset = jest.fn();
-const mockSettingsStoreReset = jest.fn();
 const mockSetOnboardingComplete = jest.fn();
+const mockSetLevel = jest.fn();
+const mockSetTotalXP = jest.fn();
+const mockSetTitles = jest.fn();
+const mockSetActiveTitle = jest.fn();
 
 jest.mock('../../src/stores/gameStore', () => ({
   useGameStore: {
     getState: () => ({
-      setLevel: jest.fn(),
-      setTotalXP: jest.fn(),
-      setTitles: jest.fn(),
-      setActiveTitle: jest.fn(),
+      setLevel: mockSetLevel,
+      setTotalXP: mockSetTotalXP,
+      setTitles: mockSetTitles,
+      setActiveTitle: mockSetActiveTitle,
     }),
   },
 }));
 
 jest.mock('../../src/stores/habitStore', () => ({
   useHabitStore: {
+    setState: jest.fn(),
     getState: () => ({
       habits: [],
       completions: {},
       streaks: {},
     }),
-    setState: mockHabitStoreReset,
   },
 }));
 
@@ -96,15 +99,22 @@ jest.mock('../../src/stores/settingsStore', () => ({
       prayerCalcMethod: 'ISNA',
       darkMode: 'auto',
       soundEnabled: true,
+      hapticEnabled: true,
       arabicTermsEnabled: true,
-      onboardingComplete: true,
       selectedNiyyahs: ['strengthen-salah'],
+      characterPresetId: null,
+      muhasabahReminderTime: '21:00',
+      muhasabahNotifEnabled: true,
+      streakMilestonesEnabled: false,
+      questExpiringEnabled: false,
+      morningMotivationEnabled: false,
+      onboardingComplete: true,
       setOnboardingComplete: mockSetOnboardingComplete,
     }),
   },
 }));
 
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { collectAllUserData, exportUserData, deleteAllUserData } from '../../src/services/data-export';
 
@@ -129,16 +139,26 @@ describe('data-export service', () => {
       expect(data).toHaveProperty('settings');
     });
 
-    it('includes habit data in correct shape', async () => {
+    it('includes exportedAt and version fields', async () => {
+      const data = await collectAllUserData(USER_ID);
+      expect(data).toHaveProperty('exportedAt');
+      expect(data).toHaveProperty('version');
+      expect(data.version).toBe('1.0');
+    });
+
+    it('includes habit data as array', async () => {
       const data = await collectAllUserData(USER_ID);
       expect(Array.isArray(data.habits)).toBe(true);
       expect(data.habits.length).toBeGreaterThan(0);
     });
 
-    it('includes settings as object', async () => {
+    it('includes settings as object with required fields', async () => {
       const data = await collectAllUserData(USER_ID);
       expect(typeof data.settings).toBe('object');
       expect(data.settings).not.toBeNull();
+      expect(data.settings).toHaveProperty('prayerCalcMethod');
+      expect(data.settings).toHaveProperty('arabicTermsEnabled');
+      expect(data.settings).toHaveProperty('selectedNiyyahs');
     });
   });
 
@@ -160,12 +180,32 @@ describe('data-export service', () => {
       expect(shareArg).toContain('halalhabits-export.json');
       expect(options?.mimeType).toBe('application/json');
     });
+
+    it('exported JSON contains all required keys', async () => {
+      await exportUserData(USER_ID);
+      const content = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls[0][1];
+      const parsed = JSON.parse(content);
+      expect(parsed).toHaveProperty('habits');
+      expect(parsed).toHaveProperty('completions');
+      expect(parsed).toHaveProperty('streaks');
+      expect(parsed).toHaveProperty('xp_ledger');
+      expect(parsed).toHaveProperty('titles');
+      expect(parsed).toHaveProperty('quests');
+      expect(parsed).toHaveProperty('muhasabah');
+      expect(parsed).toHaveProperty('settings');
+    });
   });
 
   describe('deleteAllUserData', () => {
     it('calls setOnboardingComplete(false) to reset app to onboarding', async () => {
       await deleteAllUserData(USER_ID);
       expect(mockSetOnboardingComplete).toHaveBeenCalledWith(false);
+    });
+
+    it('resets game store to level 1', async () => {
+      await deleteAllUserData(USER_ID);
+      expect(mockSetLevel).toHaveBeenCalledWith(1);
+      expect(mockSetTotalXP).toHaveBeenCalledWith(0);
     });
 
     it('does not throw on successful deletion', async () => {
