@@ -87,15 +87,15 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **ONBR-01**: First-launch onboarding includes Niyyah (intention setting) flow
 - [x] **ONBR-02**: User selects initial habits from preset library during onboarding
-- [ ] **ONBR-03**: Onboarding communicates game metaphor and XP philosophy clearly
-- [ ] **ONBR-04**: Onboarding is completable in under 2 minutes
+- [x] **ONBR-03**: Onboarding communicates game metaphor and XP philosophy clearly
+- [x] **ONBR-04**: Onboarding is completable in under 2 minutes
 
 ### Profile and Settings
 
-- [ ] **PROF-01**: User can view profile with title, level, XP, streak history, and achievements
+- [x] **PROF-01**: User can view profile with title, level, XP, streak history, and achievements
 - [x] **PROF-02**: User can access settings for notifications, prayer calculation method, and privacy controls
-- [ ] **PROF-03**: User can export or delete all personal data
-- [ ] **PROF-04**: Dark mode supported (default or system-auto)
+- [x] **PROF-03**: User can export or delete all personal data
+- [x] **PROF-04**: Dark mode supported (default or system-auto)
 
 ### Backend and Sync
 

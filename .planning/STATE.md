@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 2 of 4 (Phase 6) — plan 02 at checkpoint (awaiting human-verify)
-status: in_progress
-stopped_at: Checkpoint - 06-02 human verification of onboarding flow on device
-last_updated: "2026-03-16T20:06:00Z"
-last_activity: "2026-03-16 -- 06-02: 5-screen onboarding flow (Welcome, Character, Niyyah, Habits, Tour), Stack.Protected hydration gate"
+current_plan: 2 of 4 (Phase 6) — plan 02 at human-verify checkpoint
+status: verifying
+stopped_at: Phase 6 plan 03 human-verify checkpoint - Profile, Settings, Prayer Reminders, Your Data, data-export TDD
+last_updated: "2026-03-16T20:05:02.932Z"
+last_activity: "2026-03-16 -- 06-02: 5-screen onboarding flow with Stack.Protected hydration gate"
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 24
-  completed_plans: 24
-  percent: 92
+  total_plans: 28
+  completed_plans: 27
+  percent: 93
 ---
 
 # Project State
@@ -74,6 +74,7 @@ Overall: 5 complete phases (Phase 01-05), Phase 06 in progress (2/4 plans — 1 
 | 03-06 | ~15min | 3 | Prayer, Mercy Mode, calendar, verification |
 | Phase 04-game-engine-and-progression P04 | 5 | 2 tasks | 6 files |
 | Phase 05-hud-visual-identity-and-muhasabah P04 | 4min | 1 tasks | 8 files |
+| Phase 06 P03 | 13 | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -144,6 +145,10 @@ Recent decisions affecting current work:
 - [Phase 06-02]: Character customization encoded as compound string in characterPresetId field (no DB change)
 - [Phase 06-02]: Tour background uses simplified HUD preview (not real store context) — keeps onboarding self-contained
 - [Phase 06-02]: as never cast for expo-router typed routes (type generation runs at build time, not TS compile)
+- [Phase 06-03]: expo-file-system/legacy (not v2 root) for writeAsStringAsync and cacheDirectory
+- [Phase 06-03]: deleteAllUserData uses raw execSync SQL -- no new deleteAll repo methods needed, wrapped in try/catch for store resets
+- [Phase 06-03]: TrophyCase renders all titles from TITLE_SEED_DATA client-side (static data, no DB query)
+- [Phase 06-03]: ProfileHeader uses RN Image not Skia -- standard View context, not inside Skia Canvas
 
 ### Pending Todos
 
@@ -165,6 +170,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-16T20:06:00Z
-Stopped at: Phase 6 plan 02 — human-verify checkpoint (onboarding flow on device)
-Resume file: .planning/phases/06-onboarding-profile-and-notifications/06-02-PLAN.md
+Last session: 2026-03-16T20:04:35.142Z
+Stopped at: Phase 6 plan 03 human-verify checkpoint - Profile, Settings, Prayer Reminders, Your Data, data-export TDD
+Resume file: None
