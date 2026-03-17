@@ -46,15 +46,17 @@ Component-level presets (sourced from `src/tokens/spacing.ts`):
 | Token | Value | Usage |
 |-------|-------|-------|
 | cardPadding | 16px | Auth form card inner padding |
-| buttonPaddingVertical | 12px | Sign In / Create Account buttons |
+| buttonPaddingVertical | 16px | Sign In / Create Account buttons |
 | buttonPaddingHorizontal | 24px | Sign In / Create Account buttons |
 | modalPadding | 24px | Account creation modal, sign-out confirmation |
 | modalElementGap | 16px | Spacing between modal form fields |
+| listItemPaddingVertical | 16px | Settings account section rows |
+| listItemPaddingHorizontal | 16px | Settings account section rows |
 
 Exceptions:
 
 - Touch targets for all interactive elements: minimum 44x44px (per ui-ux-pro-max `touch-target-size` rule). Cloud sync icon, dismiss button, and sign-in form inputs must meet this threshold.
-- Account nudge banner: 12px vertical padding (hudCardPadding) to match HUD card aesthetic.
+- Account nudge banner: 16px vertical padding (md token) to match HUD card aesthetic.
 
 ---
 
@@ -64,16 +66,17 @@ Sourced from `src/tokens/typography.ts`. Two font families in use: Inter (body/U
 
 | Role | Size | Weight | Line Height | Font Family | Usage |
 |------|------|--------|-------------|-------------|-------|
-| Body (bodyMd) | 15px | 400 | 22px (1.47) | Inter-Regular | Form labels, descriptive copy, settings rows |
-| Body small (bodySm) | 13px | 400 | 18px (1.38) | Inter-Regular | Sync status text, helper copy, caption under cloud icon |
-| Heading (headingMd) | 14px | 700 | 22px (1.57) | Press Start 2P | Section headers in auth screens, account card title |
+| Body (bodyMd) | 15px | 400 | 22px (1.47) | Inter-Regular | Form labels, descriptive copy, settings rows, button labels |
+| Body small (bodySm) | 13px | 400 | 18px (1.38) | Inter-Regular | Sync status text, helper copy, caption under cloud icon, sync timestamp ("Last synced 3 min ago"), section headers in auth screens, account card title |
 | Heading large (headingLg) | 18px | 700 | 28px (1.56) | Press Start 2P | Sign In screen title, Create Account title |
 
 Notes:
 
-- Auth screens use Inter-SemiBold (600) for button labels — this is the only semibold usage in Phase 7.
-- Pixel font (Press Start 2P) used for screen titles and section headers only — matching established phase convention.
-- Caption style (11px, 0.5 letter-spacing) used for the sync timestamp ("Last synced 3 min ago").
+- Exactly 3 font sizes declared (15px, 13px, 18px) — no size is within 1px of another.
+- Exactly 2 font weights declared (Inter-Regular 400 for body copy, Press Start 2P 700 for pixel headings).
+- Auth screen section headers and account card titles use bodySm (13px, 400, Inter-Regular) — no separate headingMd style.
+- Sync timestamp collapses into bodySm (13px) — no separate caption style.
+- Pixel font (Press Start 2P) used for screen titles only — matching established phase convention.
 
 ---
 
@@ -143,7 +146,7 @@ Appears as a non-blocking bottom banner after first level-up or title unlock whe
 - Background: mercy orange (#FFB347) at 15% opacity overlay on surface-800
 - Left accent bar: 3px solid mercy orange
 - Body copy: bodyMd Inter-Regular
-- Title: "Your progress is safe — for now." (headingMd Press Start 2P)
+- Title: "Your progress is safe — for now." (bodySm Inter-Regular, used as section label)
 - CTA button: accent emerald, "Keep My Progress"
 - Dismiss: "x" icon top-right, 44x44px touch target, no confirmation required
 - Never reappears after dismissed (settingsStore flag)
@@ -163,6 +166,7 @@ Destructive. Accessible from Settings > Account > Delete Account.
 - Row label: "Delete Account" in ruby-500 (error token)
 - Two-step confirmation: sheet modal with warning copy + explicit "Delete Everything" button in ruby-500
 - "Delete Everything" button requires deliberate tap (not swipe)
+- Cancel button label: "Keep My Account" (not "Cancel" — specific label required)
 - On completion: navigate to onboarding Welcome screen
 
 ---
@@ -193,7 +197,7 @@ All copy follows adab-safe guidelines from CONTEXT.md: invitational, not shame-b
 | Delete account sheet title | "Delete Everything?" |
 | Delete account sheet body | "This permanently erases your account and all progress on this device and our servers. Your journey cannot be recovered." |
 | Delete account confirmation button | "Delete Everything" |
-| Delete account cancel button | "Cancel" |
+| Delete account cancel button | "Keep My Account" |
 | Auth error — invalid credentials | "Incorrect email or password. Please try again." |
 | Auth error — network | "No connection. Check your internet and try again." |
 | Auth error — email taken | "That email is already registered. Try signing in instead." |
@@ -203,6 +207,7 @@ All copy follows adab-safe guidelines from CONTEXT.md: invitational, not shame-b
 Adab notes:
 
 - "Delete Everything" is used instead of "Confirm" to make the destructive action legible without relying on color alone (accessibility rule: color is not the only indicator).
+- "Keep My Account" replaces "Cancel" on the delete confirmation sheet — specific label, not a generic dismissal.
 - No copy references "losing your streak" or frames account creation as risk-avoidance pressure. Framing is positive: protect what you've built.
 - "Start Fresh" is offered without friction or shame copy — respects user agency per CONTEXT.md decision.
 
@@ -240,7 +245,7 @@ These components are new in Phase 7. All existing component patterns (HabitCard,
 ### Settings Screen — Account Section (additive to existing settings)
 
 - Inserted as a new section at the top of the existing Settings screen
-- Same row pattern as existing settings rows (listItemPaddingVertical: 12px, listItemPaddingHorizontal: 16px)
+- Same row pattern as existing settings rows (listItemPaddingVertical: 16px, listItemPaddingHorizontal: 16px)
 - SyncStatusIcon appears inline in section header row (right-aligned)
 - Account section hidden / shows guest state when signed out
 
