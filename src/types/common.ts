@@ -43,3 +43,6 @@ export type XPSourceType =
 
 /** User dark mode preference */
 export type DarkMode = 'auto' | 'dark' | 'light';
+
+/** Operations tracked in the sync queue */
+export type SyncQueueOperation = 'INSERT' | 'UPDATE' | 'DELETE';

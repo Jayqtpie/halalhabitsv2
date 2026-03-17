@@ -19,6 +19,7 @@ export const users = sqliteTable('users', {
   totalXp: integer('total_xp').notNull().default(0),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
+  expoPushToken: text('expo_push_token'),
 }, (table) => ([
   index('idx_user_level').on(table.currentLevel),
 ]));
@@ -206,6 +207,8 @@ export const syncQueue = sqliteTable('sync_queue', {
   payload: text('payload').notNull(),
   createdAt: text('created_at').notNull(),
   syncedAt: text('synced_at'),
+  retryCount: integer('retry_count').notNull().default(0),
+  lastError: text('last_error'),
 }, (table) => ([
   index('idx_sync_entity').on(table.entityType, table.entityId),
 ]));
