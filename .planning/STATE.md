@@ -2,34 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 4 of 4 (Phase 6) — plan 04 at human-verify checkpoint
-status: verifying
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-03-17T21:46:19.934Z"
-last_activity: "2026-03-16 -- 06-04: notification lifecycle wiring in root layout"
+current_plan: 1 of 5 (Phase 7) — plan 01 complete
+status: in_progress
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-03-17T21:10:00.000Z"
+last_activity: "2026-03-17 -- 07-01: Supabase client, authStore, auth-service, DB migration"
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 33
   completed_plans: 29
   percent: 88
----
-
----
-gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-current_plan: 4 of 4 (Phase 6) — plan 04 at human-verify checkpoint
-status: verifying
-stopped_at: Phase 7 UI-SPEC approved
-last_updated: "2026-03-17T20:33:37.995Z"
-last_activity: "2026-03-16 -- 06-04: notification lifecycle wiring in root layout"
-progress:
-  [█████████░] 88%
-  completed_phases: 6
-  total_plans: 28
-  completed_plans: 28
-  percent: 96
 ---
 
 # Project State
@@ -39,17 +22,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Phase 6 in progress — notification lifecycle wiring done, awaiting full Phase 6 verification
+**Current focus:** Phase 7 in progress — Supabase client + auth service foundation complete (07-01), sync engine next (07-02)
 
 ## Current Position
 
-Phase: 6 of 7 (Onboarding, Profile & Notifications — in progress)
-Current Plan: 4 of 4 (Phase 6) — plan 04 at human-verify checkpoint
-Status: All Phase 6 tasks implemented, awaiting full device verification of onboarding + profile + settings + notifications
-Last activity: 2026-03-16 -- 06-04: notification lifecycle wiring in root layout
+Phase: 7 of 7 (Backend, Auth & Sync — in progress)
+Current Plan: 1 of 5 (Phase 7) — plan 01 complete
+Status: 07-01 complete (Supabase client, authStore, auth-service, DB migration). Ready for 07-02 sync engine.
+Last activity: 2026-03-17 -- 07-01: Supabase client, authStore, auth-service, DB migration
 
-Progress: [██████████] 96% overall (27/28 plans complete)
-Overall: 5 complete phases (Phase 01-05), Phase 06 nearly complete (3/4 plans done, 1 at checkpoint)
+Progress: [█████████░] 88% overall (29/33 plans complete)
+Overall: 6 complete phases (Phase 01-06), Phase 07 in progress (1/5 plans done)
 
 ## Performance Metrics
 
@@ -62,7 +45,8 @@ Overall: 5 complete phases (Phase 01-05), Phase 06 nearly complete (3/4 plans do
 | Phase 03 | 6/6 | Complete | 2026-03-10 |
 | Phase 04 | 3/3 | Complete | 2026-03-15 |
 | Phase 05 | 4/4 | Complete | 2026-03-16 |
-| Phase 06 | 4/4 | Checkpoint (awaiting verification) | — |
+| Phase 06 | 4/4 | Complete | 2026-03-17 |
+| Phase 07 | 1/5 | In Progress | — |
 
 **Phase 4 Plan Breakdown:**
 
@@ -81,6 +65,12 @@ Overall: 5 complete phases (Phase 01-05), Phase 06 nearly complete (3/4 plans do
 | 06-03 | ~13min | 2+checkpoint | Profile RPG screen, Settings 4-section, Prayer Reminders sub-screen, Your Data with export/delete TDD |
 | 06-04 | ~8min | 1+checkpoint | Notification lifecycle wiring (startup reschedule, settings-change reschedule, tap routing) |
 
+**Phase 7 Plan Breakdown:**
+
+| Plan | Duration | Tasks | Description |
+|------|----------|-------|-------------|
+| 07-01 | ~22min | 2 | Supabase client, authStore, auth-service (signUp/signIn/signOut/deleteAccount/migrateGuestData), DB migration |
+
 **Phase 3 Plan Breakdown:**
 
 | Plan | Duration | Tasks | Description |
@@ -91,10 +81,6 @@ Overall: 5 complete phases (Phase 01-05), Phase 06 nearly complete (3/4 plans do
 | 03-04 | 4min | 2 | Daily habit list screen |
 | 03-05 | 6min | 2 | Habit creation & management |
 | 03-06 | ~15min | 3 | Prayer, Mercy Mode, calendar, verification |
-| Phase 04-game-engine-and-progression P04 | 5 | 2 tasks | 6 files |
-| Phase 05-hud-visual-identity-and-muhasabah P04 | 4min | 1 tasks | 8 files |
-| Phase 06 P03 | 13 | 2 tasks | 13 files |
-| Phase 07 P02 | 5min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -173,9 +159,11 @@ Recent decisions affecting current work:
 - [Phase 06-04]: Notification tap routing via title+body keyword matching -- no custom data payload needed, consistent with notification-copy.ts patterns
 - [Phase 06-04]: rescheduleAll effect dependency array includes all 9 notification settings -- settings screen changes apply immediately without restart
 - [Phase 06-04]: Non-fatal try/catch on rescheduleAll -- notifications are enhancement not core function
-- [Phase 07]: Factory mocks in jest.mock() required for modules with expo-sqlite side-effects; auto-mock evaluates the module and runs openDatabaseSync
-- [Phase 07]: [Phase 07-02]: Supabase error objects wrapped with new Error(error.message) in sync-engine to preserve message string through instanceof Error check in catch block
-- [Phase 07]: [Phase 07-02]: jest.setup.ts global mocks for expo-sqlite/localStorage/install and react-native-url-polyfill/auto prevent side-effect failures across all Phase 7 test suites
+- [Phase 07-01]: Inline jest.mock factory for src/lib/supabase in tests — avoids localStorage global not defined in Node env
+- [Phase 07-01]: authStore has NO persist middleware — session managed by Supabase's own expo-sqlite localStorage persistence
+- [Phase 07-01]: signOut is non-destructive — local SQLite data belongs to the device, not the session
+- [Phase 07-01]: deleteAccount calls supabase.rpc('delete_user') for server cleanup before local wipe
+- [Phase 07-01]: migrateGuestData uses raw execSync (same pattern as deleteAllUserData) — no new repo methods needed
 
 ### Pending Todos
 
@@ -194,9 +182,10 @@ Recent decisions affecting current work:
 
 - Asset placeholders in use -- real pixel art assets needed before product-quality screenshots
 - Success criterion "app builds via EAS Build (not Expo Go)" not yet met -- using Expo Go on SDK 54
+- Supabase project not yet created -- EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY needed in .env
 
 ## Session Continuity
 
-Last session: 2026-03-17T21:46:19.930Z
-Stopped at: Completed 07-02-PLAN.md
-Resume file: None
+Last session: 2026-03-17T21:10:00.000Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: .planning/phases/07-backend-auth-and-sync/07-02-PLAN.md

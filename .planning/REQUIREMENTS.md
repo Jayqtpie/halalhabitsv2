@@ -99,7 +99,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Backend and Sync
 
-- [ ] **SYNC-01**: User can create account with email, Apple, or Google auth via Supabase
+- [x] **SYNC-01**: User can create account with email, Apple, or Google auth via Supabase
 - [x] **SYNC-02**: Non-private data syncs to Supabase when online (XP, settings, profile)
 - [x] **SYNC-03**: Sync engine handles offline queue with conflict resolution (idempotent completions)
 - [ ] **SYNC-04**: Push notifications delivered via Supabase Edge Functions
