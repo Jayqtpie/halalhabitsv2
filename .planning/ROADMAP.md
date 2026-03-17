@@ -143,11 +143,14 @@ Plans:
   3. App works identically when offline for 3+ days, then syncs correctly when connectivity returns with no duplicate or lost entries
   4. Push notifications are delivered via Supabase Edge Functions for prayer reminders and Muhasabah prompts
   5. Row-Level Security enforces that users can only access their own data at the database level
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 07-01: TBD
-- [ ] 07-02: TBD
+- [ ] 07-01-PLAN.md — Supabase client, authStore, auth-service with signUp/signIn/signOut, local DB migration, tests
+- [ ] 07-02-PLAN.md — Sync queue repository and sync engine with flush logic, privacy guard, retry tracking, tests
+- [ ] 07-03-PLAN.md — Auth UI screens (sign-in, create-account), account nudge banner, settings account section, sync status icon
+- [ ] 07-04-PLAN.md — Root layout auth wiring, default-user replacement, push token registration, data-export extension
+- [ ] 07-05-PLAN.md — Supabase server-side: Postgres schema, RLS policies, push notification Edge Function
 
 ## Progress
 
@@ -162,4 +165,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. Game Engine and Progression | 4/4 | Complete   | 2026-03-15 |
 | 5. HUD, Visual Identity, and Muhasabah | 1/4 | In Progress|  |
 | 6. Onboarding, Profile, and Notifications | 4/4 | Complete   | 2026-03-16 |
-| 7. Backend, Auth, and Sync | 0/2 | Not started | - |
+| 7. Backend, Auth, and Sync | 0/5 | Not started | - |
