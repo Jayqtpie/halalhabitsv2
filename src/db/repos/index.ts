@@ -13,3 +13,4 @@ export { settingsRepo } from './settingsRepo';
 export { completionRepo } from './completionRepo';
 export { streakRepo } from './streakRepo';
 export { muhasabahRepo } from './muhasabahRepo';
+export { syncQueueRepo } from './syncQueueRepo';
