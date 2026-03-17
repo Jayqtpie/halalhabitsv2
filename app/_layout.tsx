@@ -10,14 +10,22 @@
  * - Startup reschedule: after appReady, reschedules today's notifications if
  *   permissions are granted and location is set.
  * - Tap listener: prayer tap -> habits tab; Muhasabah tap -> opens modal.
+ *
+ * Auth/sync wiring (Phase 7, Plan 04):
+ * - AppState listener: startAutoRefresh/stopAutoRefresh for token refresh (module-level)
+ * - onAuthStateChange: updates authStore session on every auth event
+ * - Push token registration: registers on every SIGNED_IN event
+ * - Sync-on-foreground: flushes sync queue when app becomes active and user is authenticated
  */
 import React, { useEffect } from 'react';
+import { AppState } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { I18nextProvider } from 'react-i18next';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
 import { useShallow } from 'zustand/react/shallow';
 import i18n from '../src/i18n/config';
 import { db } from '../src/db/client';
@@ -26,6 +34,9 @@ import { MuhasabahModal } from '../src/components/muhasabah/MuhasabahModal';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { useMuhasabahStore } from '../src/stores/muhasabahStore';
 import * as NotificationService from '../src/services/notification-service';
+import { supabase } from '../src/lib/supabase';
+import { useAuthStore } from '../src/stores/authStore';
+import { flushQueue } from '../src/services/sync-engine';
 import type { CalcMethodKey } from '../src/types/habits';
 
 // Keep splash screen visible while loading
@@ -42,6 +53,21 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
+
+// ── AppState listener for Supabase token auto-refresh ────────────────────────
+// Registered at module level with a guard to prevent double registration
+// on hot reload. Pauses token refresh when app is backgrounded to save battery.
+let appStateListenerRegistered = false;
+if (!appStateListenerRegistered) {
+  appStateListenerRegistered = true;
+  AppState.addEventListener('change', (state) => {
+    if (state === 'active') {
+      supabase.auth.startAutoRefresh();
+    } else {
+      supabase.auth.stopAutoRefresh();
+    }
+  });
+}
 
 export default function RootLayout() {
   const router = useRouter();
@@ -83,6 +109,52 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [appReady]);
+
+  // ── Auth state subscription ────────────────────────────────────────────────
+  // Subscribes to Supabase auth events and syncs session into authStore.
+  // Also registers push token on every SIGNED_IN event (handles reinstall/new device).
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        useAuthStore.getState().setSession(session);
+
+        // Register push token on every sign-in (handles reinstall, new device)
+        if (session?.user?.id && _event === 'SIGNED_IN') {
+          try {
+            const { status } = await Notifications.getPermissionsAsync();
+            if (status === 'granted') {
+              const token = await Notifications.getExpoPushTokenAsync({
+                projectId: Constants.expoConfig?.extra?.eas?.projectId,
+              });
+              await supabase
+                .from('users')
+                .update({ expo_push_token: token.data })
+                .eq('id', session.user.id);
+            }
+          } catch (err) {
+            console.warn('[layout] push token registration failed:', err);
+          }
+        }
+      },
+    );
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // ── Sync-on-foreground ────────────────────────────────────────────────────
+  // Flushes the offline sync queue whenever the app comes to the foreground
+  // and the user is authenticated. Non-fatal — sync is a background enhancement.
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async (nextState) => {
+      if (nextState === 'active' && useAuthStore.getState().isAuthenticated) {
+        try {
+          await flushQueue();
+        } catch {
+          // Non-fatal: sync is background enhancement
+        }
+      }
+    });
+    return () => subscription.remove();
+  }, []);
 
   // ── Startup notification reschedule ───────────────────────────────────────
   // Runs once after appReady. Handles the Android reboot case where OS clears
