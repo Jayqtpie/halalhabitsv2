@@ -15,9 +15,30 @@
 
 jest.mock('@supabase/supabase-js');
 jest.mock('@react-native-community/netinfo');
-jest.mock('../../src/lib/supabase');
-jest.mock('../../src/stores/authStore');
-jest.mock('../../src/db/repos/syncQueueRepo');
+
+// Inline factory to avoid running supabase.ts side-effect imports in test env
+jest.mock('../../src/lib/supabase', () => ({
+  supabase: {
+    from: jest.fn(),
+  },
+}));
+
+jest.mock('../../src/stores/authStore', () => ({
+  useAuthStore: {
+    getState: jest.fn(),
+  },
+}));
+
+// Inline factory to avoid loading db/client (expo-sqlite) in test env
+jest.mock('../../src/db/repos/syncQueueRepo', () => ({
+  syncQueueRepo: {
+    getPending: jest.fn(),
+    markSynced: jest.fn(),
+    markFailed: jest.fn(),
+    purgeSynced: jest.fn(),
+    clearAll: jest.fn(),
+  },
+}));
 
 import NetInfo from '@react-native-community/netinfo';
 import { flushQueue, syncNow } from '../../src/services/sync-engine';

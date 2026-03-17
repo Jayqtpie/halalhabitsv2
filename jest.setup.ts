@@ -1,3 +1,9 @@
+// Mock expo-sqlite localStorage polyfill (side-effect import in supabase.ts)
+jest.mock('expo-sqlite/localStorage/install', () => {});
+
+// Mock react-native-url-polyfill (side-effect import in supabase.ts)
+jest.mock('react-native-url-polyfill/auto', () => {});
+
 // Jest mock for @shopify/react-native-skia
 jest.mock('@shopify/react-native-skia', () => ({
   Canvas: ({ children }: any) => children,
