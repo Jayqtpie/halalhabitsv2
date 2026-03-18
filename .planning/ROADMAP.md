@@ -197,5 +197,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 5. HUD, Visual Identity, and Muhasabah | 4/4 | Complete | 2026-03-16 |
 | 6. Onboarding, Profile, and Notifications | 4/4 | Complete | 2026-03-16 |
 | 7. Backend, Auth, and Sync | 5/5 | Complete | 2026-03-18 |
-| 8. Critical Integration Wiring | 0/2 | Not Started | — |
+| 8. Critical Integration Wiring | 1/2 | In Progress|  |
 | 9. Verification and Audit Cleanup | 0/? | Not Started | — |
