@@ -6,6 +6,9 @@ import { eq } from 'drizzle-orm';
 import { getDb } from '../client';
 import { titles, userTitles } from '../schema';
 import type { NewUserTitle } from '../../types/database';
+import { syncQueueRepo } from './syncQueueRepo';
+import { assertSyncable } from '../../services/privacy-gate';
+import { useAuthStore } from '../../stores/authStore';
 
 export const titleRepo = {
   /**
@@ -36,11 +39,23 @@ export const titleRepo = {
    */
   async grantTitle(data: NewUserTitle) {
     const db = getDb();
-    return db
+    const result = await db
       .insert(userTitles)
       .values(data)
       .onConflictDoNothing()
       .returning();
+
+    // Enqueue for sync (non-blocking, skip for guests)
+    // Only enqueue if a new row was actually inserted (result is non-empty)
+    try {
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated && result.length > 0) {
+        assertSyncable('user_titles');
+        syncQueueRepo.enqueue('user_titles', data.titleId, 'INSERT', data).catch(() => {});
+      }
+    } catch { /* enqueue must never block local write */ }
+
+    return result;
   },
 
   /**
@@ -56,6 +71,7 @@ export const titleRepo = {
   /**
    * Bulk insert title seed data (for first-run seeding).
    * Uses onConflictDoNothing to be fully idempotent.
+   * NOTE: seedTitles is static seed data, NOT enqueued for sync.
    */
   async seedTitles(data: typeof titles.$inferInsert[]) {
     const db = getDb();

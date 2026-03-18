@@ -6,11 +6,25 @@ import { eq, and, gte, lt, sql } from 'drizzle-orm';
 import { getDb } from '../client';
 import { xpLedger } from '../schema';
 import type { NewXPLedger } from '../../types/database';
+import { syncQueueRepo } from './syncQueueRepo';
+import { assertSyncable } from '../../services/privacy-gate';
+import { useAuthStore } from '../../stores/authStore';
 
 export const xpRepo = {
   async create(data: NewXPLedger) {
     const db = getDb();
-    return db.insert(xpLedger).values(data).returning();
+    const result = await db.insert(xpLedger).values(data).returning();
+
+    // Enqueue for sync (non-blocking, skip for guests)
+    try {
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        assertSyncable('xp_ledger');
+        syncQueueRepo.enqueue('xp_ledger', data.id, 'INSERT', data).catch(() => {});
+      }
+    } catch { /* enqueue must never block local write */ }
+
+    return result;
   },
 
   async getByUser(userId: string) {

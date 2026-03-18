@@ -6,6 +6,9 @@ import { eq, and, lt, gte, ne, sql } from 'drizzle-orm';
 import { getDb } from '../client';
 import { quests } from '../schema';
 import type { NewQuest } from '../../types/database';
+import { syncQueueRepo } from './syncQueueRepo';
+import { assertSyncable } from '../../services/privacy-gate';
+import { useAuthStore } from '../../stores/authStore';
 
 export const questRepo = {
   /**
@@ -78,15 +81,39 @@ export const questRepo = {
 
   async create(data: NewQuest) {
     const db = getDb();
-    return db.insert(quests).values(data).returning();
+    const result = await db.insert(quests).values(data).returning();
+
+    // Enqueue for sync (non-blocking, skip for guests)
+    try {
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        assertSyncable('quests');
+        syncQueueRepo.enqueue('quests', data.id, 'INSERT', data).catch(() => {});
+      }
+    } catch { /* enqueue must never block local write */ }
+
+    return result;
   },
 
   async updateProgress(id: string, progress: number) {
     const db = getDb();
-    return db
+    const result = await db
       .update(quests)
       .set({ progress, status: 'in_progress' })
       .where(eq(quests.id, id));
+
+    try {
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        assertSyncable('quests');
+        const updated = await db.select().from(quests).where(eq(quests.id, id));
+        if (updated[0]) {
+          syncQueueRepo.enqueue('quests', id, 'UPDATE', updated[0]).catch(() => {});
+        }
+      }
+    } catch {}
+
+    return result;
   },
 
   /**
@@ -96,7 +123,7 @@ export const questRepo = {
    */
   async updateProgressAtomic(id: string, targetValue: number) {
     const db = getDb();
-    return db
+    const result = await db
       .update(quests)
       .set({
         progress: sql`MIN(${quests.progress} + 1, ${targetValue})`,
@@ -104,22 +131,48 @@ export const questRepo = {
       })
       .where(eq(quests.id, id))
       .returning();
+
+    try {
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        assertSyncable('quests');
+        if (result[0]) {
+          syncQueueRepo.enqueue('quests', id, 'UPDATE', result[0]).catch(() => {});
+        }
+      }
+    } catch {}
+
+    return result;
   },
 
   async complete(id: string) {
     const db = getDb();
-    return db
+    const result = await db
       .update(quests)
       .set({
         status: 'completed',
         completedAt: new Date().toISOString(),
       })
       .where(eq(quests.id, id));
+
+    try {
+      const { isAuthenticated } = useAuthStore.getState();
+      if (isAuthenticated) {
+        assertSyncable('quests');
+        const updated = await db.select().from(quests).where(eq(quests.id, id));
+        if (updated[0]) {
+          syncQueueRepo.enqueue('quests', id, 'UPDATE', updated[0]).catch(() => {});
+        }
+      }
+    } catch {}
+
+    return result;
   },
 
   /**
    * Expire quests past their expiresAt timestamp.
    * Expires both 'available' and 'in_progress' quests.
+   * NOTE: expireOld is a bulk operation not tied to user interaction, NOT enqueued for sync.
    */
   async expireOld() {
     const db = getDb();
