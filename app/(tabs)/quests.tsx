@@ -20,6 +20,7 @@ import { useFocusEffect } from 'expo-router';
 import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '../../src/stores/gameStore';
 import { useHabitStore } from '../../src/stores/habitStore';
+import { useAuthStore } from '../../src/stores/authStore';
 import { QuestBoardHeader } from '../../src/components/quests/QuestBoardHeader';
 import { QuestSection } from '../../src/components/quests/QuestSection';
 import { QuestLockedState } from '../../src/components/quests/QuestLockedState';
@@ -67,25 +68,24 @@ export default function QuestsScreen() {
     }))
   );
 
-  // Placeholder user ID (Phase 6 will wire real auth)
-  const USER_ID = 'default-user';
+  const userId = useAuthStore((s) => s.userId);
 
   // Load game data on mount
   useEffect(() => {
-    loadGame(USER_ID).catch((e) =>
+    loadGame(userId).catch((e) =>
       console.warn('[QuestsScreen] loadGame error:', e)
     );
-  }, [loadGame]);
+  }, [loadGame, userId]);
 
   // Generate/refresh quests on focus
   useFocusEffect(
     useCallback(() => {
       if (currentLevel >= 5) {
-        generateQuests(USER_ID).catch((e) =>
+        generateQuests(userId).catch((e) =>
           console.warn('[QuestsScreen] generateQuests error:', e)
         );
       }
-    }, [currentLevel, generateQuests])
+    }, [currentLevel, generateQuests, userId])
   );
 
   // Load all title definitions when switching to titles tab
@@ -136,11 +136,11 @@ export default function QuestsScreen() {
 
   const handleEquipTitle = useCallback(
     (titleId: string) => {
-      equipTitle(USER_ID, titleId).catch((e) =>
+      equipTitle(userId, titleId).catch((e) =>
         console.warn('[QuestsScreen] equipTitle error:', e)
       );
     },
-    [equipTitle]
+    [equipTitle, userId]
   );
 
   // ── Render ─────────────────────────────────────────────────────────────────

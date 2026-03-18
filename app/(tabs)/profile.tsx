@@ -27,12 +27,13 @@ import { TrophyCase } from '../../src/components/profile/TrophyCase';
 import { StreakBars } from '../../src/components/profile/StreakBars';
 import { NiyyahDisplay } from '../../src/components/profile/NiyyahDisplay';
 import { colors, typography, spacing } from '../../src/tokens';
+import { useAuthStore } from '../../src/stores/authStore';
 import { xpForLevel, xpToNextLevel } from '../../src/domain/xp-engine';
-
-const USER_ID = 'default-user';
 
 export default function ProfileScreen() {
   const router = useRouter();
+
+  const userId = useAuthStore((s) => s.userId);
 
   const { currentLevel, totalXP, xpToNext, activeTitle, titles, equipTitle, setActiveTitle } = useGameStore(
     useShallow((s) => ({
@@ -62,9 +63,9 @@ export default function ProfileScreen() {
 
   // Load game data on mount
   useEffect(() => {
-    useGameStore.getState().loadGame(USER_ID);
-    useHabitStore.getState().loadDailyState(USER_ID);
-  }, []);
+    useGameStore.getState().loadGame(userId);
+    useHabitStore.getState().loadDailyState(userId);
+  }, [userId]);
 
   // Compute XP progress within current level
   const xpAtCurrentLevel = xpForLevel(currentLevel);
@@ -93,14 +94,14 @@ export default function ProfileScreen() {
   })();
 
   const handleEquipTitle = useCallback((titleId: string) => {
-    equipTitle(USER_ID, titleId);
-  }, [equipTitle]);
+    equipTitle(userId, titleId);
+  }, [equipTitle, userId]);
 
   const handleUnequipTitle = useCallback(async () => {
     const { userRepo } = await import('../../src/db/repos/userRepo');
-    await userRepo.setActiveTitle(USER_ID, null);
+    await userRepo.setActiveTitle(userId, null);
     setActiveTitle(null);
-  }, [setActiveTitle]);
+  }, [setActiveTitle, userId]);
 
   // Build habit streak list for StreakBars
   const habitStreaks = habits.map((h) => ({

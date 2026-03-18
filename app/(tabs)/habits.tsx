@@ -32,13 +32,14 @@ import { LevelBadge } from '../../src/components/game/LevelBadge';
 import { XPFloatLabel } from '../../src/components/game/XPFloatLabel';
 import { CelebrationManager } from '../../src/components/game/CelebrationManager';
 import { colors, typography, spacing, radius } from '../../src/tokens';
+import { useAuthStore } from '../../src/stores/authStore';
 import { PixelGearIcon } from '../../src/components/ui/PixelGearIcon';
 import type { Habit } from '../../src/types/database';
 
-const DEFAULT_USER_ID = 'default-user';
-
 export default function HabitsScreen() {
   const router = useRouter();
+
+  const userId = useAuthStore((s) => s.userId);
 
   // ── Store selectors ──────────────────────────────────────────────────
   const { dailyProgress, mercyModes, habits, streaks } = useHabitStore(
@@ -74,9 +75,9 @@ export default function HabitsScreen() {
   const prevTotalXPRef = React.useRef(gameTotalXP);
 
   useEffect(() => {
-    loadDailyState(DEFAULT_USER_ID);
-    loadGame(DEFAULT_USER_ID);
-  }, [loadDailyState, loadGame]);
+    loadDailyState(userId);
+    loadGame(userId);
+  }, [loadDailyState, loadGame, userId]);
 
   // Watch for XP changes to show float label
   useEffect(() => {
@@ -248,7 +249,7 @@ export default function HabitsScreen() {
       {/* Habit List */}
       <View style={styles.listContainer}>
         <HabitList
-          userId={DEFAULT_USER_ID}
+          userId={userId}
           onLongPressHabit={handleLongPressHabit}
           onAddHabit={handleAddHabit}
           onCompleteWithPosition={handleCompleteWithPosition}

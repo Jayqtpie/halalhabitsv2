@@ -10,26 +10,35 @@
  *
  * Replaces PlaceholderScreen. The Home tab is now the game world.
  */
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '../../src/stores/gameStore';
 import { useSettingsStore } from '../../src/stores/settingsStore';
 import { useMuhasabahStore } from '../../src/stores/muhasabahStore';
+import { useAuthStore } from '../../src/stores/authStore';
 import { HudScene } from '../../src/components/hud/HudScene';
 import { SceneObjects } from '../../src/components/hud/SceneObjects';
 import { HudStatBar } from '../../src/components/hud/HudStatBar';
 import { EnvironmentReveal } from '../../src/components/hud/EnvironmentReveal';
 import { CelebrationManager } from '../../src/components/game/CelebrationManager';
+import { AccountNudgeBanner } from '../../src/components/auth/AccountNudgeBanner';
 import { isMuhasabahTime } from '../../src/domain/muhasabah-engine';
 import { getPrayerWindows } from '../../src/services/prayer-times';
+import { titleRepo } from '../../src/db/repos';
+import { TITLE_SEED_DATA } from '../../src/domain/title-seed-data';
 import type { CalcMethodKey } from '../../src/types/habits';
-
-const DEFAULT_USER_ID = 'default-user';
 
 export default function HomeScreen() {
   const router = useRouter();
+
+  const userId = useAuthStore((s) => s.userId);
+  const { isAuthenticated, nudgeDismissed } = useAuthStore(
+    useShallow((s) => ({ isAuthenticated: s.isAuthenticated, nudgeDismissed: s.nudgeDismissed }))
+  );
+
+  const [firstUnlockedTitle, setFirstUnlockedTitle] = useState<string | null>(null);
 
   const { currentLevel, loadGame } = useGameStore(
     useShallow((s) => ({
@@ -67,10 +76,23 @@ export default function HomeScreen() {
     }
   }, [locationLat, locationLng, prayerCalcMethod]);
 
+  // Check for title unlock to trigger nudge banner
+  useEffect(() => {
+    if (!isAuthenticated && !nudgeDismissed) {
+      titleRepo.getUserTitles(userId).then((userTitles) => {
+        if (userTitles.length > 0) {
+          const titleId = userTitles[0].titleId;
+          const seedEntry = TITLE_SEED_DATA.find((t) => t.id === titleId);
+          setFirstUnlockedTitle(seedEntry?.name ?? 'The Steadfast');
+        }
+      }).catch(() => {});
+    }
+  }, [isAuthenticated, nudgeDismissed, userId]);
+
   // Load game state on mount (consistent with habits.tsx pattern)
   useEffect(() => {
-    loadGame(DEFAULT_USER_ID);
-  }, [loadGame]);
+    loadGame(userId);
+  }, [loadGame, userId]);
 
   const handleTapJournal = () => {
     useMuhasabahStore.getState().open();
@@ -97,6 +119,15 @@ export default function HomeScreen() {
 
       {/* Layer 5: Environment reveal on level threshold crossing */}
       <EnvironmentReveal />
+
+      {/* Layer 6: Account nudge banner for guest users */}
+      {firstUnlockedTitle && (
+        <AccountNudgeBanner
+          titleName={firstUnlockedTitle}
+          onCreateAccount={() => router.push('/create-account' as never)}
+          onDismiss={() => setFirstUnlockedTitle(null)}
+        />
+      )}
     </View>
   );
 }
