@@ -2,13 +2,30 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
+current_plan: "3 of 5 (Phase 7) — plan 03 paused at checkpoint:human-verify"
+status: in_progress
+stopped_at: "Completed 07-05-PLAN.md (Task 1 committed; Task 2 checkpoint:human-action — Supabase project setup required)"
+last_updated: "2026-03-18T05:13:22.814Z"
+last_activity: "2026-03-18 -- 07-03: Auth UI screens, AccountSection, SyncStatusIcon, AccountNudgeBanner, DeleteAccountSheet"
+progress:
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 33
+  completed_plans: 33
+  percent: 100
+---
+
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
 current_plan: 3 of 5 (Phase 7) — plan 03 complete (paused at checkpoint:human-verify)
 status: in_progress
 stopped_at: Completed 07-03-PLAN.md (checkpoint:human-verify Task 2)
 last_updated: "2026-03-18T01:15:00.000Z"
 last_activity: "2026-03-18 -- 07-03: Auth UI screens, AccountSection, SyncStatusIcon, AccountNudgeBanner, DeleteAccountSheet"
 progress:
-  total_phases: 7
+  [██████████] 100%
   completed_phases: 6
   total_plans: 33
   completed_plans: 30
@@ -83,6 +100,7 @@ Overall: 6 complete phases (Phase 01-06), Phase 07 in progress (3/5 plans done)
 | 03-05 | 6min | 2 | Habit creation & management |
 | 03-06 | ~15min | 3 | Prayer, Mercy Mode, calendar, verification |
 | Phase 07 P04 | 3min | 2 tasks | 8 files |
+| Phase 07-backend-auth-and-sync P05 | 8 | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -172,6 +190,9 @@ Recent decisions affecting current work:
 - [Phase 07-03]: AccountNudgeBanner exit animation uses setTimeout(210ms) delay before calling setNudgeDismissed
 - [Phase 07]: [Phase 07-04]: useAuthStore.getState().userId in callbacks/handlers avoids rules-of-hooks violations
 - [Phase 07]: [Phase 07-04]: Server-side deletion in deleteAllUserData is non-fatal — local deletion always proceeds even if Supabase unreachable
+- [Phase 07-05]: text PKs in Postgres to match SQLite schema, avoiding UUID conversion in sync layer
+- [Phase 07-05]: (select auth.uid()) RLS pattern caches auth call per query (not per row) for performance
+- [Phase 07-05]: delete_user() uses SECURITY DEFINER to bypass RLS and cascade-delete all user data in dependency order
 
 ### Pending Todos
 
@@ -194,6 +215,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-18
-Stopped at: 07-03 paused at checkpoint:human-verify (Task 2) — visual verification needed
+Last session: 2026-03-18T05:13:22.809Z
+Stopped at: Completed 07-05-PLAN.md (Task 1 committed; Task 2 checkpoint:human-action — Supabase project setup required)
 Resume file: None
