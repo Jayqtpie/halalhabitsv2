@@ -153,22 +153,26 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BLUE-01 through BLUE-16 | Phase 1: Master Blueprint | Pending |
-| FOUN-01 through FOUN-07 | Phase 2: Foundation and Data Layer | Pending |
-| HBIT-01 through HBIT-06 | Phase 3: Core Habit Loop | Pending |
-| PRAY-01 through PRAY-04 | Phase 3: Core Habit Loop | Pending |
-| STRK-01 through STRK-05 | Phase 3: Core Habit Loop | Pending |
-| GAME-01 through GAME-06 | Phase 4: Game Engine and Progression | Pending |
-| HUD-01 through HUD-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Pending |
-| MUHA-01 through MUHA-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Pending |
-| ONBR-01 through ONBR-04 | Phase 6: Onboarding, Profile, and Notifications | Pending |
-| PROF-01 through PROF-04 | Phase 6: Onboarding, Profile, and Notifications | Pending |
-| NOTF-01 through NOTF-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-04) |
-| SYNC-01 through SYNC-05 | Phase 7: Backend, Auth, and Sync | Pending |
+| BLUE-01 through BLUE-16 | Phase 1: Master Blueprint | Complete (01-VERIFICATION) |
+| FOUN-01 through FOUN-07 | Phase 2 + Phase 9 (verification) | Partial (code complete, verification pending) |
+| HBIT-01, HBIT-02, HBIT-05 | Phase 3 + Phase 9 (verification) | Unsatisfied (code exists, no verification trail) |
+| HBIT-03, HBIT-04, HBIT-06 | Phase 3: Core Habit Loop | Partial (listed in SUMMARYs, no VERIFICATION) |
+| PRAY-01 through PRAY-04 | Phase 3 + Phase 9 (verification) | Orphaned (code exists, never tracked) |
+| STRK-01 through STRK-05 | Phase 3: Core Habit Loop | Partial (listed in SUMMARYs, no VERIFICATION) |
+| GAME-01 through GAME-06 | Phase 4: Game Engine and Progression | Complete (04-VERIFICATION) |
+| HUD-01 through HUD-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Complete (05-VERIFICATION) |
+| MUHA-01 through MUHA-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Complete (05-VERIFICATION) |
+| ONBR-01 through ONBR-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-VERIFICATION) |
+| PROF-01 through PROF-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-VERIFICATION) |
+| NOTF-01 through NOTF-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-VERIFICATION) |
+| SYNC-01 through SYNC-05 | Phase 7 + Phase 8 (integration fix) | Partial (code complete, integration gaps in Phase 8) |
 
 **Coverage:**
 - v1 requirements: 62 total
-- Mapped to phases: 62
+- Mapped to phases: 62 (+ 2 gap closure phases)
+- Satisfied: 50
+- Partial: 12 (verification gaps)
+- Unsatisfied: 7 (Phase 9 will close)
 - Unmapped: 0
 
 ---

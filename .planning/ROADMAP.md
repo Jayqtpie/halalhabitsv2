@@ -19,6 +19,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 5: HUD, Visual Identity, and Muhasabah** - 16-bit Home HUD with Skia rendering, animations, haptics, and nightly reflection
 - [x] **Phase 6: Onboarding, Profile, and Notifications** - First-launch Niyyah flow, profile/settings screens, and notification system (completed 2026-03-16)
 - [x] **Phase 7: Backend, Auth, and Sync** - Supabase auth, sync engine with conflict resolution, push notifications, and RLS enforcement (completed 2026-03-18)
+- [ ] **Phase 8: Critical Integration Wiring** - Wire sync queue into repos, replace hardcoded userId in tabs, render AccountNudgeBanner — closes 2 critical audit gaps
+- [ ] **Phase 9: Verification and Audit Cleanup** - Create missing VERIFICATION.md for Phases 02/03, update REQUIREMENTS.md checkboxes and traceability table
 
 ## Phase Details
 
@@ -152,17 +154,43 @@ Plans:
 - [ ] 07-04-PLAN.md — Root layout auth wiring, default-user replacement, push token registration, data-export extension
 - [ ] 07-05-PLAN.md — Supabase server-side: Postgres schema, RLS policies, push notification Edge Function
 
+### Phase 8: Critical Integration Wiring
+**Goal**: Fix the 2 critical integration gaps found by milestone audit — sync queue never populated and tabs hardcoding 'default-user' — so auth and sync flows work end-to-end
+**Depends on**: Phase 7
+**Requirements**: SYNC-02, SYNC-03 (integration fix), SYNC-01 (userId wiring)
+**Gap Closure**: Closes gaps from v1.0 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. syncQueueRepo.enqueue() is called by all syncable repos after write operations (habits, XP, quests, titles, settings)
+  2. All tab screens read authStore.userId instead of hardcoded 'default-user'
+  3. AccountNudgeBanner renders for guest users past a progression milestone
+  4. E2E flow "Auth → data visible after sign-in" passes (currently BROKEN)
+  5. E2E flow "Sync activates → data flows to Supabase" passes (currently BROKEN)
+
+### Phase 9: Verification and Audit Cleanup
+**Goal**: Close verification paper trail gaps for Phases 02 and 03, update all stale REQUIREMENTS.md checkboxes and traceability, so the milestone audit passes clean
+**Depends on**: Phase 8
+**Requirements**: HBIT-01, HBIT-02, HBIT-05, PRAY-01, PRAY-02, PRAY-03, PRAY-04, FOUN-01, FOUN-02, FOUN-03, FOUN-04, FOUN-05, FOUN-06, FOUN-07
+**Gap Closure**: Closes verification gaps from v1.0 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Phase 02 has VERIFICATION.md confirming FOUN-01..07 status
+  2. Phase 03 has VERIFICATION.md confirming HBIT-01..06, PRAY-01..04, STRK-01..05 status
+  3. All REQUIREMENTS.md checkboxes match actual implementation status
+  4. Traceability table statuses updated from 'Pending' to actual status
+  5. ROADMAP.md progress table reflects actual completion state
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Master Blueprint | 7/7 | Complete   | 2026-03-07 |
+| 1. Master Blueprint | 7/7 | Complete | 2026-03-07 |
 | 2. Foundation and Data Layer | 3/3 | Complete | 2026-03-09 |
 | 3. Core Habit Loop | 6/6 | Complete | 2026-03-10 |
-| 4. Game Engine and Progression | 4/4 | Complete   | 2026-03-15 |
-| 5. HUD, Visual Identity, and Muhasabah | 1/4 | In Progress|  |
-| 6. Onboarding, Profile, and Notifications | 4/4 | Complete   | 2026-03-16 |
-| 7. Backend, Auth, and Sync | 5/5 | Complete   | 2026-03-18 |
+| 4. Game Engine and Progression | 4/4 | Complete | 2026-03-15 |
+| 5. HUD, Visual Identity, and Muhasabah | 4/4 | Complete | 2026-03-16 |
+| 6. Onboarding, Profile, and Notifications | 4/4 | Complete | 2026-03-16 |
+| 7. Backend, Auth, and Sync | 5/5 | Complete | 2026-03-18 |
+| 8. Critical Integration Wiring | 0/? | Not Started | — |
+| 9. Verification and Audit Cleanup | 0/? | Not Started | — |
