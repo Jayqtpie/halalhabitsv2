@@ -10,10 +10,9 @@
 import React, { useCallback } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useGameStore } from '../../stores/gameStore';
+import { useAuthStore } from '../../stores/authStore';
 import { LevelUpOverlay } from './LevelUpOverlay';
 import { TitleUnlockOverlay } from './TitleUnlockOverlay';
-
-const DEFAULT_USER_ID = 'default-user';
 
 export function CelebrationManager() {
   const { pendingCelebrations, consumeCelebration, equipTitle } = useGameStore(
@@ -31,7 +30,7 @@ export function CelebrationManager() {
   }, [consumeCelebration]);
 
   const handleEquip = useCallback(async (titleId: string) => {
-    await equipTitle(DEFAULT_USER_ID, titleId);
+    await equipTitle(useAuthStore.getState().userId, titleId);
     consumeCelebration();
   }, [equipTitle, consumeCelebration]);
 

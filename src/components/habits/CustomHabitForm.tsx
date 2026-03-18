@@ -16,6 +16,7 @@ import {
 import { useShallow } from 'zustand/react/shallow';
 import { PRESET_CATEGORIES } from '../../domain/presets';
 import { useHabitStore } from '../../stores/habitStore';
+import { useAuthStore } from '../../stores/authStore';
 import { generateId } from '../../utils/uuid';
 import { colors, typography, fontFamilies, spacing, componentSpacing, radius } from '../../tokens';
 import type { PresetCategory } from '../../types/habits';
@@ -76,7 +77,7 @@ export function CustomHabitForm({ onCreated }: CustomHabitFormProps) {
       const now = new Date().toISOString();
       const newHabit: NewHabit = {
         id: generateId(),
-        userId: 'default-user',
+        userId: useAuthStore.getState().userId,
         name: name.trim(),
         type: 'custom',
         category,

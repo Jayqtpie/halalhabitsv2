@@ -16,6 +16,27 @@ jest.mock('expo-sharing', () => ({
   shareAsync: jest.fn().mockResolvedValue(undefined),
 }));
 
+// Mock supabase to avoid localStorage not defined in Node env
+jest.mock('../../src/lib/supabase', () => ({
+  supabase: {
+    from: jest.fn().mockReturnValue({
+      delete: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({ error: null }),
+      }),
+    }),
+  },
+}));
+
+// Mock authStore
+jest.mock('../../src/stores/authStore', () => ({
+  useAuthStore: {
+    getState: () => ({
+      isAuthenticated: false,
+      userId: 'local-user',
+    }),
+  },
+}));
+
 // Mock repos — using actual method names from the repos
 jest.mock('../../src/db/repos', () => ({
   habitRepo: {
@@ -52,6 +73,9 @@ jest.mock('../../src/db/repos', () => ({
     getByUserId: jest.fn().mockResolvedValue([
       { id: 'm1', userId: 'local-user', createdAt: '2026-01-01', prompt1Text: 'Reflection' },
     ]),
+  },
+  syncQueueRepo: {
+    clearAll: jest.fn().mockResolvedValue(undefined),
   },
 }));
 

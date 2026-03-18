@@ -13,6 +13,7 @@ import type { ImageSourcePropType } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 import { useMuhasabahStore } from '../../stores/muhasabahStore';
 import { useHabitStore } from '../../stores/habitStore';
+import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../tokens/colors';
 import { fontFamilies } from '../../tokens/typography';
 import type { Habit } from '../../types/database';
@@ -28,7 +29,6 @@ const HABIT_ICONS: Record<string, ImageSourcePropType> = {
   custom:    require('../../../assets/icons/habit-custom.png'),
 };
 
-const DEFAULT_USER_ID = 'default-user';
 const c = colors.dark;
 
 // ─── Component ─────────────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ export function MuhasabahStep2() {
 
   // Refresh habits + completions when this step mounts
   useEffect(() => {
-    loadDailyState(DEFAULT_USER_ID);
+    loadDailyState(useAuthStore.getState().userId);
   }, [loadDailyState]);
 
   // Today's completed habits

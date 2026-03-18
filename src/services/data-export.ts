@@ -17,10 +17,13 @@ import {
   titleRepo,
   questRepo,
   muhasabahRepo,
+  syncQueueRepo,
 } from '../db/repos';
 import { useSettingsStore } from '../stores/settingsStore';
 import { useGameStore } from '../stores/gameStore';
 import { useHabitStore } from '../stores/habitStore';
+import { useAuthStore } from '../stores/authStore';
+import { supabase } from '../lib/supabase';
 import { getDb } from '../db/client';
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -128,6 +131,24 @@ export async function exportUserData(userId: string): Promise<void> {
  * user_titles -> habits -> users -> settings store
  */
 export async function deleteAllUserData(userId: string): Promise<void> {
+  // If authenticated, delete server-side data first
+  const { isAuthenticated } = useAuthStore.getState();
+  if (isAuthenticated) {
+    try {
+      // Delete from all syncable tables on server
+      const syncableTables = ['xp_ledger', 'user_titles', 'quests', 'habits', 'settings', 'users'];
+      for (const table of syncableTables) {
+        if (table === 'users') {
+          await supabase.from(table).delete().eq('id', userId);
+        } else {
+          await supabase.from(table).delete().eq('user_id', userId);
+        }
+      }
+    } catch {
+      // Non-fatal: continue with local deletion even if server fails
+    }
+  }
+
   try {
     const db = getDb();
 
@@ -169,6 +190,13 @@ export async function deleteAllUserData(userId: string): Promise<void> {
     loading: false,
     error: null,
   });
+
+  // Clear sync queue
+  try {
+    await syncQueueRepo.clearAll();
+  } catch {
+    // Non-fatal
+  }
 
   // Mark onboarding as incomplete — triggers redirect to onboarding
   useSettingsStore.getState().setOnboardingComplete(false);

@@ -12,6 +12,7 @@ import { View, Text, Pressable, ActivityIndicator, StyleSheet } from 'react-nati
 import { useShallow } from 'zustand/react/shallow';
 import { useMuhasabahStore } from '../../stores/muhasabahStore';
 import { useHabitStore } from '../../stores/habitStore';
+import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../tokens/colors';
 import { fontFamilies } from '../../tokens/typography';
 
@@ -73,7 +74,7 @@ export function MuhasabahStep3() {
     setError(null);
     setFocusIntent(intent);
     try {
-      await submit('default-user');
+      await submit(useAuthStore.getState().userId);
     } catch (err) {
       setError('Something went wrong. Tap to try again.');
     }
