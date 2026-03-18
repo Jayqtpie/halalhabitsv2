@@ -2,17 +2,33 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: "3 of 5 (Phase 7) — plan 03 paused at checkpoint:human-verify"
+current_plan: Not yet planned
 status: in_progress
-stopped_at: "Completed 07-05-PLAN.md (Task 1 committed; Task 2 checkpoint:human-action — Supabase project setup required)"
-last_updated: "2026-03-18T05:33:32.995Z"
-last_activity: "2026-03-18 -- 07-03: Auth UI screens, AccountSection, SyncStatusIcon, AccountNudgeBanner, DeleteAccountSheet"
+stopped_at: Phase 8 context gathered
+last_updated: "2026-03-18T20:23:45.276Z"
+last_activity: 2026-03-18 -- Gap closure phases 8-9 added to roadmap
 progress:
-  total_phases: 7
+  total_phases: 9
   completed_phases: 7
   total_plans: 33
   completed_plans: 33
-  percent: 100
+---
+
+---
+gsd_state_version: 1.0
+milestone: v1.0
+milestone_name: milestone
+current_plan: "Phase 8 ready to plan"
+status: in_progress
+stopped_at: "Gap closure phases 8-9 created from milestone audit. Phase 8 ready to plan."
+last_updated: "2026-03-18T07:00:00.000Z"
+last_activity: "2026-03-18 -- Gap closure phases created: Phase 8 (integration wiring), Phase 9 (verification cleanup)"
+progress:
+  total_phases: 9
+  completed_phases: 7
+  total_plans: 33
+  completed_plans: 33
+  percent: 93
 ---
 
 ---
@@ -43,13 +59,13 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 
 ## Current Position
 
-Phase: 7 of 7 (Backend, Auth & Sync — in progress)
-Current Plan: 3 of 5 (Phase 7) — plan 03 paused at checkpoint:human-verify
-Status: 07-03 Task 1 complete. Auth UI screens and components built. Awaiting human visual verification (Task 2 checkpoint).
-Last activity: 2026-03-18 -- 07-03: Auth UI screens, AccountSection, SyncStatusIcon, AccountNudgeBanner, DeleteAccountSheet
+Phase: 8 of 9 (Critical Integration Wiring — ready to plan)
+Current Plan: Not yet planned
+Status: Gap closure phases created from milestone audit. Phase 8 needs planning.
+Last activity: 2026-03-18 -- Gap closure phases 8-9 added to roadmap
 
-Progress: [█████████░] 91% overall (30/33 plans complete)
-Overall: 6 complete phases (Phase 01-06), Phase 07 in progress (3/5 plans done)
+Progress: [█████████░] 93% overall (33/33 original plans complete, 2 gap phases added)
+Overall: 7 original phases complete (Phase 01-07), 2 gap closure phases pending (08, 09)
 
 ## Performance Metrics
 
@@ -215,6 +231,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-18T05:13:22.809Z
-Stopped at: Completed 07-05-PLAN.md (Task 1 committed; Task 2 checkpoint:human-action — Supabase project setup required)
-Resume file: None
+Last session: 2026-03-18T20:23:45.271Z
+Stopped at: Phase 8 context gathered
+Resume file: .planning/phases/08-critical-integration-wiring/08-CONTEXT.md
