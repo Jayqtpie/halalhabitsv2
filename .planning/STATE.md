@@ -2,34 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: 1 of 5 (Phase 7) — plan 01 complete
+current_plan: 3 of 5 (Phase 7) — plan 03 complete (paused at checkpoint:human-verify)
 status: in_progress
-stopped_at: Completed 07-04-PLAN.md
-last_updated: "2026-03-18T01:10:55.784Z"
-last_activity: "2026-03-17 -- 07-01: Supabase client, authStore, auth-service, DB migration"
+stopped_at: Completed 07-03-PLAN.md (checkpoint:human-verify Task 2)
+last_updated: "2026-03-18T01:15:00.000Z"
+last_activity: "2026-03-18 -- 07-03: Auth UI screens, AccountSection, SyncStatusIcon, AccountNudgeBanner, DeleteAccountSheet"
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 33
-  completed_plans: 31
-  percent: 94
----
-
----
-gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-current_plan: 1 of 5 (Phase 7) — plan 01 complete
-status: in_progress
-stopped_at: Completed 07-01-PLAN.md
-last_updated: "2026-03-17T21:10:00.000Z"
-last_activity: "2026-03-17 -- 07-01: Supabase client, authStore, auth-service, DB migration"
-progress:
-  [█████████░] 94%
-  completed_phases: 6
-  total_plans: 33
-  completed_plans: 29
-  percent: 88
+  completed_plans: 30
+  percent: 91
 ---
 
 # Project State
@@ -44,12 +27,12 @@ See: .planning/PROJECT.md (updated 2026-03-07)
 ## Current Position
 
 Phase: 7 of 7 (Backend, Auth & Sync — in progress)
-Current Plan: 1 of 5 (Phase 7) — plan 01 complete
-Status: 07-01 complete (Supabase client, authStore, auth-service, DB migration). Ready for 07-02 sync engine.
-Last activity: 2026-03-17 -- 07-01: Supabase client, authStore, auth-service, DB migration
+Current Plan: 3 of 5 (Phase 7) — plan 03 paused at checkpoint:human-verify
+Status: 07-03 Task 1 complete. Auth UI screens and components built. Awaiting human visual verification (Task 2 checkpoint).
+Last activity: 2026-03-18 -- 07-03: Auth UI screens, AccountSection, SyncStatusIcon, AccountNudgeBanner, DeleteAccountSheet
 
-Progress: [█████████░] 88% overall (29/33 plans complete)
-Overall: 6 complete phases (Phase 01-06), Phase 07 in progress (1/5 plans done)
+Progress: [█████████░] 91% overall (30/33 plans complete)
+Overall: 6 complete phases (Phase 01-06), Phase 07 in progress (3/5 plans done)
 
 ## Performance Metrics
 
@@ -63,7 +46,7 @@ Overall: 6 complete phases (Phase 01-06), Phase 07 in progress (1/5 plans done)
 | Phase 04 | 3/3 | Complete | 2026-03-15 |
 | Phase 05 | 4/4 | Complete | 2026-03-16 |
 | Phase 06 | 4/4 | Complete | 2026-03-17 |
-| Phase 07 | 1/5 | In Progress | — |
+| Phase 07 | 3/5 | In Progress | — |
 
 **Phase 4 Plan Breakdown:**
 
@@ -87,6 +70,7 @@ Overall: 6 complete phases (Phase 01-06), Phase 07 in progress (1/5 plans done)
 | Plan | Duration | Tasks | Description |
 |------|----------|-------|-------------|
 | 07-01 | ~22min | 2 | Supabase client, authStore, auth-service (signUp/signIn/signOut/deleteAccount/migrateGuestData), DB migration |
+| 07-03 | ~15min | 1+checkpoint | Auth UI screens (sign-in, create-account), AccountNudgeBanner, SyncStatusIcon, AccountSection, DeleteAccountSheet, MergeChoiceSheet |
 
 **Phase 3 Plan Breakdown:**
 
@@ -182,6 +166,10 @@ Recent decisions affecting current work:
 - [Phase 07-01]: signOut is non-destructive — local SQLite data belongs to the device, not the session
 - [Phase 07-01]: deleteAccount calls supabase.rpc('delete_user') for server cleanup before local wipe
 - [Phase 07-01]: migrateGuestData uses raw execSync (same pattern as deleteAllUserData) — no new repo methods needed
+- [Phase 07-03]: PressStart2P at 18px for auth screen titles per UI-SPEC (overrides typography.headingLg which is Inter-Bold 24px)
+- [Phase 07-03]: SyncStatusIcon treats idle+!isAuthenticated as the offline/no-account muted state (cloud-x, surface-700)
+- [Phase 07-03]: MergeChoiceSheet is rendered inside create-account.tsx (not as a separate route) — single-use decision modal
+- [Phase 07-03]: AccountNudgeBanner exit animation uses setTimeout(210ms) delay before calling setNudgeDismissed
 - [Phase 07]: [Phase 07-04]: useAuthStore.getState().userId in callbacks/handlers avoids rules-of-hooks violations
 - [Phase 07]: [Phase 07-04]: Server-side deletion in deleteAllUserData is non-fatal — local deletion always proceeds even if Supabase unreachable
 
@@ -206,6 +194,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-18T01:10:55.780Z
-Stopped at: Completed 07-04-PLAN.md
+Last session: 2026-03-18
+Stopped at: 07-03 paused at checkpoint:human-verify (Task 2) — visual verification needed
 Resume file: None
