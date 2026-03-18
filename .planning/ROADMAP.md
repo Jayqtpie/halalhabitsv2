@@ -165,6 +165,11 @@ Plans:
   3. AccountNudgeBanner renders for guest users past a progression milestone
   4. E2E flow "Auth → data visible after sign-in" passes (currently BROKEN)
   5. E2E flow "Sync activates → data flows to Supabase" passes (currently BROKEN)
+**Plans**: 2 plans
+
+Plans:
+- [ ] 08-01-PLAN.md — Wire syncQueueRepo.enqueue() into all 6 syncable repos with auth guard and assertSyncable
+- [ ] 08-02-PLAN.md — Replace hardcoded userId in 4 tab screens with authStore hook, mount AccountNudgeBanner on Home HUD
 
 ### Phase 9: Verification and Audit Cleanup
 **Goal**: Close verification paper trail gaps for Phases 02 and 03, update all stale REQUIREMENTS.md checkboxes and traceability, so the milestone audit passes clean
@@ -192,5 +197,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 5. HUD, Visual Identity, and Muhasabah | 4/4 | Complete | 2026-03-16 |
 | 6. Onboarding, Profile, and Notifications | 4/4 | Complete | 2026-03-16 |
 | 7. Backend, Auth, and Sync | 5/5 | Complete | 2026-03-18 |
-| 8. Critical Integration Wiring | 0/? | Not Started | — |
+| 8. Critical Integration Wiring | 0/2 | Not Started | — |
 | 9. Verification and Audit Cleanup | 0/? | Not Started | — |
