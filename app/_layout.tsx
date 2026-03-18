@@ -250,6 +250,9 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack.Protected>
 
+        {/* Auth screens — modal presentation for sign-in and create-account */}
+        <Stack.Screen name="(auth)" options={{ headerShown: false, presentation: 'modal' }} />
+
         {/* Settings screens — card presentation for later plans */}
         <Stack.Screen name="settings" options={{ headerShown: false, presentation: 'card' }} />
         <Stack.Screen name="prayer-reminders" options={{ headerShown: false, presentation: 'card' }} />

@@ -22,6 +22,7 @@ import * as Location from 'expo-location';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { colors, typography, spacing } from '../src/tokens';
 import ExpoConstants from 'expo-constants';
+import { AccountSection } from '../src/components/settings/AccountSection';
 
 const CALC_METHODS = [
   { key: 'ISNA', label: 'ISNA (North America)' },
@@ -191,8 +192,11 @@ export default function SettingsScreen() {
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.scrollContent}>
 
+        {/* Account Section — must be first */}
+        <AccountSection />
+
         {/* Prayer Section */}
-        <Text style={styles.sectionTitle}>PRAYER</Text>
+        <Text style={[styles.sectionTitle, styles.sectionTitleGap]}>PRAYER</Text>
         <View style={styles.sectionCard}>
           <NavRow
             label="Calculation Method"
