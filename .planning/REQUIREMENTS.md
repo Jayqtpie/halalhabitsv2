@@ -64,9 +64,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **GAME-01**: User earns XP for habit completions (effort-based, not outcome-based)
 - [x] **GAME-02**: User levels up through XP accumulation with logarithmic progression curve
-- [x] **GAME-03**: User unlocks Identity Titles at milestone thresholds (e.g., "The Steadfast" at 40 consecutive Fajr)
+- [ ] **GAME-03**: User unlocks Identity Titles at milestone thresholds (e.g., "The Steadfast" at 40 consecutive Fajr)
 - [x] **GAME-04**: Quest Board presents daily and weekly quests with rotating variety
-- [x] **GAME-05**: User can complete quests for bonus XP and progression
+- [ ] **GAME-05**: User can complete quests for bonus XP and progression
 - [x] **GAME-06**: XP economy modeled and balanced (levels 1-100 progression curve)
 
 ### Home HUD
@@ -94,7 +94,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **PROF-01**: User can view profile with title, level, XP, streak history, and achievements
 - [x] **PROF-02**: User can access settings for notifications, prayer calculation method, and privacy controls
-- [x] **PROF-03**: User can export or delete all personal data
+- [ ] **PROF-03**: User can export or delete all personal data
 - [x] **PROF-04**: Dark mode supported (default or system-auto)
 
 ### Backend and Sync
@@ -161,22 +161,27 @@ Deferred to future release. Tracked but not in current roadmap.
 | PRAY-01 through PRAY-03 | Phase 3 + Phase 9 (verification) | Complete (03-VERIFICATION) |
 | PRAY-04 | Phase 3 + Phase 6 + Phase 9 (verification) | Complete (03-VERIFICATION, implemented in Phase 06) |
 | STRK-01 through STRK-05 | Phase 3 + Phase 9 (verification) | Complete (03-VERIFICATION) |
-| GAME-01 through GAME-06 | Phase 4: Game Engine and Progression | Complete (04-VERIFICATION) |
+| GAME-01, GAME-02, GAME-04, GAME-06 | Phase 4: Game Engine and Progression | Complete (04-VERIFICATION) |
+| GAME-03 | Phase 4 + Phase 10 (gap closure) | Partial → Pending (title conditions blocked by hardcoded 0s) |
+| GAME-05 | Phase 4 + Phase 10 (gap closure) | Partial → Pending (quest progress parameter bug) |
 | HUD-01 through HUD-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Complete (05-VERIFICATION) |
 | MUHA-01 through MUHA-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Complete (05-VERIFICATION) |
 | ONBR-01 through ONBR-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-VERIFICATION) |
-| PROF-01 through PROF-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-VERIFICATION) |
+| PROF-01, PROF-02, PROF-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-VERIFICATION) |
+| PROF-03 | Phase 6 + Phase 10 (gap closure) | Partial → Pending (hardcoded userId in your-data.tsx) |
 | NOTF-01 through NOTF-04 | Phase 6: Onboarding, Profile, and Notifications | Complete (06-VERIFICATION) |
-| SYNC-01 through SYNC-05 | Phase 7 + Phase 8 (integration fix) | Partial (code complete, integration gaps in Phase 8) |
+| SYNC-01 | Phase 7 + Phase 8 + Phase 10 (gap closure) | Partial → Pending (your-data.tsx userId) |
+| SYNC-02 through SYNC-05 | Phase 7 + Phase 8 (integration fix) | Complete (07/08-VERIFICATION) |
 
 **Coverage:**
 - v1 requirements: 62 total
-- Mapped to phases: 62 (+ 2 gap closure phases)
-- Satisfied: 61
+- Mapped to phases: 62 (+ 3 gap closure phases)
+- Satisfied: 58
 - Partial: 1 (FOUN-01: EAS Build deferred)
+- Pending (Phase 10): 3 (GAME-03, GAME-05, PROF-03)
 - Unsatisfied: 0
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-19 after Phase 9 atomic checkbox sweep*
+*Last updated: 2026-03-19 after Phase 10 gap closure planning*

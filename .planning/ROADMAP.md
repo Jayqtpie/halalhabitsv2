@@ -21,6 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Backend, Auth, and Sync** - Supabase auth, sync engine with conflict resolution, push notifications, and RLS enforcement (completed 2026-03-18)
 - [x] **Phase 8: Critical Integration Wiring** - Wire sync queue into repos, replace hardcoded userId in tabs, render AccountNudgeBanner — closes 2 critical audit gaps (completed 2026-03-18)
 - [x] **Phase 9: Verification and Audit Cleanup** - Create missing VERIFICATION.md for Phases 02/03, update REQUIREMENTS.md checkboxes and traceability table (completed 2026-03-19)
+- [ ] **Phase 10: Title Pipeline and Integration Fixes** - Wire real mercyRecoveries/muhasabahStreak into title checks, fix your-data userId, fix quest progress parameter bug
 
 ## Phase Details
 
@@ -188,10 +189,23 @@ Plans:
 - [x] 09-01-PLAN.md — Write missing VERIFICATION.md for Phases 02 and 03
 - [ ] 09-02-PLAN.md — Atomic sweep of REQUIREMENTS.md and ROADMAP.md checkboxes
 
+### Phase 10: Title Pipeline and Integration Fixes
+**Goal**: Wire real data into title unlock conditions and fix remaining integration gaps so all 62 requirements are fully satisfied and both broken E2E flows pass
+**Depends on**: Phase 9
+**Requirements**: GAME-03, GAME-05, PROF-03, SYNC-01, STRK-03, STRK-04, MUHA-01
+**Gap Closure**: Closes gaps from v1.0 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. `mercyRecoveries` in PlayerStats reflects real count from streakRepo (not hardcoded 0)
+  2. `muhasabahStreak` in PlayerStats reflects real consecutive-day count from muhasabah entries (not hardcoded 0)
+  3. `your-data.tsx` reads userId from authStore, not hardcoded `'default-user'`
+  4. `updateQuestProgress` passes correct progress value (not targetValue) for partial quests
+  5. E2E flow "Mercy Mode → title unlock" passes
+  6. E2E flow "Muhasabah → title unlock" passes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
+Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -204,3 +218,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 7. Backend, Auth, and Sync | 5/5 | Complete | 2026-03-18 |
 | 8. Critical Integration Wiring | 2/2 | Complete | 2026-03-18 |
 | 9. Verification and Audit Cleanup | 2/2 | Complete   | 2026-03-19 |
+| 10. Title Pipeline and Integration Fixes | 0/0 | Planned | — |
