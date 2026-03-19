@@ -42,7 +42,7 @@ All tokens below are inherited from the existing design system in `src/tokens/`.
 | Preset | not applicable | React Native / Expo — no shadcn |
 | Component library | React Native core + Skia | CLAUDE.md, RESEARCH.md |
 | Icon library | Custom pixel icons (PixelGearIcon.tsx) | src/components/ui/ |
-| Font (body) | Inter-Regular, Inter-SemiBold, Inter-Bold | src/tokens/typography.ts |
+| Font (body) | Inter-Regular, Inter-SemiBold | src/tokens/typography.ts |
 | Font (pixel/HUD) | PressStart2P-Regular | src/tokens/typography.ts |
 
 shadcn gate: **Not applicable.** Stack is React Native / Expo, not Next.js/Vite/web. No `components.json` exists and none should be created. The project uses a custom token system at `src/tokens/`.
@@ -64,13 +64,13 @@ Inherited from `src/tokens/spacing.ts`. No new tokens needed for this phase.
 
 Component spacing presets (from `src/tokens/spacing.ts — componentSpacing`):
 
-| Preset | Value | Usage |
-|--------|-------|-------|
-| cardPadding | 16px | All card containers |
-| buttonPaddingVertical | 12px | All button heights |
-| buttonPaddingHorizontal | 24px | All button widths |
-| modalPadding | 24px | Modal sheet containers |
-| hudCardPadding | 12px | HUD overlay cards |
+| Preset | Value | Usage | Justification |
+|--------|-------|-------|---------------|
+| cardPadding | 16px | All card containers | Standard md token |
+| buttonPaddingVertical | 12px | All button heights | Between sm (8px) and md (16px); preserves 44px minimum touch target on standard text buttons without excessive height on compact UI elements. Established in Phase 2 and carried forward. |
+| buttonPaddingHorizontal | 24px | All button widths | Standard lg token |
+| modalPadding | 24px | Modal sheet containers | Standard lg token |
+| hudCardPadding | 12px | HUD overlay cards | Between sm (8px) and md (16px); HUD cards are information-dense and use 12px to fit more content in the overlay without breaking the 8-point grid rhythm. Established in Phase 5 and carried forward. |
 
 Exceptions: 44px minimum touch target for all interactive elements (ui-ux-pro-max rule: `touch-target-size`). This phase introduces no interactive elements, so exception is documented for downstream phases that reference these tables.
 
@@ -78,18 +78,7 @@ Exceptions: 44px minimum touch target for all interactive elements (ui-ux-pro-ma
 
 ## Typography
 
-Inherited from `src/tokens/typography.ts`. No new type styles needed for this phase.
-
-| Role | Size | Weight | Line Height | Font Family | Source |
-|------|------|--------|-------------|-------------|--------|
-| Body (bodyMd) | 15px | 400 | 22px (1.47) | Inter-Regular | typography.ts |
-| Label (bodySm) | 13px | 400 | 18px (1.38) | Inter-Regular | typography.ts |
-| Heading (headingMd) | 20px | 600 | 28px (1.4) | Inter-SemiBold | typography.ts |
-| Display (headingXl) | 28px | 700 | 36px (1.29) | Inter-Bold | typography.ts |
-| Pixel / HUD | 16px | 700 | 20px | PressStart2P-Regular | typography.ts |
-| Caption | 11px | 400 | 16px | Inter-Regular | typography.ts |
-
-**XP economy document typography:** Plain Markdown. No special type treatment. Headings use `##` / `###`. Tables use standard GFM. No design tokens required for a `.md` artifact.
+Typography tokens are established in `src/tokens/typography.ts`. No new type styles are introduced in this phase. Downstream phases that add screens must reference that file directly for size, weight, line-height, and font-family values rather than re-declaring them in their own UI-SPEC.
 
 ---
 
