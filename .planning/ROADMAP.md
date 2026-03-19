@@ -16,10 +16,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Foundation and Data Layer** - Expo scaffold, navigation, SQLite persistence, state management, privacy boundaries, and design tokens (completed 2026-03-09)
 - [x] **Phase 3: Core Habit Loop** - Habit tracking, prayer time integration, streaks, and Mercy Mode recovery -- the product's reason to exist (completed 2026-03-10)
 - [x] **Phase 4: Game Engine and Progression** - XP system, leveling, Identity Titles, Quest Board, and balanced game economy (completed 2026-03-15)
-- [ ] **Phase 5: HUD, Visual Identity, and Muhasabah** - 16-bit Home HUD with Skia rendering, animations, haptics, and nightly reflection
+- [x] **Phase 5: HUD, Visual Identity, and Muhasabah** - 16-bit Home HUD with Skia rendering, animations, haptics, and nightly reflection (completed 2026-03-16)
 - [x] **Phase 6: Onboarding, Profile, and Notifications** - First-launch Niyyah flow, profile/settings screens, and notification system (completed 2026-03-16)
 - [x] **Phase 7: Backend, Auth, and Sync** - Supabase auth, sync engine with conflict resolution, push notifications, and RLS enforcement (completed 2026-03-18)
-- [ ] **Phase 8: Critical Integration Wiring** - Wire sync queue into repos, replace hardcoded userId in tabs, render AccountNudgeBanner — closes 2 critical audit gaps
+- [x] **Phase 8: Critical Integration Wiring** - Wire sync queue into repos, replace hardcoded userId in tabs, render AccountNudgeBanner — closes 2 critical audit gaps (completed 2026-03-18)
 - [ ] **Phase 9: Verification and Audit Cleanup** - Create missing VERIFICATION.md for Phases 02/03, update REQUIREMENTS.md checkboxes and traceability table
 
 ## Phase Details
@@ -37,13 +37,13 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 7 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Executive vision, player fantasy, and Game Design Bible (foundation sections)
-- [ ] 01-02-PLAN.md — Worldbuilding/lore framework and feature systems detailed specs
-- [ ] 01-03-PLAN.md — Information architecture and screen-by-screen product spec (14+ screens)
-- [ ] 01-04-PLAN.md — UI design tokens, sound/haptics direction, and tech architecture
-- [ ] 01-05-PLAN.md — Data model and API contract with privacy classifications
-- [ ] 01-06-PLAN.md — Telemetry plan, QA/balance plan, and delivery roadmap
-- [ ] 01-07-PLAN.md — Content pack (130+ copy strings) and final build handoff
+- [x] 01-01-PLAN.md — Executive vision, player fantasy, and Game Design Bible (foundation sections)
+- [x] 01-02-PLAN.md — Worldbuilding/lore framework and feature systems detailed specs
+- [x] 01-03-PLAN.md — Information architecture and screen-by-screen product spec (14+ screens)
+- [x] 01-04-PLAN.md — UI design tokens, sound/haptics direction, and tech architecture
+- [x] 01-05-PLAN.md — Data model and API contract with privacy classifications
+- [x] 01-06-PLAN.md — Telemetry plan, QA/balance plan, and delivery roadmap
+- [x] 01-07-PLAN.md — Content pack (130+ copy strings) and final build handoff
 
 ### Phase 2: Foundation and Data Layer
 **Goal**: A running Expo app with navigation, local persistence, state management, and privacy boundaries -- the skeleton everything else plugs into
@@ -95,10 +95,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 04-01-PLAN.md — Pure TS domain engines (xp-engine, title-engine, quest-engine) with TDD, title seeds, quest templates
-- [ ] 04-02-PLAN.md — Data wiring (titleRepo, title seed migration, gameStore actions, habitStore XP injection)
-- [ ] 04-03-PLAN.md — XP feedback UI (floating XP label, progress bar, level/title header) and celebration overlays (level-up, title unlock)
-- [ ] 04-04-PLAN.md — Quest Board screen with quest display, title browser, locked state, and tab toggle
+- [x] 04-01-PLAN.md — Pure TS domain engines (xp-engine, title-engine, quest-engine) with TDD, title seeds, quest templates
+- [x] 04-02-PLAN.md — Data wiring (titleRepo, title seed migration, gameStore actions, habitStore XP injection)
+- [x] 04-03-PLAN.md — XP feedback UI (floating XP label, progress bar, level/title header) and celebration overlays (level-up, title unlock)
+- [x] 04-04-PLAN.md — Quest Board screen with quest display, title browser, locked state, and tab toggle
 
 ### Phase 5: HUD, Visual Identity, and Muhasabah
 **Goal**: The app looks and feels like a premium retro RPG with a game-world Home HUD, smooth animations, haptic feedback, and a private nightly reflection ritual
@@ -114,7 +114,7 @@ Plans:
 Plans:
 - [x] 05-01-PLAN.md — Skia install, test scaffolds, Muhasabah domain (engine, repo, store), HUD environment domain (completed 2026-03-15)
 - [x] 05-02-PLAN.md — Home HUD screen: Skia Canvas scene, day/night cycle, character sprite, stat overlay, tap zones, environment reveal (checkpoint awaiting verify 2026-03-15)
-- [ ] 05-03-PLAN.md — Muhasabah UI flow: 3-screen modal (mood, highlight, focus), closing ayah, root layout mounting
+- [x] 05-03-PLAN.md — Muhasabah UI flow: 3-screen modal (mood, highlight, focus), closing ayah, root layout mounting
 - [x] 05-04-PLAN.md — Pixel art icon migration for habit cards + full phase human-verify checkpoint (completed 2026-03-15)
 
 ### Phase 6: Onboarding, Profile, and Notifications
@@ -130,10 +130,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 06-01-PLAN.md — Domain modules (niyyah, starter packs, notification copy), NotificationService, settingsStore extension
-- [ ] 06-02-PLAN.md — 5-screen onboarding flow (Welcome, Character, Niyyah, Habits, HUD Tour) with Stack.Protected guard
-- [ ] 06-03-PLAN.md — Profile screen (RPG character sheet), Settings, Prayer Reminders, Your Data (export/delete)
-- [ ] 06-04-PLAN.md — Notification lifecycle wiring (startup schedule, response listeners) and Muhasabah HUD cue
+- [x] 06-01-PLAN.md — Domain modules (niyyah, starter packs, notification copy), NotificationService, settingsStore extension
+- [x] 06-02-PLAN.md — 5-screen onboarding flow (Welcome, Character, Niyyah, Habits, HUD Tour) with Stack.Protected guard
+- [x] 06-03-PLAN.md — Profile screen (RPG character sheet), Settings, Prayer Reminders, Your Data (export/delete)
+- [x] 06-04-PLAN.md — Notification lifecycle wiring (startup schedule, response listeners) and Muhasabah HUD cue
 
 ### Phase 7: Backend, Auth, and Sync
 **Goal**: Users can create accounts, sync non-private data across devices, and receive push notifications -- all while the app continues working perfectly offline
@@ -148,11 +148,11 @@ Plans:
 **Plans**: 5 plans
 
 Plans:
-- [ ] 07-01-PLAN.md — Supabase client, authStore, auth-service with signUp/signIn/signOut, local DB migration, tests
-- [ ] 07-02-PLAN.md — Sync queue repository and sync engine with flush logic, privacy guard, retry tracking, tests
-- [ ] 07-03-PLAN.md — Auth UI screens (sign-in, create-account), account nudge banner, settings account section, sync status icon
-- [ ] 07-04-PLAN.md — Root layout auth wiring, default-user replacement, push token registration, data-export extension
-- [ ] 07-05-PLAN.md — Supabase server-side: Postgres schema, RLS policies, push notification Edge Function
+- [x] 07-01-PLAN.md — Supabase client, authStore, auth-service with signUp/signIn/signOut, local DB migration, tests
+- [x] 07-02-PLAN.md — Sync queue repository and sync engine with flush logic, privacy guard, retry tracking, tests
+- [x] 07-03-PLAN.md — Auth UI screens (sign-in, create-account), account nudge banner, settings account section, sync status icon
+- [x] 07-04-PLAN.md — Root layout auth wiring, default-user replacement, push token registration, data-export extension
+- [x] 07-05-PLAN.md — Supabase server-side: Postgres schema, RLS policies, push notification Edge Function
 
 ### Phase 8: Critical Integration Wiring
 **Goal**: Fix the 2 critical integration gaps found by milestone audit — sync queue never populated and tabs hardcoding 'default-user' — so auth and sync flows work end-to-end
@@ -168,8 +168,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 08-01-PLAN.md — Wire syncQueueRepo.enqueue() into all 6 syncable repos with auth guard and assertSyncable
-- [ ] 08-02-PLAN.md — Replace hardcoded userId in 4 tab screens with authStore hook, mount AccountNudgeBanner on Home HUD
+- [x] 08-01-PLAN.md — Wire syncQueueRepo.enqueue() into all 6 syncable repos with auth guard and assertSyncable
+- [x] 08-02-PLAN.md — Replace hardcoded userId in 4 tab screens with authStore hook, mount AccountNudgeBanner on Home HUD
 
 ### Phase 9: Verification and Audit Cleanup
 **Goal**: Close verification paper trail gaps for Phases 02 and 03, update all stale REQUIREMENTS.md checkboxes and traceability, so the milestone audit passes clean
@@ -185,7 +185,7 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 09-01-PLAN.md — Write missing VERIFICATION.md for Phases 02 and 03
+- [x] 09-01-PLAN.md — Write missing VERIFICATION.md for Phases 02 and 03
 - [ ] 09-02-PLAN.md — Atomic sweep of REQUIREMENTS.md and ROADMAP.md checkboxes
 
 ## Progress
@@ -202,5 +202,5 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9
 | 5. HUD, Visual Identity, and Muhasabah | 4/4 | Complete | 2026-03-16 |
 | 6. Onboarding, Profile, and Notifications | 4/4 | Complete | 2026-03-16 |
 | 7. Backend, Auth, and Sync | 5/5 | Complete | 2026-03-18 |
-| 8. Critical Integration Wiring | 1/2 | In Progress|  |
-| 9. Verification and Audit Cleanup | 1/2 | In Progress|  |
+| 8. Critical Integration Wiring | 2/2 | Complete | 2026-03-18 |
+| 9. Verification and Audit Cleanup | 1/2 | In Progress | -- |
