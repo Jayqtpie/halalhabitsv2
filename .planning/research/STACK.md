@@ -1,264 +1,384 @@
 # Technology Stack
 
-**Project:** HalalHabits: Ferrari 16-Bit Edition
-**Researched:** 2026-03-07
-**Overall Confidence:** MEDIUM (web verification tools unavailable; recommendations based on training data through early 2025 plus strong ecosystem knowledge -- verify latest versions before `npm install`)
+**Project:** HalalHabits v2.0 — Social & Battle Systems
+**Researched:** 2026-03-19
+**Scope:** NEW additions only — existing v1.0 stack is validated and unchanged
 
-## Recommended Stack
+---
 
-### Core Framework
+## Existing Stack (Validated — Do Not Re-research)
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| React Native | 0.76+ | Cross-platform mobile runtime | Required by project constraints. New Architecture (Fabric + TurboModules) is now default, enabling better animation performance critical for game UI | MEDIUM |
-| Expo SDK | 52+ | Managed workflow, build tooling, OTA updates | Solo dev needs managed builds (EAS Build), OTA updates, and the massive Expo module ecosystem. SDK 52 ships with RN 0.76+ and New Architecture by default | MEDIUM |
-| TypeScript | 5.x | Type safety | Non-negotiable for a solo dev project of this scope. Catches bugs before runtime, self-documents data models | HIGH |
+These are confirmed in production via v1.0 (24,689 LOC, 414 tests passing):
 
-**Version note:** Expo SDK 52 was the latest at my knowledge cutoff (late 2024 release). SDK 53 may exist by March 2026. Run `npx create-expo-app@latest --template blank-typescript` to get the current recommended version. Do NOT pin to an old SDK.
+| Technology | Version (actual) | Role |
+|------------|-----------------|------|
+| Expo SDK | ~54.0.33 | Runtime |
+| React Native | 0.81.5 | Cross-platform |
+| @shopify/react-native-skia | 2.2.12 | 2D rendering, pixel art |
+| react-native-reanimated | ~4.1.1 | Animations, worklets |
+| expo-sqlite | ~16.0.10 | Local DB |
+| drizzle-orm | ^0.45.1 | ORM / schema |
+| @supabase/supabase-js | ^2.99.2 | Auth, Postgres, Realtime |
+| zustand | ^5.0.11 | State management |
+| adhan | ^4.4.3 | Prayer time calculation |
+| expo-notifications | ~0.32.16 | Local + push notifications |
+| expo-router | ~6.0.23 | File-based navigation |
+| i18next + react-i18next | ^25 / ^16 | Internationalisation |
 
-### Backend & Database
+---
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Supabase | Latest JS client v2 | Auth, Postgres DB, Realtime, Edge Functions | Required by project constraints. Row-Level Security (RLS) is perfect for the privacy-first worship data model. Postgres handles relational habit/quest/streak data far better than NoSQL | HIGH |
-| @supabase/supabase-js | ^2.x | Client SDK | Official React Native compatible client. Handles auth session persistence, typed queries | HIGH |
-| supabase (CLI) | Latest | Local development, migrations, Edge Functions | Run Postgres locally, write and test migrations, deploy Edge Functions for server-side logic (prayer time calculations, streak validation) | HIGH |
+## New Stack Additions for v2.0
 
-### Offline-First & Local Storage
+### 1. Real-Time Messaging — Supabase Realtime (Already Installed)
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| WatermelonDB | ^0.27 | Local SQLite database with sync | Purpose-built for React Native offline-first. Lazy-loads records, handles tens of thousands of habit entries without perf issues. Has a sync protocol designed for Supabase/Postgres backends | HIGH |
-| @nozbe/watermelondb | ^0.27 | WatermelonDB package | SQLite-backed, observable queries (re-renders on data change), built-in sync primitives. Far superior to MMKV or AsyncStorage for relational data | HIGH |
-| react-native-mmkv | ^3.x | Fast key-value storage | For non-relational data: user preferences, UI state, cached prayer times, theme settings. 30x faster than AsyncStorage | HIGH |
+**Decision: Use Supabase Realtime Broadcast + Postgres Changes. No new package needed.**
 
-**Why WatermelonDB over alternatives:**
-- **Over AsyncStorage:** AsyncStorage is a flat key-value store. Habit data is relational (habits -> entries -> quests -> streaks). You need queries, not serialized JSON blobs.
-- **Over SQLite directly (expo-sqlite):** WatermelonDB adds the sync protocol, observable queries, and lazy loading you'd otherwise build yourself. The sync adapter maps cleanly onto Supabase's Postgres.
-- **Over Legend State + Supabase sync:** Legend State's sync plugin is newer and less battle-tested for complex relational data. WatermelonDB's sync protocol is mature and well-documented.
-- **Over PowerSync:** PowerSync is a strong alternative (Postgres-native sync, works with Supabase). Consider it if WatermelonDB's sync adapter proves too manual. But WatermelonDB has a longer track record in RN.
+`@supabase/supabase-js` ^2.99.2 is already installed and includes Realtime. No additional
+library is needed for the buddy messaging system.
 
-**Sync architecture:** WatermelonDB handles local CRUD. A custom sync function pulls/pushes changes to Supabase via `supabase.from('table').select()` and `supabase.from('table').upsert()`. Privacy-sensitive worship data stays local-only (never synced). Non-sensitive data (profile, settings, cosmetic unlocks) syncs for cross-device support.
+**How it works:**
 
-### State Management
+- **Postgres Changes** — listen to INSERT on `messages` table; buddy receives message via WebSocket
+- **Broadcast** — ephemeral typing indicators, online presence (no DB write needed)
+- **Realtime Authorization** — `realtime.messages` table supports RLS policies; only buddies
+  in the same channel receive events
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Zustand | ^5.x | Global UI state | Minimal API, no boilerplate, excellent TypeScript support. Perfect for game state (current XP, active quests, HUD data). Tiny bundle size (~1KB) | HIGH |
-| WatermelonDB observables | -- | Database-driven reactive state | For any UI that displays persisted data (habit lists, streak counts, history), use WatermelonDB's `withObservables` or `useObservable` hooks directly. Do NOT duplicate DB state into Zustand | HIGH |
+**Critical integration note (MEDIUM confidence — RLS + Realtime on React Native):**
+There is a documented issue where Realtime stops delivering events in React Native when
+`detectSessionInUrl: true` is set in the Supabase client config. The fix is:
 
-**Why Zustand over alternatives:**
-- **Over Redux/RTK:** Overkill for a solo dev mobile app. Redux's ceremony (slices, actions, reducers, selectors) slows development without proportional benefit at this scale.
-- **Over Jotai:** Jotai is atomic, great for forms. Zustand is better for game-state shaped data (a single store with XP, streaks, quests, active buffs).
-- **Over Legend State:** Legend State is powerful but adds complexity. Its observables overlap with WatermelonDB's observables, creating confusion about source of truth.
-- **Over React Context:** Context re-renders all consumers on any change. Game HUD updates XP, streak, quest progress frequently -- Context would cause perf issues.
+```typescript
+const supabase = createClient(url, key, {
+  auth: { detectSessionInUrl: false }  // required for RN Realtime + RLS
+})
+```
 
-### Animation & Game UI
+This is already correct for React Native. Verify this is set in `src/lib/supabase.ts`.
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| react-native-reanimated | ^3.x | Core animation engine | Worklet-based animations run on UI thread (60fps). Essential for: HUD transitions, XP bar fills, streak flame effects, screen transitions. The foundation everything else builds on | HIGH |
-| react-native-skia | ^1.x (@shopify/react-native-skia) | 2D drawing, pixel art rendering, custom shaders | Skia is how you get the 16-bit RPG aesthetic. Draw pixel-art sprites, custom progress bars, particle effects, retro UI chrome. GPU-accelerated. This is the "Ferrari" in "Ferrari x 16-bit" | HIGH |
-| lottie-react-native | ^7.x | Pre-built animations (celebrations, transitions) | For complex multi-frame animations (level-up celebrations, quest complete fanfares) that are easier to design in After Effects than code. Export as Lottie JSON, render natively | HIGH |
-| react-native-gesture-handler | ^2.x | Touch gestures | Swipe to dismiss, long-press for details, drag for custom interactions. Required by Reanimated for gesture-driven animations | HIGH |
+**Channel pattern for buddy messaging:**
 
-**Why this animation stack (not a game engine):**
-- **Over React Native Game Engine / Flame / Unity:** This is a habit app with game aesthetics, not a real-time game. You don't need a game loop, physics engine, or entity-component system. Skia + Reanimated gives you the pixel art rendering and smooth animations without the complexity of a game engine.
-- **Over expo-gl / Three.js:** 3D is wrong for 16-bit aesthetic. Skia is purpose-built for 2D drawing and is maintained by Shopify with active RN support.
-- **Over plain Animated API:** The old Animated API runs on the JS thread and drops frames during heavy computation. Reanimated's worklets are mandatory for smooth game-feel UI.
+```typescript
+// One private channel per buddy pair, keyed by sorted user IDs
+const channelId = [myId, buddyId].sort().join(':')
+const channel = supabase.channel(`buddy:${channelId}`, {
+  config: { broadcast: { self: true } }
+})
+```
 
-**Pixel art rendering strategy:**
-1. Create sprite sheets (PNG) for characters, items, UI elements in pixel art style
-2. Use Skia's `drawImage` / `drawImageRect` to render sprite regions
-3. Use Reanimated to drive sprite animation frames (walking cycles, idle animations)
-4. Use Skia's `Paint` with `FilterQuality.None` to keep pixel art crisp (no anti-aliasing blur)
-5. Skia Atlas API for rendering multiple sprites efficiently (quest board, inventory)
+**Confidence: HIGH** — Supabase Realtime is documented, battle-tested with React Native,
+and the package is already installed.
 
-### Navigation
+---
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| expo-router | ^4.x | File-based routing | Convention over configuration. Nested layouts map perfectly to game screens (HUD as persistent layout, tabs for main sections). Deep linking for notifications built-in | HIGH |
-| react-native-screens | (bundled) | Native screen containers | Expo Router uses this under the hood. Ensures screens are native views, not JS-rendered, for smooth transitions | HIGH |
+### 2. Content Filtering for Buddy Messages
 
-**Why expo-router over React Navigation directly:**
-- Expo Router IS React Navigation underneath, but with file-based routing that reduces boilerplate dramatically.
-- TypeScript route types are auto-generated from the file structure.
-- Deep linking (for notification tap -> specific screen) works with zero config.
+**Decision: `leo-profanity` (client-side pre-filter) + Supabase Edge Function (server-side validator)**
 
-### Notifications & Scheduling
+Two-layer approach:
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| expo-notifications | ^0.28+ | Push and local notifications | Local notifications for prayer reminders, habit nudges, evening Muhasabah prompt. Push via Supabase Edge Functions for future features. Expo handles APNs/FCM abstraction | HIGH |
-| expo-task-manager | ^12.x | Background tasks | Schedule recurring notification logic, background sync when app is backgrounded. Required for reliable prayer time notifications | MEDIUM |
-| expo-background-fetch | ^12.x | Periodic background execution | Refresh prayer times daily, pre-compute quest resets at midnight. Works with task-manager | MEDIUM |
+| Layer | Library | Role | When |
+|-------|---------|------|------|
+| Client | `leo-profanity` ^1.9.0 | Block obvious profanity before send | Before API call |
+| Server | Supabase Edge Function (custom) | Authoritative filter + Islamic content rules | On message INSERT trigger |
 
-**Prayer time notifications:** Calculate locally using a prayer time library (adhan-js, see below). Schedule as local notifications. Do NOT rely on push notifications for prayer times -- they must work offline.
+**Why leo-profanity over bad-words:**
+- `leo-profanity` is actively maintained (published 2 months ago as of March 2026); `bad-words`
+  last published 2 years ago
+- Supports custom word list extension — needed for Islamic-specific blocked terms (profanity
+  against prophets, blasphemous phrases)
+- Pure JS, works in React Native with no native dependencies
 
-### Islamic-Specific Libraries
+**Why NOT an ML-based filter (glin-profanity, Azure Cognitive Services, OpenAI moderation):**
+- Overkill for a small buddy chat (max 20 connections)
+- ML models add latency and cost
+- The app is offline-first — an ML API call blocks message send
+- Simple word-list filtering is sufficient for a closed, small-network buddy system
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| adhan | ^4.x | Prayer time calculation | Industry-standard prayer time library. Supports all major calculation methods (MWL, ISNA, Egypt, Karachi, etc.). Pure JS, works offline. Actively maintained | HIGH |
-| Intl.DateTimeFormat (built-in) | -- | Hijri calendar dates | Modern JS engines support `islamic-umalqura` calendar. No external library needed for Hijri date display | MEDIUM |
+**Installation:**
 
-**Why adhan over alternatives:**
-- **Over IslamicFinder API / Aladhan API:** Those require network. Prayer times MUST work offline -- this is a hard constraint. Calculate locally, cache results.
-- **Over praytimes.js:** Unmaintained. adhan is actively maintained and used by major Islamic apps.
+```bash
+npm install leo-profanity
+```
 
-### UI & Design System
+**Usage pattern:**
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Tamagui | ^1.x | Styled components + design tokens | Compiles styles at build time (fast). Token system maps to game UI tokens (colors, spacing, typography). Cross-platform web-ready if ever needed | MEDIUM |
-| expo-font | (bundled) | Custom pixel fonts | Load retro/pixel fonts (e.g., Press Start 2P, custom Arabic pixel font). Essential for 16-bit aesthetic | HIGH |
-| expo-haptics | (bundled) | Haptic feedback | Tactile feedback on XP gain, streak break, level up. "Ferrari" = precision feel | HIGH |
-| expo-av or expo-audio | (bundled) | Sound effects | 8-bit/chiptune sound effects for game events. Short clips, not music streaming | HIGH |
-| react-native-safe-area-context | ^4.x | Safe area handling | Notch/island avoidance. Bundled with Expo | HIGH |
+```typescript
+import leoProfanity from 'leo-profanity'
+leoProfanity.loadDictionary('en')
+leoProfanity.add(['islamophobic_term_1', 'islamophobic_term_2'])  // custom list
 
-**Why Tamagui over alternatives:**
-- **Over NativeWind/Tailwind:** Tailwind's utility classes don't map well to a design token system for game UI. You need semantic tokens ($hudBackground, $xpBarFill, $pixelBorder) not utility classes.
-- **Over Styled Components / Emotion:** No build-time optimization. Runtime style computation hurts perf on lower-end Android devices.
-- **Over Unistyles:** Unistyles is good but newer. Tamagui has broader adoption and better docs.
-- **Over rolling your own StyleSheet:** You'll reinvent tokens, themes, and responsive scaling. Don't.
+const isSafe = !leoProfanity.check(messageText)
+```
 
-**Alternative consideration:** If Tamagui feels heavy for the retro aesthetic, **Unistyles 2.0** is a lighter alternative that still supports themes and design tokens. This is a choose-one-and-commit decision -- pick during Phase 1 scaffolding.
+**Confidence: MEDIUM** — leo-profanity is well-established. Custom Islamic word list must be
+curated manually by the developer; no existing Islamic-specific profanity list was found in
+the ecosystem.
 
-### Testing
+---
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| Jest | ^29.x | Unit testing | Bundled with Expo. Test XP calculations, streak logic, quest state machines | HIGH |
-| React Native Testing Library | ^12.x | Component testing | Test screen rendering, user interactions. Encourages testing behavior not implementation | HIGH |
-| Maestro | Latest | E2E mobile testing | YAML-based, visual, no flaky selectors. Test critical flows: complete habit -> see XP -> check streak. Free for solo dev | MEDIUM |
+### 3. Boss Battle Animations — Skottie (Already Partially Available)
 
-**Why Maestro over Detox:**
-- Detox is powerful but requires significant setup and maintenance. Maestro's YAML flows are 10x faster to write and more reliable.
-- Solo dev constraint means testing must be low-friction or it won't happen.
+**Decision: Use built-in Skottie from `@shopify/react-native-skia` 2.2.12 (already installed).
+No new package needed.**
 
-### Build & Deploy
+React Native Skia 2.x ships with Skottie (Lottie renderer built on Skia). Boss battle
+animations (hit flash, health drain, phase transitions) can be expressed as Lottie JSON
+files rendered inside the existing Skia canvas, composited with other Skia drawing primitives.
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| EAS Build | (Expo service) | Cloud builds for iOS/Android | No need for local Xcode builds (huge time saver on Windows). Handles code signing, provisioning | HIGH |
-| EAS Submit | (Expo service) | App Store/Play Store submission | Automated store submission from CI | HIGH |
-| EAS Update | (Expo service) | OTA updates | Push JS bundle updates without store review. Critical for rapid iteration post-launch | HIGH |
+**Why this is better than `lottie-react-native` for boss battles:**
+- Skottie renders inside the Skia canvas, so animations layer with pixel-art health bars and
+  boss sprites without a separate native view
+- 63% better frame rates on low-end Android vs lottie-react-native (benchmark source: Margelo)
+- Boss phase transitions need compositing (hit flash OVER the boss sprite) — only achievable
+  inside a single Skia canvas
 
-### Developer Tooling
+**What Skia 2.2.12 Skottie supports:**
 
-| Technology | Version | Purpose | Why | Confidence |
-|------------|---------|---------|-----|------------|
-| ESLint | ^9.x | Linting | Flat config format. Use @expo/eslint-config as base | MEDIUM |
-| Prettier | ^3.x | Formatting | Consistent code style, no debates | HIGH |
-| Husky + lint-staged | Latest | Pre-commit hooks | Lint and format on commit. Prevents broken code from entering repo | HIGH |
+```typescript
+import { Skottie, useSkottie } from '@shopify/react-native-skia'
 
-## Alternatives Considered (and Rejected)
+const animation = useSkottie(require('./boss-hit.json'))  // Lottie JSON asset
 
-| Category | Recommended | Alternative | Why Not |
-|----------|-------------|-------------|---------|
-| Offline DB | WatermelonDB | expo-sqlite raw | No sync protocol, no observables, you'd build WatermelonDB features manually |
-| Offline DB | WatermelonDB | PowerSync | Strong option but adds a paid service dependency. Re-evaluate if WatermelonDB sync proves painful |
-| Offline DB | WatermelonDB | Legend State persistence | Less mature for complex relational data; overlaps with Zustand |
-| State | Zustand | Redux Toolkit | Too much ceremony for solo dev. Zustand does the same with 90% less code |
-| State | Zustand | MobX | Proxy-based reactivity can cause subtle bugs. Zustand's explicit subscriptions are safer |
-| Animation | Reanimated + Skia | React Native Game Engine | Overkill. No physics or game loop needed. Adds complexity without benefit |
-| Animation | Reanimated + Skia | expo-gl + Three.js | 3D is wrong aesthetic. Skia is 2D-native and far simpler |
-| Styling | Tamagui | NativeWind | Utility classes don't map to game design tokens. Need semantic token system |
-| Styling | Tamagui | Dripsy | Less actively maintained, smaller community |
-| Navigation | expo-router | React Navigation bare | expo-router IS React Navigation + file-based routing + auto deep linking. No reason to go bare |
-| Notifications | expo-notifications | OneSignal / Notifee | External dependency for something Expo handles natively. OneSignal adds a service dependency |
-| Testing E2E | Maestro | Detox | Higher setup cost, more flaky, harder to maintain for solo dev |
-| Prayer times | adhan (local) | Aladhan API | Must work offline. Network dependency is unacceptable for prayer times |
+// Inside a <Canvas>:
+<Skottie animation={animation} x={0} y={0} width={200} height={200} />
+```
 
-## What NOT to Use
+**Boss battle UX does NOT require new libraries.** The existing Reanimated 4.1.1 +
+Skia 2.2.12 stack handles:
+- Health bar drain animations (Reanimated `useSharedValue` + Skia `Paint`)
+- Boss idle/attack frame cycles (Reanimated driving Skia `drawImageRect` sprite frames)
+- Hit flash effect (Skia `ColorFilter` + Reanimated timing)
+- Phase transition screen shake (Reanimated `useSharedValue` on canvas transform)
+
+**Confidence: HIGH** — Skia 2.2.12 is the confirmed installed version. Skottie is documented
+as part of @shopify/react-native-skia since v1.x. No additional package required.
+
+---
+
+### 4. Dopamine Detox Timer — No New Library Needed
+
+**Decision: Timestamp + AppState pattern using built-in React Native APIs. No new package.**
+
+The Dopamine Detox Dungeon requires a 2-8 hour countdown timer that survives app
+backgrounding. The correct approach for Expo (without ejecting or foreground services):
+
+**Pattern: Start timestamp + AppState reconciliation**
+
+```typescript
+// On challenge start:
+const startedAt = Date.now()
+await AsyncStorage.setItem('detox_start', String(startedAt))
+await AsyncStorage.setItem('detox_duration_ms', String(durationMs))
+
+// In component:
+const appState = useRef(AppState.currentState)
+AppState.addEventListener('change', (nextState) => {
+  if (nextState === 'active') {
+    const start = await AsyncStorage.getItem('detox_start')
+    const elapsed = Date.now() - Number(start)
+    setRemainingMs(durationMs - elapsed)
+  }
+})
+```
+
+**Why NOT `react-native-background-timer`:**
+- Requires ejecting (loses Expo Go compatibility; the project is still using Expo Go)
+- Foreground services on Android require additional native configuration
+- Timestamp reconciliation is sufficient — the timer just needs accuracy when foregrounded,
+  not continuous background tick accuracy
+
+**Why NOT expo-background-fetch:**
+- Background fetch fires at OS-discretion intervals (minutes, not seconds)
+- Cannot maintain a second-by-second countdown in background
+- Correct approach: recalculate elapsed time on foreground, not tick in background
+
+**Scheduled notification at challenge end:**
+Use the existing `expo-notifications` ^0.32.16 with a future-date trigger:
+
+```typescript
+await Notifications.scheduleNotificationAsync({
+  content: {
+    title: 'Dungeon Complete',
+    body: 'You conquered the Dopamine Detox Dungeon. Barakah earned.'
+  },
+  trigger: { date: new Date(startedAt + durationMs) }
+})
+```
+
+**Confidence: HIGH** — AppState + timestamp is the documented Expo-compatible pattern.
+expo-notifications future-date triggers are confirmed in current Expo 54 docs.
+
+---
+
+### 5. Friday Power-Up Scheduling
+
+**Decision: No new library. Use `adhan` (already installed) + `expo-notifications` (already installed).**
+
+Friday detection uses the existing `adhan` library + JavaScript `Date`:
+
+```typescript
+// Jumu'ah detection
+const now = new Date()
+const isFriday = now.getDay() === 5  // 0=Sun, 5=Fri
+
+// Jumu'ah starts at Dhuhr on Friday (use adhan for local prayer times)
+const prayerTimes = new PrayerTimes(coords, now, calculationParams)
+const jumuahStart = prayerTimes.dhuhr
+const jumuahEnd = prayerTimes.asr
+```
+
+**2x XP multiplier:** Pure TypeScript in the existing XP engine. No library needed.
+
+**Surah Al-Kahf challenge scheduling:** Schedule a weekly local notification every Thursday
+night using `expo-notifications` `WeeklyTrigger`:
+
+```typescript
+await Notifications.scheduleNotificationAsync({
+  content: { title: 'Friday Reminder', body: 'Read Surah Al-Kahf before sunset.' },
+  trigger: { weekday: 6, hour: 20, minute: 0, repeats: true }  // Thursday 8pm
+})
+```
+
+**Confidence: HIGH** — Both components use confirmed installed packages.
+
+---
+
+### 6. Social / Buddy Data Layer — Supabase (New Tables, No New Library)
+
+**Decision: New Supabase tables + existing drizzle-orm schema + existing Zustand store. No new package.**
+
+The buddy system requires new database tables in Supabase (server) and possibly mirrored
+schema in expo-sqlite (local cache for offline viewing). New Zustand slice: `useBuddyStore`.
+
+**New Supabase tables (server-side):**
+
+| Table | Purpose |
+|-------|---------|
+| `user_profiles` (extend) | Add `username`, `invite_code` (unique, 6-char) fields |
+| `buddy_connections` | `user_a_id`, `user_b_id`, `status` (pending/accepted/blocked), `created_at` |
+| `buddy_messages` | `id`, `channel_id`, `sender_id`, `content`, `filtered`, `sent_at` |
+| `shared_habits` | `id`, `owner_id`, `buddy_id`, `habit_id`, `goal`, `created_at` |
+| `duo_quests` | `id`, `user_a_id`, `user_b_id`, `quest_type`, `a_completed`, `b_completed` |
+
+**RLS policies required for all new tables** — buddy can only read messages in their channel,
+connections only visible to participating users.
+
+**Invite code generation:** Use existing `expo-crypto` (already installed):
+
+```typescript
+import * as Crypto from 'expo-crypto'
+const bytes = await Crypto.getRandomBytesAsync(4)
+const code = Array.from(bytes).map(b => b.toString(36)).join('').toUpperCase().slice(0, 6)
+```
+
+**New local SQLite tables (via drizzle-orm):** Cache buddy list and recent messages for
+offline viewing. Full message sync is not needed offline — just the buddy list + last 50
+messages per buddy.
+
+**Confidence: HIGH** — Standard Supabase pattern, all tools already installed.
+
+---
+
+### 7. Nafs Boss Arena State — No New Library
+
+**Decision: Boss battle state is pure TypeScript + existing Zustand + expo-sqlite. No new package.**
+
+Boss battles are multi-day, persistent state machines:
+
+- **Local state:** expo-sqlite table `boss_battles` (boss_id, player_id, phase, hp_remaining,
+  started_at, daily_damage_dealt)
+- **In-memory state:** New `useBossStore` Zustand slice (active boss, current phase, player
+  attack queue)
+- **Progression unlock:** Boss unlocks at Level 10+ — query existing XP store, no new logic
+
+**Boss archetype definitions:** Static TypeScript constants file. No library needed.
+
+```typescript
+export const BOSS_ARCHETYPES = {
+  WASWASAH:  { name: 'Al-Waswas', hp: 500, phases: 3, duration_days: 7 },
+  GHAFLAH:   { name: 'Al-Ghaflah', hp: 400, phases: 3, duration_days: 5 },
+  KIBR:      { name: 'Al-Kibr', hp: 600, phases: 4, duration_days: 10 },
+  HASAD:     { name: 'Al-Hasad', hp: 450, phases: 3, duration_days: 7 },
+  TARSEEL:   { name: 'Al-Tarseel', hp: 350, phases: 2, duration_days: 5 },
+} as const
+```
+
+**Daily damage is awarded by completing regular habits** — the boss system hooks into
+the existing habit completion event bus (Zustand `useHabitStore`). No architectural change.
+
+**Confidence: HIGH** — Pure TypeScript state machine, existing infrastructure sufficient.
+
+---
+
+## Summary: New Packages Required
+
+Only one new npm package is required for the entire v2.0 milestone:
+
+| Package | Version | Purpose | Install Command |
+|---------|---------|---------|----------------|
+| `leo-profanity` | ^1.9.0 | Client-side message content filter | `npm install leo-profanity` |
+
+Everything else — Realtime messaging, boss animations, detox timer, Friday power-ups,
+buddy data layer, boss state — uses already-installed packages.
+
+---
+
+## What NOT to Add
 
 | Technology | Why Not |
 |------------|---------|
-| Firebase / Firestore | Project chose Supabase (Postgres). Firestore's NoSQL model is wrong for relational habit data |
-| AsyncStorage | Too slow, no querying, no sync. Only acceptable for tiny key-value data (use MMKV instead) |
-| React Context for global state | Re-renders all consumers. Game HUD updates frequently. Performance disaster |
-| Animated (old API) | JS thread animations. Will drop frames during game UI transitions. Use Reanimated |
-| Expo Go for development | Use development builds (expo-dev-client). Expo Go doesn't support native modules like WatermelonDB, Skia |
-| Any CSS-in-JS with runtime overhead | StyleSheet or build-time compiled only. Runtime CSS kills mobile perf |
-| Unity / Godot for game UI | Massive bundle size, bridge overhead, wrong tool for a habit app. Skia handles 2D game aesthetics |
-| GraphQL (Apollo, URQL) | Supabase's PostgREST is simpler and sufficient. GraphQL adds complexity without benefit here |
+| Stream Chat / Sendbird / Pubnub | External paid chat service; Supabase Realtime is sufficient for 20-buddy private messaging |
+| `react-native-background-timer` | Requires ejecting; timestamp + AppState is sufficient for detox timer |
+| `lottie-react-native` (standalone) | Skia 2.2.12 already has Skottie built-in; redundant |
+| `react-native-skottie` (Margelo) | Same as above — this package wraps what Skia 2.x already ships |
+| ML content moderation (Azure/OpenAI) | Overkill for 20-buddy closed network; adds latency and cost |
+| Firebase Cloud Messaging (separate) | expo-notifications already handles APNs/FCM abstraction |
+| Socket.io / ws (standalone WebSocket) | Supabase Realtime uses WebSockets internally; no raw WS library needed |
+| Redux / Redux Toolkit | Already decided against; Zustand handles new social store slices |
+| `expo-background-fetch` (new) | Already in project; not useful for second-accurate detox countdown |
+| Separate invitation service | Supabase invite codes via `expo-crypto` (already installed) are sufficient |
 
-## Installation
+---
 
-```bash
-# Create project
-npx create-expo-app@latest halalhabits --template blank-typescript
+## Integration Points (How New Features Wire Into Existing Architecture)
 
-# Core Expo modules (install via npx expo install for version compatibility)
-npx expo install expo-router expo-notifications expo-task-manager expo-background-fetch
-npx expo install expo-font expo-haptics expo-av expo-image expo-secure-store
-npx expo install react-native-safe-area-context react-native-screens
-npx expo install react-native-gesture-handler
+| New Feature | Hooks Into | Integration Pattern |
+|-------------|-----------|---------------------|
+| Buddy messaging | Supabase Realtime channel, existing `useSupabase` hook | New `useChatStore` Zustand slice; subscribe on buddy screen mount |
+| Content filter | Message send path in chat service | Filter before `supabase.from('buddy_messages').insert()` |
+| Boss battle | `useHabitStore` completion event | Boss damage calculated on `onHabitCompleted` callback |
+| Boss animation | Existing Skia canvas in game HUD | New `BossArenaScreen` with `<Canvas>` + Skottie + Reanimated |
+| Detox timer | `AppState` + `expo-notifications` | New `useDetoxStore` Zustand slice; schedule notification on start |
+| Friday 2x XP | Existing XP engine `calculateXP()` | Add `fridayMultiplier` param; check `Date.getDay() === 5` |
+| Surah Al-Kahf | `expo-notifications` weekly trigger | Schedule once on app startup, replace if already scheduled |
+| Invite codes | `expo-crypto` random bytes, Supabase `user_profiles` | Generate on first launch, store in profile |
 
-# Animation & Rendering
-npx expo install react-native-reanimated
-npx expo install @shopify/react-native-skia
-npm install lottie-react-native
+---
 
-# Backend
-npm install @supabase/supabase-js
+## Confidence Assessment
 
-# Offline & Storage
-npm install @nozbe/watermelondb
-npm install react-native-mmkv
+| Area | Confidence | Basis |
+|------|------------|-------|
+| Supabase Realtime for messaging | HIGH | Official docs, confirmed package installed |
+| Supabase Realtime + RLS in React Native | MEDIUM | Documented known issue with `detectSessionInUrl`; verify config |
+| leo-profanity content filter | MEDIUM | Confirmed active package; Islamic custom list must be hand-curated |
+| Skottie in Skia 2.2.12 | HIGH | Confirmed version installed; Skottie documented in Skia since v1.x |
+| AppState timer for detox | HIGH | Standard documented Expo pattern, no native module needed |
+| Friday power-up via adhan + notifications | HIGH | Both packages confirmed installed and functional |
+| New Supabase tables (buddy system) | HIGH | Standard Supabase + Drizzle pattern, identical to existing tables |
+| Boss battle as pure TS state machine | HIGH | No new library, hooks into existing event system |
 
-# State Management
-npm install zustand
-
-# Islamic
-npm install adhan
-
-# UI Framework (choose one -- verify latest)
-npm install tamagui @tamagui/config
-
-# Dev Dependencies
-npm install -D typescript @types/react jest @testing-library/react-native
-npm install -D eslint prettier husky lint-staged
-
-# NOTE: WatermelonDB requires a development build (not Expo Go)
-# Run: npx expo prebuild  (generates native projects)
-# Then: npx expo run:ios  or use EAS Build
-```
-
-**Important:** Always use `npx expo install` for Expo-ecosystem packages. It resolves the correct version for your SDK. Using `npm install` directly can cause version mismatches.
-
-## Architecture Decision: Development Builds Required
-
-WatermelonDB and Skia both require native modules not available in Expo Go. From Day 1:
-
-1. Run `npx expo prebuild` to generate `ios/` and `android/` directories
-2. Use `npx expo run:ios` locally (Mac) or EAS Build (any platform including Windows)
-3. Install `expo-dev-client` for development build with hot reload
-4. This is standard practice for production Expo apps in 2025+
-
-Since you're developing on Windows, use **EAS Build** for iOS builds from the start. Android can be built locally or via EAS.
-
-## Version Verification Checklist
-
-Before starting development, verify these versions are current:
-
-- [ ] Expo SDK: Check https://expo.dev/changelog for latest SDK
-- [ ] React Native: Expo SDK pins the RN version -- don't pick separately
-- [ ] Supabase JS: Check https://github.com/supabase/supabase-js/releases
-- [ ] WatermelonDB: Check https://github.com/Nozbe/WatermelonDB/releases
-- [ ] Skia: Check https://github.com/Shopify/react-native-skia/releases
-- [ ] Reanimated: Check https://github.com/software-mansion/react-native-reanimated/releases
-- [ ] Tamagui: Check https://github.com/tamagui/tamagui/releases
-- [ ] adhan: Check https://github.com/batoulapps/adhan-js/releases
+---
 
 ## Sources
 
-- Training data knowledge (Expo SDK 51/52 era, late 2024). Confidence: MEDIUM for versions, HIGH for architecture patterns
-- WatermelonDB sync documentation and community patterns: well-established by 2024
-- Shopify Skia for React Native: established as the standard 2D rendering solution by 2024
-- Reanimated 3.x with New Architecture: stable since 2024
-- Supabase React Native guide: established pattern with @supabase/supabase-js v2
-- adhan-js: industry standard since 2020, actively maintained through 2024+
-
-**Honest gap:** I could not verify exact latest versions (WebSearch/WebFetch unavailable). All version numbers are minimums from my training data. The architecture and library choices are HIGH confidence; exact version pins are MEDIUM confidence. Run the verification checklist above before scaffolding.
+- [Supabase Realtime Authorization](https://supabase.com/docs/guides/realtime/authorization) — RLS on broadcast channels
+- [Supabase Broadcast Docs](https://supabase.com/docs/guides/realtime/broadcast) — Channel patterns
+- [Supabase Realtime + RLS React Native issue](https://medium.com/@kidane10g/supabase-realtime-stops-working-when-rls-is-enabled-heres-the-fix-154f0b43c69a) — `detectSessionInUrl` fix (MEDIUM confidence)
+- [leo-profanity npm](https://www.npmjs.com/package/leo-profanity) — Version 1.9.0 confirmed active
+- [React Native Skia Skottie docs](https://shopify.github.io/react-native-skia/docs/skottie/) — Built-in since Skia 1.x
+- [Margelo react-native-skottie benchmark](https://github.com/margelo/react-native-skottie) — 63% fps improvement vs lottie-react-native
+- [Expo background timer AppState pattern](https://aloukissas.medium.com/how-to-build-a-background-timer-in-expo-react-native-without-ejecting-ea7d67478408) — Timestamp reconciliation
+- [Expo Notifications scheduling](https://docs.expo.dev/versions/latest/sdk/notifications/) — Future-date and weekly triggers
+- [Drizzle + Expo SQLite](https://expo.dev/blog/modern-sqlite-for-react-native-apps) — Confirmed integration pattern
+- Existing `package.json` (confirmed installed versions, March 2026)

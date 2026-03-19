@@ -1,613 +1,606 @@
 # Architecture Patterns
 
-**Domain:** Gamified Islamic habit-building mobile app
-**Stack:** React Native (Expo) + Supabase
-**Researched:** 2026-03-07
-**Overall Confidence:** MEDIUM (training data only -- web search/docs unavailable; patterns are well-established but version-specific details should be verified)
+**Domain:** Social & Battle Systems integration into offline-first Islamic habit app
+**Researched:** 2026-03-19
+**Confidence:** HIGH (existing codebase verified, Supabase Realtime docs verified, integration patterns confirmed)
 
 ---
 
-## Recommended Architecture
+## Context: What Already Exists
 
-### High-Level Overview
+The v1.0 codebase has a well-established three-layer architecture:
 
 ```
-+--------------------------------------------------+
-|                EXPO MOBILE APP                    |
-|                                                   |
-|  +------------+  +------------+  +-------------+  |
-|  | Navigation |  |   Screens  |  |  UI Layer   |  |
-|  | (Expo      |  | (Home HUD, |  | (Components |  |
-|  |  Router)   |  |  Forge,    |  |  Tokens,    |  |
-|  |            |  |  Quests,   |  |  Animations)|  |
-|  +------+-----+  +-----+------+  +------+------+  |
-|         |              |                |          |
-|  +------v--------------v----------------v------+   |
-|  |           APPLICATION LAYER                 |   |
-|  |  +----------+  +----------+  +-----------+  |   |
-|  |  | Game     |  | Habit    |  | Schedule  |  |   |
-|  |  | Engine   |  | Tracker  |  | Engine    |  |   |
-|  |  | (XP,     |  | (CRUD,   |  | (Notifs,  |  |   |
-|  |  |  Streaks,|  |  Check-  |  |  Prayer   |  |   |
-|  |  |  Titles) |  |  ins)    |  |  Times)   |  |   |
-|  |  +----+-----+  +----+-----+  +-----+-----+  |   |
-|  |       |             |              |          |   |
-|  +-------v-------------v--------------v---------+   |
-|  |           STATE & DATA LAYER                  |   |
-|  |  +----------+  +----------+  +-----------+    |   |
-|  |  | Zustand  |  | Local DB |  | Sync      |    |   |
-|  |  | (UI/Game |  | (SQLite  |  | Engine    |    |   |
-|  |  |  State)  |  |  via     |  | (Queue +  |    |   |
-|  |  |          |  |  expo-   |  |  Conflict  |    |   |
-|  |  |          |  |  sqlite) |  |  Resolver) |    |   |
-|  |  +----------+  +----+-----+  +-----+-----+    |   |
-|  +---------------------|--------------|----------+   |
-+------------------------|--------------|----------+
-                         |              |
-              (local)    |              | (network)
-                         v              v
-                  +------+------+  +----+--------+
-                  | Device      |  | Supabase    |
-                  | Storage     |  | Backend     |
-                  | (SQLite DB) |  | (Postgres,  |
-                  |             |  |  Auth, RLS) |
-                  +-------------+  +-------------+
+Domain (pure TS functions)  →  Stores (Zustand)  →  Repos (Drizzle/SQLite)
+                                                             ↓
+                                               Sync Queue → Supabase
 ```
 
-### Design Principles
+Key architectural invariants that MUST be preserved:
+- Privacy Gate: `assertSyncable()` is the only path to sync queue writes. All 13 existing entities have explicit classifications. New tables require explicit classification before they can be touched.
+- Pure domain functions: `xp-engine.ts`, `quest-engine.ts`, `streak-engine.ts` have no React imports. New game engines must follow the same pattern.
+- Repository pattern: stores never touch Drizzle directly — they call repos. New stores must follow this.
+- SQLite is source of truth. Supabase is a backup/sync target, not the primary read path.
 
-1. **Offline-first, sync-second** -- the app must be fully functional without network. Supabase is the sync/backup layer, not the primary data store.
-2. **Local worship data** -- prayer logs, habit check-ins, and spiritual reflections never leave the device by default. Only non-sensitive data (settings, XP totals, anonymized progress) syncs.
-3. **Game engine as a pure function** -- XP calculation, streak logic, title progression are deterministic functions of state. No side effects, easy to test.
-4. **Privacy boundaries are architectural** -- not just policy. Sensitive data lives in a separate SQLite table namespace that the sync engine cannot access.
+---
+
+## Recommended Architecture for v2.0 Features
+
+### Overview: Four New Subsystems
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  EXISTING (unchanged)                                           │
+│  habitStore → habitRepo → SQLite → syncQueue → Supabase        │
+│  gameStore  → xpRepo, questRepo → SQLite                       │
+└────────────────────────────────┬────────────────────────────────┘
+                                 │ extends
+┌────────────────────────────────▼────────────────────────────────┐
+│  NEW SUBSYSTEM A: Social / Buddy                                │
+│  socialStore → buddyRepo, messageRepo → SQLite                  │
+│               (when online)                                     │
+│  Supabase: buddies table (SYNCABLE) + Realtime channel          │
+│  Edge Function: message-filter (content moderation before DB)   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  NEW SUBSYSTEM B: Boss Arena                                    │
+│  bossStore → bossRepo → SQLite (PRIVATE — personal struggle)   │
+│  boss-engine.ts (pure TS state machine, no React)              │
+│  No sync to Supabase — boss battles are personal, not social   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  NEW SUBSYSTEM C: Dopamine Detox Dungeon                        │
+│  detoxStore → detoxRepo → SQLite (LOCAL_ONLY, no sync)         │
+│  detox-engine.ts (pure TS timer state machine)                 │
+│  Timer: AppState start_timestamp stored locally; elapsed        │
+│         recalculated on foreground, no background process      │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  NEW SUBSYSTEM D: Friday Power-Ups                              │
+│  friday-engine.ts (pure TS, extends xp-engine multiplier)      │
+│  Integrates with gameStore.awardXP() — no new store needed     │
+│  Friday detection: JS Date.getDay() + adhan-js timezone         │
+└─────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
 ## Component Boundaries
 
-### Layer 1: UI Layer
-
 | Component | Responsibility | Communicates With |
 |-----------|---------------|-------------------|
-| **Navigation (Expo Router)** | File-based routing, tab structure, deep links | Screens |
-| **Screen Components** | Screen-level layout, data fetching orchestration | Application Layer hooks, UI Components |
-| **UI Components** | Reusable presentational components (buttons, cards, progress bars, HUD elements) | Props only (no direct state access) |
-| **Animation System** | Retro pixel transitions, XP gain animations, haptic feedback | UI Components, react-native-reanimated |
-
-**Boundary rule:** UI layer never touches SQLite or Supabase directly. All data access through hooks that wrap the Application Layer.
-
-### Layer 2: Application Layer (Domain Logic)
-
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| **Game Engine** | XP calculation, streak evaluation, title progression, quest completion logic | State Layer (reads habit data, writes XP/streak state) |
-| **Habit Tracker** | CRUD for habits, check-in recording, custom habit creation (Habit Forge) | Local DB, Sync Engine (for non-sensitive habits) |
-| **Quest Board** | Daily/weekly quest generation, completion tracking, reward distribution | Game Engine, Habit Tracker |
-| **Muhasabah Engine** | Nightly reflection prompts, journaling, mood/energy logging | Local DB only (private) |
-| **Mercy Mode** | Streak recovery logic, compassionate re-engagement flows | Game Engine, Notification scheduler |
-| **Schedule Engine** | Prayer time calculation, notification scheduling, daily reset timing | expo-notifications, device clock |
-
-**Boundary rule:** Domain logic is framework-agnostic where possible. Game Engine and streak logic should be pure TypeScript modules with no React imports -- testable in isolation.
-
-### Layer 3: State & Data Layer
-
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| **Zustand Store** | In-memory UI state, current session game state, derived computed values | Application Layer (via hooks) |
-| **Local DB (expo-sqlite)** | Persistent storage for all habit data, check-ins, XP history, journal entries | Zustand (hydration on app open), Sync Engine |
-| **Sync Engine** | Queues changes for upload, resolves conflicts, manages connectivity state | Local DB, Supabase client |
-| **Privacy Gate** | Classifies data as private vs syncable, enforces sync boundaries | Sync Engine, Local DB |
-
-**Boundary rule:** Zustand is the single source of truth for the running app. SQLite is the persistence layer that survives app restarts. Supabase is the backup/cross-device layer.
-
-### Layer 4: Backend (Supabase)
-
-| Component | Responsibility | Communicates With |
-|-----------|---------------|-------------------|
-| **Supabase Auth** | User authentication (email, Apple Sign-In, Google) | Mobile auth flow |
-| **Supabase Postgres** | Remote storage for syncable data, user profile, settings | Sync Engine via Supabase JS client |
-| **Row Level Security (RLS)** | Ensures users can only access their own data | All Postgres queries |
-| **Edge Functions** | Push notification dispatch, prayer time API proxy, optional analytics | Supabase scheduled jobs, expo-notifications push |
-
-**Boundary rule:** The app must function identically if Supabase is unreachable. The backend is for sync, auth, and notifications -- never for core game logic.
+| `buddy-engine.ts` | Invite code generation, connection limits (max 20), duo quest eligibility rules | `socialStore` |
+| `message-filter` (Edge Function) | Server-side content moderation before DB insert; blocks inappropriate content | Supabase `messages` table |
+| `boss-engine.ts` | Boss state machine (IDLE → ENGAGED → ATTACKED → FLED/DEFEATED), damage calculation, phase transitions | `bossStore` |
+| `detox-engine.ts` | Challenge duration validation (2-8hr), completion criteria, XP awards | `detoxStore` |
+| `friday-engine.ts` | Friday detection (local timezone via settings), multiplier injection (2x), Al-Kahf challenge gate | `gameStore.awardXP()` |
+| `socialStore` | Buddy list state, pending invites, connection requests, shared quest state | `buddyRepo`, `messageRepo`, Supabase Realtime |
+| `bossStore` | Active boss battle state, cooldown tracking, defeat history | `bossRepo` |
+| `detoxStore` | Active challenge state, start_timestamp, pause state | `detoxRepo` |
+| `buddyRepo` | CRUD for `buddies`, `shared_habits`, `duo_quests` tables | SQLite (Drizzle) |
+| `messageRepo` | CRUD for local `messages` cache table | SQLite (Drizzle) |
+| `bossRepo` | CRUD for `boss_battles` table | SQLite (Drizzle) |
+| `detoxRepo` | CRUD for `detox_sessions` table | SQLite (Drizzle) |
 
 ---
 
-## Data Flow
+## Data Flow: Social / Buddy System
 
-### Core Daily Loop
-
+### Connection Flow (Invite Codes)
 ```
-User opens app
-  |
-  v
-[App Start] --> Zustand hydrates from SQLite
-  |
-  v
-[Home HUD renders] <-- Zustand provides: today's habits, XP, streak, title, quests
-  |
-  v
-[User checks in a habit]
-  |
-  +--> Zustand updates immediately (optimistic UI)
-  +--> SQLite writes check-in record
-  +--> Game Engine recalculates: XP earned, streak status, quest progress
-  |      |
-  |      +--> If title threshold crossed --> trigger title animation
-  |      +--> If quest completed --> trigger quest reward
-  |
-  +--> Sync Engine queues change (if habit is syncable)
-       |
-       +--> On next connectivity --> batch upload to Supabase
+User A generates invite code
+  → stored in Supabase buddies table with status='pending' + code + TTL
+  → User B enters code → Edge Function validates TTL + uniqueness
+  → buddies row updated to status='accepted', both directions inserted
+  → sync flushes to both users' SQLite caches
 ```
 
-### Data Privacy Flow
-
-```
-All data generated
-  |
-  +-- Privacy Gate classifies -->
-  |
-  |   PRIVATE (never syncs):          SYNCABLE (syncs when online):
-  |   - Salah check-in times          - XP totals
-  |   - Quran reading logs            - Streak counts (not details)
-  |   - Muhasabah journal entries     - Custom habit names (user choice)
-  |   - Dua completion                - App settings/preferences
-  |   - Worship-specific habits       - Title/progression state
-  |                                   - Anonymized usage analytics
-  |
-  v                                   v
-  SQLite only                         SQLite + Supabase sync queue
-  (device-bound)                      (eventual consistency)
-```
-
-### Offline-First Sync Pattern
-
-```
-[Check-in happens offline]
-  |
-  v
-[Write to SQLite] --> [Add to sync_queue table]
-  |                       |
-  v                       v
-[UI updates instantly]  [sync_queue row]:
-                         { id, table, operation, payload, created_at, synced: false }
-
-[Network becomes available]
-  |
-  v
-[Sync Engine processes queue in order]
-  |
-  +--> For each queued item:
-       |
-       +--> POST to Supabase
-       +--> On success: mark synced: true
-       +--> On conflict: apply conflict resolution
-       |     |
-       |     +--> Last-write-wins for settings
-       |     +--> Merge for XP (sum, not replace)
-       |     +--> Device-wins for private data (should never conflict)
-       |
-       +--> On failure: retry with exponential backoff
-```
-
----
-
-## State Management Architecture
-
-### Why Zustand (not Redux, not Context)
-
-- **Zustand** is the right choice for this app. It is lightweight, has no boilerplate, supports computed/derived state, works well with React Native, and handles persistence via middleware.
-- Redux is overkill for a solo-dev mobile app. The action/reducer ceremony adds complexity without benefit here.
-- React Context causes unnecessary re-renders in deep component trees, which kills performance on the Home HUD with multiple animated elements.
-
-### Store Structure
-
-```typescript
-// stores/gameStore.ts -- Game state (XP, streaks, titles)
-interface GameStore {
-  xp: number;
-  level: number;
-  currentTitle: string;
-  streaks: Record<string, StreakData>;
-  addXP: (amount: number, source: string) => void;
-  evaluateStreaks: () => void;
-  checkTitleProgression: () => void;
-}
-
-// stores/habitStore.ts -- Habit definitions and check-ins
-interface HabitStore {
-  habits: Habit[];
-  todayCheckIns: CheckIn[];
-  checkIn: (habitId: string) => void;
-  createHabit: (habit: NewHabit) => void;
-}
-
-// stores/questStore.ts -- Daily/weekly quests
-interface QuestStore {
-  dailyQuests: Quest[];
-  weeklyQuests: Quest[];
-  generateDailyQuests: () => void;
-  completeQuest: (questId: string) => void;
-}
-
-// stores/uiStore.ts -- Transient UI state
-interface UIStore {
-  activeTab: string;
-  modalStack: string[];
-  animationQueue: Animation[];
-}
-```
-
-### Persistence Flow
-
-```
-App opens --> SQLite read --> Zustand hydrate --> UI renders
-                                  |
-                           (subscriptions active)
-                                  |
-State change --> Zustand update --> SQLite write (debounced) --> Sync queue
-```
-
-Use Zustand's `persist` middleware with a custom SQLite storage adapter rather than AsyncStorage. SQLite is faster and more reliable for structured data.
-
----
-
-## Database Schema (SQLite -- Local)
-
-### Core Tables
-
+**RLS Policy Pattern (Supabase):**
 ```sql
--- Habit definitions
-CREATE TABLE habits (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  category TEXT NOT NULL, -- 'salah' | 'quran' | 'dhikr' | 'character' | 'focus' | 'custom'
-  is_private INTEGER DEFAULT 1, -- 1 = never syncs
-  xp_value INTEGER DEFAULT 10,
-  frequency TEXT DEFAULT 'daily', -- 'daily' | 'weekly' | 'custom'
-  created_at TEXT NOT NULL,
-  archived_at TEXT
-);
+-- buddies table: users can only see rows where they are requester or recipient
+CREATE POLICY "buddies_select" ON buddies
+  FOR SELECT USING (
+    auth.uid() = requester_id OR auth.uid() = recipient_id
+  );
 
--- Check-in records
-CREATE TABLE check_ins (
-  id TEXT PRIMARY KEY,
-  habit_id TEXT NOT NULL REFERENCES habits(id),
-  checked_at TEXT NOT NULL,
-  xp_earned INTEGER NOT NULL,
-  notes TEXT, -- optional reflection
-  is_private INTEGER DEFAULT 1
-);
-
--- Streak tracking
-CREATE TABLE streaks (
-  habit_id TEXT PRIMARY KEY REFERENCES habits(id),
-  current_streak INTEGER DEFAULT 0,
-  longest_streak INTEGER DEFAULT 0,
-  last_check_in TEXT,
-  mercy_mode_used INTEGER DEFAULT 0
-);
-
--- Game progression
-CREATE TABLE progression (
-  id INTEGER PRIMARY KEY DEFAULT 1, -- singleton row
-  total_xp INTEGER DEFAULT 0,
-  level INTEGER DEFAULT 1,
-  current_title TEXT DEFAULT 'Seeker',
-  titles_unlocked TEXT DEFAULT '[]', -- JSON array
-  updated_at TEXT
-);
-
--- Quest tracking
-CREATE TABLE quests (
-  id TEXT PRIMARY KEY,
-  type TEXT NOT NULL, -- 'daily' | 'weekly'
-  title TEXT NOT NULL,
-  description TEXT,
-  target_count INTEGER DEFAULT 1,
-  current_count INTEGER DEFAULT 0,
-  xp_reward INTEGER NOT NULL,
-  generated_date TEXT NOT NULL,
-  completed_at TEXT
-);
-
--- Muhasabah (reflection) journal
-CREATE TABLE muhasabah (
-  id TEXT PRIMARY KEY,
-  date TEXT NOT NULL,
-  energy_level INTEGER, -- 1-5
-  gratitude TEXT,
-  struggle TEXT,
-  tomorrow_intention TEXT,
-  created_at TEXT NOT NULL
-  -- Always private, never syncs
-);
-
--- Sync queue (for syncable data only)
-CREATE TABLE sync_queue (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  table_name TEXT NOT NULL,
-  record_id TEXT NOT NULL,
-  operation TEXT NOT NULL, -- 'INSERT' | 'UPDATE' | 'DELETE'
-  payload TEXT NOT NULL, -- JSON
-  created_at TEXT NOT NULL,
-  synced_at TEXT,
-  retry_count INTEGER DEFAULT 0
-);
+-- messages table: users can only see messages in channels where they are a buddy
+CREATE POLICY "messages_select" ON messages
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM buddies
+      WHERE status = 'accepted'
+        AND ((requester_id = auth.uid() AND recipient_id = messages.recipient_id)
+          OR (recipient_id = auth.uid() AND requester_id = messages.sender_id))
+    )
+  );
 ```
 
-### Supabase Schema (Remote -- Syncable Data Only)
+### Messaging Flow (Online Path)
+```
+User types message
+  → socialStore.sendMessage() called
+  → Edge Function: message-filter validates content (bad-words library + Islamic content rules)
+  → if clean: insert into Supabase messages table
+  → Supabase Realtime fires on private channel messages:{lower_uid}:{higher_uid}
+  → recipient's app receives via Realtime subscription
+  → messageRepo.insert() caches locally
+  → socialStore state update (both sender optimistic + recipient delivery)
+```
 
-```sql
--- Only non-private data lives here
-CREATE TABLE profiles (
-  id UUID PRIMARY KEY REFERENCES auth.users(id),
-  display_name TEXT,
-  current_title TEXT,
-  total_xp INTEGER DEFAULT 0,
-  level INTEGER DEFAULT 1,
-  created_at TIMESTAMPTZ DEFAULT now(),
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
+### Messaging Flow (Offline Path)
+```
+User types message while offline
+  → message stored in local messageRepo with status='pending_send'
+  → when connectivity restored: flushQueue() picks up pending messages
+  → Edge Function validates before DB insert (moderation still runs server-side)
+  → on success: local message status updated to 'sent'
+```
 
--- Enable RLS
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can only access own profile"
-  ON profiles FOR ALL USING (auth.uid() = id);
-
-CREATE TABLE synced_settings (
-  user_id UUID PRIMARY KEY REFERENCES auth.users(id),
-  notification_preferences JSONB DEFAULT '{}',
-  theme TEXT DEFAULT 'dark',
-  prayer_calculation_method TEXT DEFAULT 'ISNA',
-  updated_at TIMESTAMPTZ DEFAULT now()
-);
-
-ALTER TABLE synced_settings ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users own settings"
-  ON synced_settings FOR ALL USING (auth.uid() = user_id);
+**Privacy classification for new social tables:**
+```typescript
+// Addition to PRIVACY_MAP in privacy-gate.ts
+buddies: 'SYNCABLE',          // connection graph — profile data, not worship
+messages: 'SYNCABLE',         // buddy chat — no worship content allowed by design
+duo_quests: 'SYNCABLE',       // shared game state, not worship data
+shared_habits: 'SYNCABLE',    // habit metadata visibility, not completion data
+boss_battles: 'PRIVATE',      // personal struggle data, spiritually sensitive
+detox_sessions: 'LOCAL_ONLY', // ephemeral timer, no cloud value
 ```
 
 ---
 
-## Key Technical Patterns
+## Data Flow: Boss Arena State Machine
 
-### 1. Game Engine as Pure Functions
+Boss battles are **PRIVATE** (revealing which nafs archetype a user battles is spiritually sensitive). They never leave the device.
 
-**Confidence: HIGH** -- this is standard game architecture.
+```
+boss-engine.ts (pure TS) — no XState dependency needed
+  States: IDLE | COOLDOWN | ENGAGED | FLED | DEFEATED
 
-```typescript
-// engine/xp.ts -- No React, no side effects, pure math
-export function calculateXP(action: ActionType, streak: number): number {
-  const base = XP_VALUES[action];
-  const streakMultiplier = Math.min(1 + (streak * 0.1), 2.0); // caps at 2x
-  return Math.floor(base * streakMultiplier);
-}
+IDLE
+  → player triggers battle (Level 10+ gate checked by engine)
+  → select boss archetype from 5 types
+  → generate battle_id, set hp = calculateBossHP(archetype, playerLevel)
+  → state: ENGAGED
 
-export function calculateLevel(totalXP: number): number {
-  // Logarithmic curve -- early levels fast, later levels slower
-  return Math.floor(Math.sqrt(totalXP / 100)) + 1;
-}
+ENGAGED (multi-day)
+  → each habit completion calls boss-engine.processDamage(habitType, bossArchetype)
+  → damage varies by archetype relevance
+    (dhikr does more damage to Waswasa boss, fasting to Shumukh, etc.)
+  → if boss.hp <= 0: state DEFEATED, XP reward calculated
+  → if player misses X consecutive days: state FLED (boss retreats)
+  → Cooldown after defeat or flight before new battle allowed
 
-export function evaluateTitle(level: number, achievements: string[]): string {
-  // Deterministic title based on level + achievement combination
-  return TITLE_THRESHOLDS.find(t => meetsRequirements(level, achievements, t))?.title ?? 'Seeker';
-}
+DEFEATED / FLED
+  → bossStore saves outcome to bossRepo
+  → gameStore.awardXP() called with source_type='boss_victory'
+  → bossRepo.recordHistory() stores archetype, duration, outcome
+  → state: COOLDOWN → IDLE after cooldown_ends_at
 ```
 
-This pattern means the entire game engine is unit-testable without any React Native or database setup. Critical for a game app where balance tuning requires fast iteration.
-
-### 2. Offline-First with Sync Queue
-
-**Confidence: MEDIUM** -- the pattern is well-known, but Supabase does not provide a built-in offline sync SDK. You build this yourself.
-
-The key insight: Supabase is NOT Firebase -- it does not have built-in offline persistence or sync. You must implement the offline queue manually. This is actually an advantage because it gives you full control over what syncs and what stays private.
+**No XState dependency.** The existing pattern uses plain TypeScript discriminated unions and pure functions. Boss engine follows the `streak-engine.ts` pattern: receive state, return new state. XState adds unnecessary complexity and bundle size for this use case.
 
 ```typescript
-// sync/engine.ts
-export class SyncEngine {
-  private db: SQLiteDatabase;
-  private supabase: SupabaseClient;
+// Pattern: pure function, matches existing domain style
+export function processBossDamage(
+  state: BossState,
+  event: BossEvent
+): BossState { ... }
+```
 
-  async processQueue(): Promise<void> {
-    const pending = await this.db.getAllAsync(
-      'SELECT * FROM sync_queue WHERE synced_at IS NULL ORDER BY created_at ASC'
-    );
+---
 
-    for (const item of pending) {
-      try {
-        await this.pushToSupabase(item);
-        await this.db.runAsync(
-          'UPDATE sync_queue SET synced_at = ? WHERE id = ?',
-          [new Date().toISOString(), item.id]
-        );
-      } catch (error) {
-        await this.db.runAsync(
-          'UPDATE sync_queue SET retry_count = retry_count + 1 WHERE id = ?',
-          [item.id]
-        );
-        if (item.retry_count >= MAX_RETRIES) {
-          // Dead-letter it, don't block the queue
-          break;
-        }
-      }
-    }
+## Data Flow: Dopamine Detox Dungeon
+
+Detox sessions are ephemeral and **LOCAL_ONLY**. The key architectural decision: store `start_timestamp`, not a running counter.
+
+```
+detox-engine.ts (pure TS)
+  validateChallengeDuration(hours: number): boolean    // 2-8hr range
+  calculateElapsed(startTimestamp: string, now: string): number
+  isComplete(startTimestamp: string, durationHours: number, now: string): boolean
+  calculateXPReward(durationHours: number, variant: 'daily' | 'deep'): number
+
+detoxStore
+  active: DetoxSession | null
+  startChallenge(durationHours, variant)
+    → detoxRepo.insert({ start_timestamp, duration_hours, status: 'active' })
+  checkCompletion()
+    → detox-engine.isComplete() → if complete: awardXP + detoxRepo.update(status='complete')
+  abandonChallenge()
+    → detoxRepo.update(status='abandoned')
+
+Timer persistence pattern (AppState approach):
+  - Store start_timestamp (ISO string) in SQLite on challenge start — one write
+  - On app foreground: calculateElapsed(start_timestamp, Date.now())
+  - No background process — user sees elapsed time only when app is open
+  - If app is killed and reopened: recalculate elapsed from persisted timestamp
+  - OS minimum for background tasks is 15 minutes — unsuitable for this use case
+```
+
+**No notifications during detox.** The feature is anti-doomscrolling. The app must suppress all non-critical push notifications when `detoxStore.active !== null`. Sending a notification to re-open the app during a detox session undermines the feature's purpose.
+
+---
+
+## Data Flow: Friday Power-Ups
+
+No new store needed. Friday detection integrates with the existing `xp-engine.ts` multiplier parameter.
+
+```
+friday-engine.ts (pure TS)
+  isFriday(now: Date, userTimezoneOffset: number): boolean
+    // Use local weekday derived from timezone offset, not UTC getDay()
+    // userTimezoneOffset from settings (already stored as locationLat/Lng → derive offset)
+  getFridayMultiplier(): number  // returns 2.0
+  isJumuahWindow(now: Date, prayerTimes: PrayerTimes): boolean
+    // true between Dhuhr and Asr on Friday for precision variant
+
+Integration with gameStore:
+  gameStore.awardXP(habitId, completionEvent) already accepts multiplier
+  → Before calling calculateXP(), check friday-engine.isFriday(now)
+  → If Friday: inject 2x into the multiplier alongside streak multiplier
+  → Multipliers stack multiplicatively: e.g. 1.5 streak × 2.0 Friday = 3.0x total
+  → Cap remains enforced by existing soft daily cap logic in xp-engine.ts
+
+Al-Kahf challenge:
+  A quest-engine template (type: 'weekly', targetType: 'quran')
+  friday-engine.isFriday() gates the template from appearing on other days
+  No new architecture — uses existing quest system with a Friday-gated template selector
+```
+
+---
+
+## New SQLite Schema Additions
+
+All new tables follow the existing Drizzle pattern from `src/db/schema.ts`.
+
+### Subsystem A: Social
+
+```typescript
+// buddies — SYNCABLE
+export const buddies = sqliteTable('buddies', {
+  id: text('id').primaryKey(),
+  requesterId: text('requester_id').notNull().references(() => users.id),
+  recipientId: text('recipient_id').notNull().references(() => users.id),
+  status: text('status').notNull().default('pending'), // 'pending' | 'accepted' | 'declined' | 'removed'
+  inviteCode: text('invite_code'),
+  inviteExpiresAt: text('invite_expires_at'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+
+// messages — SYNCABLE (content filtered before insert)
+export const messages = sqliteTable('messages', {
+  id: text('id').primaryKey(),
+  senderId: text('sender_id').notNull().references(() => users.id),
+  recipientId: text('recipient_id').notNull().references(() => users.id),
+  body: text('body').notNull(),
+  status: text('status').notNull().default('sent'), // 'pending_send' | 'sent' | 'delivered' | 'read'
+  sentAt: text('sent_at').notNull(),
+  createdAt: text('created_at').notNull(),
+});
+
+// duo_quests — SYNCABLE
+export const duoQuests = sqliteTable('duo_quests', {
+  id: text('id').primaryKey(),
+  buddyConnectionId: text('buddy_connection_id').notNull().references(() => buddies.id),
+  initiatorId: text('initiator_id').notNull(),
+  partnerId: text('partner_id').notNull(),
+  templateId: text('template_id').notNull(),
+  description: text('description').notNull(),
+  xpReward: integer('xp_reward').notNull(),
+  targetType: text('target_type').notNull(),
+  targetValue: integer('target_value').notNull(),
+  initiatorProgress: integer('initiator_progress').notNull().default(0),
+  partnerProgress: integer('partner_progress').notNull().default(0),
+  status: text('status').notNull().default('active'), // 'active' | 'completed' | 'expired'
+  expiresAt: text('expires_at').notNull(),
+  completedAt: text('completed_at'),
+  createdAt: text('created_at').notNull(),
+});
+
+// shared_habits — SYNCABLE (visibility only; completion stays PRIVATE)
+export const sharedHabits = sqliteTable('shared_habits', {
+  id: text('id').primaryKey(),
+  buddyConnectionId: text('buddy_connection_id').notNull().references(() => buddies.id),
+  habitId: text('habit_id').notNull().references(() => habits.id),
+  sharedById: text('shared_by_id').notNull(),
+  createdAt: text('created_at').notNull(),
+});
+```
+
+### Subsystem B: Boss Arena
+
+```typescript
+// boss_battles — PRIVATE (personal struggle data)
+export const bossBattles = sqliteTable('boss_battles', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  archetype: text('archetype').notNull(), // 'waswasa' | 'ghadab' | 'kibr' | 'shumukh' | 'kasal'
+  status: text('status').notNull().default('engaged'), // 'engaged' | 'defeated' | 'fled' | 'cooldown'
+  currentHp: integer('current_hp').notNull(),
+  maxHp: integer('max_hp').notNull(),
+  damageLog: text('damage_log').notNull().default('[]'), // JSON array of damage events
+  startedAt: text('started_at').notNull(),
+  endsAt: text('ends_at'),
+  cooldownUntil: text('cooldown_until'),
+  xpAwarded: integer('xp_awarded').notNull().default(0),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+});
+```
+
+### Subsystem C: Detox Dungeon
+
+```typescript
+// detox_sessions — LOCAL_ONLY (ephemeral, no sync value)
+export const detoxSessions = sqliteTable('detox_sessions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  variant: text('variant').notNull(), // 'daily' | 'deep'
+  durationHours: integer('duration_hours').notNull(), // 2-8
+  startTimestamp: text('start_timestamp').notNull(), // ISO string, source of truth for timer
+  status: text('status').notNull().default('active'), // 'active' | 'complete' | 'abandoned'
+  xpAwarded: integer('xp_awarded').notNull().default(0),
+  completedAt: text('completed_at'),
+  createdAt: text('created_at').notNull(),
+});
+```
+
+---
+
+## Privacy Gate: Required Additions
+
+```typescript
+// src/services/privacy-gate.ts — additions to PRIVACY_MAP
+// Total entities after v2.0: 19 (up from 13)
+export const PRIVACY_MAP: Record<string, PrivacyLevel> = {
+  // ... existing 13 entries unchanged ...
+
+  // SOCIAL (SYNCABLE) — connection graph and game state, no worship content
+  buddies: 'SYNCABLE',
+  messages: 'SYNCABLE',
+  duo_quests: 'SYNCABLE',
+  shared_habits: 'SYNCABLE',
+
+  // BOSS ARENA (PRIVATE) — which nafs archetype a user battles is spiritually sensitive
+  boss_battles: 'PRIVATE',
+
+  // DETOX SESSIONS (LOCAL_ONLY) — ephemeral timer, no cloud value
+  detox_sessions: 'LOCAL_ONLY',
+};
+```
+
+The Privacy Gate throws for unknown tables — this addition MUST happen before any new repo attempts to write to the sync queue, or the app will throw in production.
+
+---
+
+## Supabase Realtime: Messaging Architecture
+
+For buddy messaging, **Postgres Changes** is the correct Realtime mode — messages are always written to the DB first (after content filtering), and Realtime notifies the recipient via DB trigger.
+
+```
+Message write path:
+  1. Client → Edge Function: message-filter (validates content)
+  2. Edge Function → Supabase DB: INSERT into messages
+  3. Supabase Realtime: realtime.broadcast_changes() fires on INSERT
+  4. Recipient's Realtime subscription receives event
+  5. Recipient's messageRepo.insert() caches locally
+  6. socialStore updates UI
+
+Channel naming: messages:{lower_user_id}:{higher_user_id}
+  // Deterministic ordering ensures both users connect to the same channel
+  // Private channel with RLS on realtime.messages table
+```
+
+**Authorization:** Private channels require `private: true` on channel creation. Supabase validates the JWT against RLS policies on `realtime.messages`. The existing `supabase` client in `src/lib/supabase.ts` already handles JWT refresh — Realtime subscriptions inherit the current session automatically.
+
+**Offline handling:** When the app reconnects after being offline, fetch missed messages from the `messages` table via a direct REST query rather than relying on Realtime replay. Broadcast Replay is a paid Supabase feature — REST fallback is safer and already consistent with the existing sync-engine pattern.
+
+---
+
+## Edge Function: Message Content Filter
+
+```typescript
+// supabase/functions/message-filter/index.ts (new)
+// Called by client BEFORE DB insert; returns { allowed: boolean, reason?: string }
+
+// bad-words npm package covers English profanity baseline
+// Custom Islamic content rules added as extended blocklist:
+//   - No promotion of shirk
+//   - No sectarian fitnah incitement
+//   - No content that would constitute a public worship leaderboard (e.g., "I prayed X times today")
+
+export default async function handler(req: Request) {
+  const { body, senderId, recipientId } = await req.json();
+  const filter = new Filter();
+
+  if (filter.isProfane(body)) {
+    return Response.json({ allowed: false, reason: 'content_policy' }, { status: 200 });
   }
+
+  // Insert to DB only if clean
+  const { error } = await supabase.from('messages').insert({ ... });
+  return Response.json({ allowed: true, messageId: ... });
 }
 ```
 
-### 3. Privacy Gate Pattern
-
-**Confidence: HIGH** -- straightforward architectural boundary.
-
-```typescript
-// privacy/gate.ts
-const PRIVATE_TABLES = new Set(['check_ins', 'muhasabah', 'streaks']);
-const SYNCABLE_TABLES = new Set(['progression', 'synced_settings']);
-
-export function canSync(tableName: string, record: any): boolean {
-  if (PRIVATE_TABLES.has(tableName)) return false;
-  if (!SYNCABLE_TABLES.has(tableName)) return false;
-  if (record.is_private) return false;
-  return true;
-}
-```
-
-The privacy gate sits between the data layer and the sync engine. It is the single enforcement point -- if you want to change what syncs, you change one file.
-
-### 4. Push Notifications via Supabase Edge Functions
-
-**Confidence: MEDIUM** -- expo-notifications handles local scheduling well; server-push for reminders requires Edge Functions.
-
-```
-Local notifications (prayer times, daily reminders):
-  --> expo-notifications scheduleNotificationAsync()
-  --> Computed from prayer time calculation
-  --> Works fully offline
-
-Server notifications (streak at risk, re-engagement):
-  --> Supabase Edge Function (cron or triggered)
-  --> Sends push via Expo Push API
-  --> Requires user to have synced push token
-```
-
-### 5. Navigation Structure (Expo Router)
-
-**Confidence: HIGH** -- Expo Router is the standard for Expo apps.
-
-```
-app/
-  _layout.tsx          -- Root layout (auth gate, providers)
-  (auth)/
-    login.tsx
-    onboarding.tsx     -- Niyyah (intention) setting flow
-  (tabs)/
-    _layout.tsx        -- Tab bar layout
-    index.tsx          -- Home HUD
-    forge.tsx          -- Habit Forge
-    quests.tsx         -- Quest Board
-    reflect.tsx        -- Muhasabah
-    profile.tsx        -- Profile, history, settings
-  (modals)/
-    check-in.tsx       -- Habit check-in modal
-    mercy-mode.tsx     -- Streak recovery
-    title-unlock.tsx   -- Title progression celebration
-```
+**Why Edge Function not client-side:** Client-side filtering is trivially bypassed. Content policy enforcement must happen server-side before DB persistence. This also keeps the filter logic centralized and updatable without an app release.
 
 ---
 
-## Anti-Patterns to Avoid
+## Existing Components: What Changes vs What Is New
 
-### Anti-Pattern 1: Supabase as Primary Database
-**What:** Treating Supabase Postgres as the source of truth, reading/writing directly.
-**Why bad:** App becomes useless offline. Every interaction requires network. Latency on every tap.
-**Instead:** SQLite is the source of truth. Supabase is the backup/sync destination.
+### MODIFIED (extend, not replace)
 
-### Anti-Pattern 2: Game Logic in Components
-**What:** Calculating XP, evaluating streaks, or determining titles inside React components.
-**Why bad:** Untestable, duplicated across screens, impossible to balance-tune.
-**Instead:** Pure TypeScript modules in an `engine/` directory. Components call hooks that call engine functions.
+| Component | Change Required |
+|-----------|----------------|
+| `src/services/privacy-gate.ts` | Add 6 new table classifications to `PRIVACY_MAP` |
+| `src/db/schema.ts` | Add 6 new Drizzle table definitions |
+| `src/db/repos/index.ts` | Export new repos (`buddyRepo`, `messageRepo`, `duoQuestRepo`, `bossRepo`, `detoxRepo`) |
+| `src/domain/xp-engine.ts` | Accept optional `fridayMultiplier` parameter in `calculateXP()` |
+| `src/domain/quest-engine.ts` | Add `isFriday` gate to `selectQuestTemplates()` for Al-Kahf template |
+| `src/stores/gameStore.ts` | Call `friday-engine.isFriday()` before XP award; wire boss victory XP source type |
+| `src/services/sync-engine.ts` | No changes needed — Privacy Gate handles classification automatically |
+| `supabase/` migrations | Add migration `0004_v2_social.sql` for new tables |
 
-### Anti-Pattern 3: Single Zustand Mega-Store
-**What:** One massive store with all app state.
-**Why bad:** Every state change re-renders everything. Performance death on Home HUD.
-**Instead:** Split stores by domain (game, habits, quests, UI). Components subscribe to only what they need.
+### NEW (create from scratch)
 
-### Anti-Pattern 4: Syncing Everything
-**What:** Syncing all data to Supabase for "backup."
-**Why bad:** Violates privacy-first constraint. Worship data on a server is a trust violation.
-**Instead:** Privacy Gate enforces boundaries. Private data stays on device. User can export manually if they want backup.
+| Component | Type | Description |
+|-----------|------|-------------|
+| `src/domain/buddy-engine.ts` | Pure TS | Invite code generation, connection limit enforcement, duo quest eligibility |
+| `src/domain/boss-engine.ts` | Pure TS state machine | Boss HP, damage calculation, state transitions, 5 archetype definitions |
+| `src/domain/detox-engine.ts` | Pure TS | Duration validation, elapsed time calculation, completion check, XP award |
+| `src/domain/friday-engine.ts` | Pure TS | Friday detection (timezone-aware), multiplier value, Al-Kahf challenge gate |
+| `src/stores/socialStore.ts` | Zustand | Buddy list, pending invites, messages, Realtime subscriptions |
+| `src/stores/bossStore.ts` | Zustand | Active boss state, history, cooldown tracking |
+| `src/stores/detoxStore.ts` | Zustand | Active session, start_timestamp, status |
+| `src/db/repos/buddyRepo.ts` | Drizzle repo | CRUD for buddies + shared_habits + duo_quests |
+| `src/db/repos/messageRepo.ts` | Drizzle repo | CRUD for messages, pending_send queue |
+| `src/db/repos/bossRepo.ts` | Drizzle repo | CRUD for boss_battles |
+| `src/db/repos/detoxRepo.ts` | Drizzle repo | CRUD for detox_sessions |
+| `supabase/functions/message-filter/` | Supabase Edge Function | Server-side content moderation |
+| `src/db/migrations/0004_v2_social.sql` | Drizzle migration | New tables for v2.0 |
 
-### Anti-Pattern 5: AsyncStorage for Structured Data
-**What:** Using AsyncStorage (key-value) for habit records, check-ins, quests.
-**Why bad:** No queries, no relations, no aggregation. "Show me my last 30 days of Fajr" requires loading everything.
-**Instead:** expo-sqlite for all structured data. AsyncStorage only for simple flags (has_onboarded, theme_preference).
+---
+
+## Build Order (Dependency Graph)
+
+Phase ordering must respect data layer → domain → store → UI dependencies.
+
+```
+Step 1: Privacy Gate + Schema additions (BLOCKING — throws on unknown tables)
+  - Update privacy-gate.ts PRIVACY_MAP (6 new entries)
+  - Add Drizzle schema definitions to schema.ts
+  - Generate + run migration 0004_v2_social.sql
+  Why first: Privacy Gate throws at runtime for unregistered tables.
+             Everything else depends on schema existing.
+
+Step 2: Pure domain engines (no dependencies, independently testable)
+  - friday-engine.ts (depends only on adhan-js, already installed)
+  - detox-engine.ts (no external deps)
+  - boss-engine.ts (no external deps)
+  - buddy-engine.ts (no external deps)
+  Why second: Pure functions with no side effects — safest to build and test
+              in isolation. Write unit tests immediately.
+
+Step 3: Repository layer (depends on schema)
+  - buddyRepo.ts, messageRepo.ts, duoQuestRepo.ts
+  - bossRepo.ts
+  - detoxRepo.ts
+  - Update repos/index.ts
+
+Step 4: Existing engine modifications (depends on domain engines from Step 2)
+  - xp-engine.ts: add optional fridayMultiplier parameter
+  - quest-engine.ts: add isFriday gate for Al-Kahf template selector
+
+Step 5: Supabase infrastructure (blocking for social features only)
+  - Deploy message-filter Edge Function
+  - Add RLS policies for buddies, messages, duo_quests, shared_habits
+  - Configure realtime.messages RLS for private channels
+  Note: Steps 6A-C below can proceed without this. Only social features blocked.
+
+Step 6: Zustand stores (depends on repos + engines)
+  A. friday-engine integration into gameStore (low-risk, additive change)
+  B. detoxStore — self-contained, no Supabase dependency
+  C. bossStore — self-contained, no Supabase dependency
+  D. socialStore — requires Supabase Realtime configured (Step 5 complete)
+
+Step 7: UI screens (depends on stores)
+  A. Friday Power-Up indicators on HUD + Al-Kahf quest card
+  B. Detox Dungeon: challenge selector + active timer screen
+  C. Boss Arena: archetype selection + battle screen + damage animations
+  D. Buddy system: invite code screen + buddy list + duo quest view
+  E. Messaging: chat screen per buddy pair (requires Step 5 complete)
+```
+
+**Recommended delivery order:** Friday Power-Ups first (pure engine extension, zero infra changes), Detox Dungeon second (self-contained, LOCAL_ONLY), Boss Arena third (self-contained, PRIVATE), Social/Messaging last (requires Supabase infra and EAS Build for push notifications).
+
+---
+
+## Critical Integration Points to Verify
+
+1. **Shared habits surface no completion data.** The `shared_habits` table records that a habit was shared (SYNCABLE), but `habit_completions` remains PRIVATE. The buddy-facing view shows only habit metadata (name, icon, frequency) — never whether it was completed today. This is adab safety rail #1 (no public worship leaderboard), enforced architecturally by the Privacy Gate.
+
+2. **Boss battles must be PRIVATE and verified before shipping.** Which nafs archetype a user battles (laziness, anger, arrogance, etc.) reveals personal spiritual struggle. Verifying the Privacy Gate classification is correct and testing that assertSyncable('boss_battles') throws is mandatory before release.
+
+3. **Supabase Realtime works in Expo Go but push notifications for offline delivery require EAS Build.** The existing PROJECT.md flags that the app runs on Expo Go (SDK 54). Realtime WebSocket connections work in Expo Go. Social features should degrade gracefully when offline — no hard crash, queue the message for send on reconnect.
+
+4. **Friday detection must be timezone-aware.** `new Date().getDay() === 5` is UTC-based. A user in UTC-5 at 11pm Thursday local time is already Friday UTC — they would incorrectly receive the 2x bonus. Use the user's stored location (settings.locationLat/Lng) to derive the local offset. adhan-js computes prayer times with timezone awareness — the same location data is already available.
+
+5. **Message content policy is Islamic-context-aware.** The `bad-words` npm library covers English profanity baseline. Custom rules for Islamic context (no shirk propagation, no sectarian fitnah, no worship performance content) require a maintained blocklist. At MVP, this is editorial — a flat list maintained in the Edge Function. Automated LLM moderation is future scope.
+
+6. **Duo quest progress must not reveal individual completion identity.** When displaying duo quest progress to a player, show aggregate progress (e.g., "4 of 10 completions") not which specific habits each player completed. This prevents the buddy pair from functioning as a private worship leaderboard.
 
 ---
 
 ## Scalability Considerations
 
-| Concern | At MVP (1 user) | At 1K users | At 100K users |
-|---------|-----------------|-------------|---------------|
-| **Local DB size** | Negligible | N/A (per-device) | N/A (per-device) |
-| **Supabase load** | Free tier fine | Free tier fine | Pro plan, connection pooling |
-| **Sync conflicts** | Won't happen (single device) | Rare (mostly single device) | Need proper conflict resolution for multi-device |
-| **Push notifications** | Expo push service free | Expo push free | Expo push free (scales well) |
-| **Prayer time calc** | On-device library | On-device library | On-device library (no server needed) |
-| **Auth** | Supabase free tier | Supabase free tier | Supabase Pro for MAU limits |
+| Concern | At 100 users | At 10K users | At 1M users |
+|---------|--------------|--------------|-------------|
+| Message volume | Supabase free tier handles | Supabase Pro with connection pooling | Separate message storage consideration |
+| Realtime connections | Fine on Supabase free tier | Monitor concurrent connections limit | Realtime sharding needed |
+| Buddy graph queries | Simple JOIN on buddies table, fast | Add index on (requester_id, status) | Potential graph database consideration |
+| RLS policy performance on messages | Minimal impact | Watch query plans on messages + buddies JOIN | Denormalize if JOIN becomes slow |
+| Boss battle data | All local, no scale concern | All local, no scale concern | All local, no scale concern |
+| Detox sessions | All local, no scale concern | All local, no scale concern | All local, no scale concern |
+| Friday XP calculation | In-process, zero infra | In-process, zero infra | In-process, zero infra |
 
-The architecture scales naturally because the heavy work (game logic, habit tracking, prayer times) is all on-device. Supabase only handles auth, sync, and push -- all lightweight operations.
-
----
-
-## Suggested Build Order
-
-Based on component dependencies, build in this order:
-
-### Foundation (must come first)
-1. **Expo project scaffold** with Expo Router navigation structure
-2. **SQLite database layer** -- schema, migrations, basic CRUD helpers
-3. **Zustand stores** -- habit store and game store with SQLite persistence
-
-**Rationale:** Everything else depends on navigation + data layer. Without these, no screen can show real data.
-
-### Core Loop (depends on Foundation)
-4. **Habit Tracker** -- create habits, check in, view today's habits
-5. **Game Engine** -- XP calculation, streak evaluation (pure functions first, then wire to stores)
-6. **Home HUD** -- render game state, today's habits, streaks
-
-**Rationale:** The daily check-in loop is the core value. Get this working end-to-end before adding systems around it.
-
-### Game Systems (depends on Core Loop)
-7. **Quest Board** -- quest generation, completion tracking, reward integration with Game Engine
-8. **Title Progression** -- title thresholds, unlock celebrations
-9. **Mercy Mode** -- streak recovery logic, compassionate re-engagement
-
-**Rationale:** These systems layer on top of the core loop. They reference habits and XP but don't change the fundamental data model.
-
-### Reflection & Privacy (can parallel with Game Systems)
-10. **Muhasabah** -- nightly reflection screen, journal entries
-11. **Privacy Gate** -- classification logic, enforcement at data layer
-
-**Rationale:** Muhasabah is a standalone screen with its own private data. Privacy Gate should be built before sync but can be built alongside game systems.
-
-### Backend & Sync (depends on Privacy Gate)
-12. **Supabase Auth** -- login, account creation, session management
-13. **Sync Engine** -- queue, conflict resolution, background sync
-14. **Push Notifications** -- local scheduling (prayer times), Supabase Edge Function for server push
-
-**Rationale:** Auth and sync are intentionally last. The app must work completely without them. Adding sync last means you test the full offline experience first.
-
-### Polish (depends on everything)
-15. **Onboarding** -- Niyyah flow, initial habit selection
-16. **Animations & Haptics** -- XP gain celebrations, streak milestones, title unlocks
-17. **Settings & Profile** -- history views, data export, prayer calculation method selection
+The solo dev context: build for 100 users at launch, design so 10K is achievable without a rewrite. Boss Arena and Detox Dungeon have zero scaling risk (local-only). Social features are the only Supabase scaling risk, handled well up to thousands of concurrent users on paid plans.
 
 ---
 
-## Technology Choices for Architecture
+## Anti-Patterns to Avoid
 
-| Layer | Technology | Why |
-|-------|-----------|-----|
-| Navigation | Expo Router | File-based routing, deep links, matches Expo ecosystem |
-| State Management | Zustand | Lightweight, no boilerplate, great React Native perf, persist middleware |
-| Local Database | expo-sqlite | Structured queries, relations, built into Expo, no native module headaches |
-| Remote Backend | Supabase (Postgres + Auth + Edge Functions) | Postgres for relational data, RLS for privacy, Edge Functions for push |
-| Animations | react-native-reanimated | 60fps UI thread animations for game feel, worklets |
-| Notifications | expo-notifications | Local + push, works with Expo managed workflow |
-| Prayer Times | adhan-js (or similar) | On-device calculation, no API dependency, works offline |
-| Haptics | expo-haptics | Tactile feedback for check-ins, milestones |
+### Anti-Pattern 1: Syncing Boss Battle Data
+**What:** Storing `boss_battles` as SYNCABLE to show battle history across devices
+**Why bad:** Reveals which nafs archetype the user struggles with — spiritually sensitive data. Violates the Privacy Gate's core purpose.
+**Instead:** Boss history stays PRIVATE (device-only). If user reinstalls, battle history resets. Accept and document this tradeoff.
+
+### Anti-Pattern 2: Real-Time Completion Sharing Between Buddies
+**What:** Broadcasting that a user completed Fajr today to their buddies via Realtime
+**Why bad:** Violates adab safety rail #1 (no public worship leaderboards). Riya (showing off acts of worship) is a documented spiritual harm — even in a private two-person context.
+**Instead:** Duo quests share only aggregate progress toward quest goals (e.g., "3 of 5 completions done"), never "who completed what prayer when."
+
+### Anti-Pattern 3: Background Timer Process for Detox
+**What:** Using `expo-background-fetch` to tick a detox countdown every minute
+**Why bad:** iOS minimum background task interval is 15 minutes (not suitable for second-level precision). Battery drain. Adds native module complexity requiring EAS Build.
+**Instead:** Store `start_timestamp` in SQLite on challenge start. Recalculate elapsed time from timestamp on app foreground. Timer is only visible when user opens the app — which is the intended behavior.
+
+### Anti-Pattern 4: Client-Side Message Filtering Only
+**What:** Filtering messages with `bad-words` in the React Native client before send
+**Why bad:** Client-side filtering is trivially bypassed by a determined user. Inappropriate content would reach the DB.
+**Instead:** Edge Function validates content server-side before DB insert. Client can show immediate feedback (optimistic UI for likely-clean messages) but server is the enforcement point.
+
+### Anti-Pattern 5: Storing Elapsed Detox Time as Running Counter
+**What:** Persisting `elapsed_seconds` to SQLite every second during a detox session
+**Why bad:** 86,400 writes per 24hr challenge. Excessive storage wear, battery drain, SQLite write contention with concurrent habit completion writes.
+**Instead:** Store only `start_timestamp` (one write on challenge start). Derive everything from `Date.now() - startTimestamp` at read time.
+
+### Anti-Pattern 6: Adding XState for Boss Battle State
+**What:** Adding XState dependency for boss battle state management
+**Why bad:** XState adds bundle size and a learning curve. The existing codebase uses plain TypeScript discriminated unions — streak-engine.ts handles complex multi-state logic without XState. Boss battles are simpler than streak recovery logic.
+**Instead:** Follow the established `streak-engine.ts` pattern: pure functions, discriminated union state types, no external dependencies.
 
 ---
 
 ## Sources
 
-- Architecture patterns derived from established React Native + Supabase community patterns (training data, MEDIUM confidence)
-- Offline-first sync queue pattern is a well-documented approach for mobile apps lacking built-in sync SDKs (HIGH confidence on pattern, MEDIUM on Supabase-specific implementation)
-- Expo Router file-based routing is the current Expo standard (HIGH confidence)
-- Zustand as React Native state management recommendation based on ecosystem trends and solo-dev ergonomics (HIGH confidence)
-- expo-sqlite over AsyncStorage for structured data is a well-established best practice (HIGH confidence)
-- Privacy Gate as architectural boundary is a custom pattern designed for this project's hard constraints (HIGH confidence on approach, project-specific)
-
-**Note:** Web search and documentation fetch were unavailable during this research session. Version-specific API details (especially expo-sqlite API surface and Supabase JS v2 client patterns) should be verified against current documentation before implementation begins.
+- Supabase Realtime Docs: [https://supabase.com/docs/guides/realtime](https://supabase.com/docs/guides/realtime)
+- Supabase Realtime Broadcast: [https://supabase.com/docs/guides/realtime/broadcast](https://supabase.com/docs/guides/realtime/broadcast)
+- Supabase Realtime Authorization: [https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization](https://supabase.com/blog/supabase-realtime-broadcast-and-presence-authorization)
+- Supabase RLS: [https://supabase.com/docs/guides/database/postgres/row-level-security](https://supabase.com/docs/guides/database/postgres/row-level-security)
+- Supabase Edge Functions: [https://supabase.com/docs/guides/functions](https://supabase.com/docs/guides/functions)
+- Profanity filtering in React Native (Stream Chat approach): [https://getstream.io/blog/filtering-profanity-in-chat-with-react-native/](https://getstream.io/blog/filtering-profanity-in-chat-with-react-native/)
+- Background timer persistence in Expo (AppState + timestamp pattern): [https://dev.to/albertop/how-to-persist-countdown-in-background-react-native-expo-23bi](https://dev.to/albertop/how-to-persist-countdown-in-background-react-native-expo-23bi)
+- Expo BackgroundTask docs (15min minimum interval confirmed): [https://docs.expo.dev/versions/latest/sdk/background-task/](https://docs.expo.dev/versions/latest/sdk/background-task/)
+- Offline-first mobile architecture patterns: [https://dev.to/odunayo_dada/offline-first-mobile-app-architecture-syncing-caching-and-conflict-resolution-1j58](https://dev.to/odunayo_dada/offline-first-mobile-app-architecture-syncing-caching-and-conflict-resolution-1j58)
+- Existing codebase (HIGH confidence — verified directly):
+  - `src/services/privacy-gate.ts` — Privacy Gate implementation
+  - `src/db/schema.ts` — all 13 entity definitions
+  - `src/stores/gameStore.ts` — XP award flow
+  - `src/domain/xp-engine.ts` — multiplier parameter pattern
+  - `src/domain/quest-engine.ts` — template selector pattern

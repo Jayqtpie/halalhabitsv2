@@ -1,392 +1,460 @@
 # Domain Pitfalls
 
 **Domain:** Gamified Islamic habit-building mobile app (React Native/Expo + Supabase)
-**Researched:** 2026-03-07
-**Overall Confidence:** MEDIUM (based on training data; web search unavailable for verification)
+**Researched:** 2026-03-07 (v1.0) / Updated 2026-03-19 (v2.0 Social & Battle Systems)
+**Overall Confidence:** MEDIUM-HIGH (v1.0 pitfalls from training data; v2.0 pitfalls from training data + web search verification)
 
 ---
 
-## Critical Pitfalls
+## v2.0 Critical Pitfalls
 
-Mistakes that cause rewrites, user abandonment, or community backlash.
+Mistakes specific to adding social features, boss battles, detox challenges, and power-ups to the existing offline-first system. These are the pitfalls that cause rewrites, data corruption, adab violations, or user churn at scale.
 
 ---
 
-### Pitfall 1: Streak Tyranny — Punishing Real Life Instead of Rewarding Discipline
+### Pitfall A: Offline-First Architecture Contamination from Social Features
 
-**What goes wrong:** Streaks become the product's emotional center. Users feel anxious about breaking them, then when they inevitably do (travel, illness, Ramadan schedule changes), the loss feels devastating and they abandon the app entirely. Duolingo's research showed that streak-break is the #1 churn event. For an Islamic app, this is worse: users associate prayer-guilt with your app.
+**What goes wrong:** Social features (buddy connections, duo quests, shared habits, messaging) require server state as the source of truth. The v1.0 system treats SQLite as the single source of truth. Naively bolting social sync on top creates two competing sources of truth — one for personal data (SQLite) and one for social data (Supabase), with no clear arbitration strategy. This leads to ghost states: "Buddy says you didn't complete the duo quest" while locally your SQLite shows completion.
 
-**Why it happens:** Developers think streaks = retention. They copy Duolingo/Snapchat without understanding that those apps tolerate high churn because of massive user bases. A niche app cannot afford the 60-70% of users who quit after a streak break.
+**Why it happens:** The offline-first pattern solves personal data well. But social data is inherently relational and shared — "did BOTH users complete this?" has no meaningful offline answer. Developers try to extend the existing sync engine with social data, not recognizing these require fundamentally different sync semantics.
 
 **Consequences:**
-- Users associate app with guilt/shame (violates Adab Safety Rail #5)
-- Streak anxiety becomes a dark pattern itself (violates Rail #4)
-- Users who miss Fajr once feel like "the game is over" and uninstall
-- Retention curve shows cliff-drops at day 7, 14, 30
+- Duo quest completion states disagree between the two users' devices
+- Buddy habit progress shows stale data for hours/days if one user is offline
+- Shared habit goals can't be verified without server authority
+- The v1.0 sync engine (designed for personal data) generates conflicts on social records
+- Users see partner data that is 24+ hours stale with no staleness indicator
 
 **Prevention:**
-- Mercy Mode must be a first-class system, not an afterthought bolted on
-- Streaks should have "shields" and "recovery windows" designed from day one
-- Frame streaks as "momentum" not "perfection" — show partial credit
-- Never use language like "You broke your streak" — use "Your momentum paused, pick up where you left off"
-- Cap the emotional weight of streaks: after 30 days, additional days shouldn't increase loss-aversion proportionally
-- Implement "streak freezes" that are generous (not premium-gated)
+- Establish a hard architectural boundary: personal habit data = SQLite source of truth (existing v1.0 model), social/shared data = Supabase source of truth (new v2.0 model). Never mix these.
+- Social features should gracefully degrade offline: "You're offline — buddy data will refresh when reconnected" is acceptable. Corrupted state is not.
+- Duo quests must resolve on the server, not on either device. When offline, show pending state. Never grant rewards locally for a duo quest until server confirms both sides.
+- Extend the Privacy Gate concept: personal worship data stays local, social interaction data is server-authoritative and requires connectivity.
+- Add a connectivity-aware layer that shows staleness timestamps on all buddy/social data.
 
 **Detection (warning signs):**
-- During playtesting, users express anxiety about opening the app after missing a day
-- DAU/MAU drops sharply on days following streak breaks
-- User feedback mentions "guilt" or "pressure"
+- Duo quest marked complete on User A's device but incomplete on User B's device
+- Shared habit goal progress diverges between buddies
+- XP granted for duo quest before server confirmation, then "taken back" on sync
 
-**Phase relevance:** Phase A (Blueprint) must define Mercy Mode mechanics. Phase B (MVP) must ship with streak recovery from day one. Never ship streaks without recovery.
+**Phase relevance:** Must be decided in the architecture phase of v2.0, before any social feature code is written. Retrofitting this boundary after social tables are built is near-impossible.
+
+**Confidence:** HIGH — this is a documented pattern in offline-first literature and Supabase's own documentation confirms it is server-first.
 
 ---
 
-### Pitfall 2: Spiritual Quantification — Accidentally Measuring Iman
+### Pitfall B: Riya (Ostentation) Seeping Through Social Accountability Features
 
-**What goes wrong:** Despite best intentions, the XP/level system creates an implicit hierarchy: "Level 12 Muslim is better than Level 5 Muslim." Users or critics interpret game scores as spiritual ranking. Community backlash from scholars or Islamic influencers calling it "gamifying worship" or "trivializing ibadah."
+**What goes wrong:** Buddy systems designed for "private accountability" gradually develop features that create social performance pressure. Habit completion notifications to buddies ("Ali just completed Fajr!") — even between two people — become a display of worship. Users start completing Salah to impress their buddy, not for the sake of Allah. The adab safety rails explicitly prohibit public worship display, but private doesn't automatically mean safe.
 
-**Why it happens:** Game mechanics inherently create rankings and comparisons. Even without leaderboards, users mentally compare. The XP number next to Salah completion unavoidably implies "your prayers have a score."
+**Why it happens:** Product designers see high engagement from social accountability features in fitness apps (Strava, Duolingo, Fitbit). They copy the "friend activity feed" pattern without recognizing that workout completion is fundamentally different from Salah completion in Islamic ethics. What's motivating in fitness becomes potentially riya in worship.
 
 **Consequences:**
-- Religious community backlash that kills word-of-mouth (your primary growth channel)
-- Users feel spiritually judged by an app
-- Scholars advise against using it
-- App becomes associated with bid'ah (innovation in worship) criticism
+- Community backlash from users who realize the app is enabling riya-adjacent behavior
+- Scholars advising against use
+- Users who are sensitive to this issue (and the target demographic often is) will self-exclude
+- App store reviews mentioning "this made me feel like I'm showing off my prayers"
+- Trust damage that cannot be undone
 
 **Prevention:**
-- XP framing must be "discipline score" not "worship score" — the language must be airtight
-- Never show XP gains directly on prayer completion screens. Show XP in a separate game layer
-- Use language like "consistency points" or "discipline XP" — never "prayer score" or "worship points"
-- Have religious copy reviewed by at least 2-3 knowledgeable Muslims before launch
-- Include an explicit disclaimer: "This app tracks your consistency habits. It does not measure the quality or acceptance of your worship."
-- The game layer should feel like it rewards the *meta-habit* (showing up, being consistent) not the *act of worship itself*
-- Consider: XP for "logged Fajr" not "prayed Fajr" — subtle but important distinction
+- Salah logs, Muhasabah entries, and other worship data remain completely invisible to buddies — always. This is already in the v1.0 Privacy Gate; v2.0 must never weaken it.
+- Buddy visibility should be limited to: streak presence (not which habits), quest participation (not worship completion), and XP progress (which is framed as discipline, not worship quality).
+- Shared habits that buddies create together should be for character/lifestyle habits (reading Quran for X minutes, no social media until Dhuhr) — never for the Salah log.
+- Duo quest notifications should reference shared challenge progress, not "Ali prayed Fajr." Prefer: "Your Duo Quest is 60% complete!" over "Ali completed his morning habit."
+- Add a clear in-app explanation when setting up buddies: "Your buddy never sees your prayer logs or Muhasabah. Shared visibility is limited to [list]."
+- Have at least two practicing Muslims with knowledge of riya concerns review every buddy-facing notification before shipping.
 
 **Detection:**
-- Beta users describe their level as their "Islam level" or similar
-- App store reviews mention spiritual judgment
-- Islamic content creators criticize the concept
+- Beta testers describe buddy features as "showing off my deen to my friend"
+- Notification copy that references specific worship act completion (even accidentally)
+- Users strategically completing habits right before messaging a buddy
 
-**Phase relevance:** Phase A (Blueprint) — XP philosophy language must be locked down. Phase B (MVP) — every string in the app touching worship must be reviewed for this.
+**Phase relevance:** Social feature blueprint phase. Every buddy-visible data point must be explicitly approved. The default should be "not visible to buddy" and visibility must be deliberately unlocked per data type.
+
+**Confidence:** HIGH — riya is a well-documented Islamic concern and the target demographic (practicing Muslims 16-35) will be attuned to it.
 
 ---
 
-### Pitfall 3: Timezone and Prayer Time Chaos
+### Pitfall C: In-App Chat Moderation in a Religious Context Is Harder Than Generic Chat
 
-**What goes wrong:** Islamic prayer times are calculated based on geographic location and astronomical formulas. There are multiple calculation methods (MWL, ISNA, Egyptian, Umm al-Qura, etc.) that differ by up to 30+ minutes. Users travel across timezones. DST changes shift everything. A habit tracked at "Fajr" doesn't mean the same time everywhere or even the same time tomorrow.
+**What goes wrong:** Standard profanity blocklists (English-only, generic bad words) miss two categories of problem content that are specific to Islamic community apps: (1) sectarian provocation — content that attacks Sunni/Shia/Sufi practices in a way that inflames division, and (2) religiously-framed manipulation — content that uses Islamic language to shame, judge spiritually, or pressure users ("if you don't complete this you're not a real Muslim"). Generic AI moderation models are not trained on Islamic community norms.
 
-**Why it happens:** Developers treat prayer times like fixed daily events (e.g., "morning routine at 7am"). Prayer times shift daily with sun position and vary dramatically by latitude. High-latitude locations (Scandinavia, Canada) have extreme Fajr/Isha times.
+**Why it happens:** Developers use off-the-shelf moderation (Stream AutoMod, OpenAI moderation endpoint, bad-words npm package) and assume it covers community needs. It does not. These tools catch profanity in English well. They miss Arabic profanity, culturally specific sectarian attacks, and Islamic language used in manipulative ways.
 
 **Consequences:**
-- Users in different regions get wrong prayer windows
-- Streak broken because app thinks Fajr window ended, but user's local calculation method says otherwise
-- Traveling users lose streaks when timezone shifts
-- High-latitude users have impossible prayer windows (Fajr at 2am in summer)
-- Day-boundary bugs: "today's habits" roll over at wrong time
+- Sectarian disputes in buddy chats drive user churn from minority sects
+- Spiritually manipulative messages ("your iman is weak if you don't do this") appear valid to the moderation system
+- Arabic-language content goes unmoderated
+- App associated with community conflict instead of spiritual growth
 
 **Prevention:**
-- Use the Adhan/PrayerTimes library (or similar) with configurable calculation methods — let users pick their method
-- Define "habit day" boundaries by Fajr-to-Fajr or Maghrib-to-Maghrib (Islamic day), NOT midnight
-- Store all times as UTC internally, convert for display only
-- Handle timezone changes gracefully: if user crosses timezone, don't retroactively invalidate completions
-- For high-latitude locations, implement fallback calculation methods (nearest city, 1/7th of night, etc.)
-- Test with: London summer Fajr (~2:30am), Reykjavik, Sydney (southern hemisphere inverted), Saudi Arabia, New York DST transition
+- Build a custom blocklist for the app's specific context: sect-attack phrases, spiritually judgmental language, Arabic profanity (use WebPurify which supports Arabic moderation as a starting point — verified by web search).
+- Establish community guidelines that explicitly prohibit: spiritual shaming, sectarian provocation, claims about another user's Islamic standing, and unsolicited religious correction.
+- Since chat is only between confirmed buddies (up to 20), this limits exposure — but does not eliminate the problem.
+- Consider using server-side Supabase Edge Functions with a moderation step before message delivery, so flagged messages can be held for review.
+- Provide an easy in-app report mechanism: reporting a buddy chat message should be one tap, with clear categories ("This message is spiritually harmful to me").
+- Ship v2.0 with human moderation capacity for reported messages — do not rely solely on automated moderation for a religious community app.
 
 **Detection:**
-- Bug reports from users in extreme latitudes
-- Streak breaks coinciding with DST transitions
-- Users reporting "wrong prayer times"
+- Beta users report receiving messages that feel judgmental or sectarian
+- Review of chat logs in beta shows slang, Arabic content, or coded shaming that automated moderation missed
+- Users unfriending buddies at high rates shortly after connecting
 
-**Phase relevance:** Phase A (Blueprint) — define which calculation methods to support and day-boundary logic. Phase B (MVP) — implement with at least 3 major calculation methods. This is foundational; getting it wrong early means data migration pain later.
+**Phase relevance:** Messaging feature design and infrastructure phase. The moderation pipeline must be designed before the messaging feature ships.
+
+**Confidence:** MEDIUM — based on web search results showing Stream AutoMod limitations + WebPurify Arabic support + analysis of Islamic community dynamics. Specific Islamic community moderation at this scale is not well-documented.
 
 ---
 
-### Pitfall 4: Offline-First Data Conflicts That Corrupt Habit History
+### Pitfall D: XP Economy Hyperinflation from Stacking Multipliers
 
-**What goes wrong:** User completes habits offline on two devices (phone and tablet), or the same device has stale data. When sync resumes, conflicts arise: duplicate completions, lost completions, XP inconsistencies, streak data contradictions. Users lose trust in the app when their history seems wrong.
+**What goes wrong:** v2.0 introduces multiple simultaneous XP boosts: 2x Friday Power-Up, boss battle bonus rewards, duo quest completion bonuses, and potentially detox challenge completion XP. A user who completes a duo quest on a Friday during an active boss battle could earn 4-8x their baseline XP for a single action. Within weeks of v2.0 launching, engaged users reach level caps or render the level curve meaningless. The existing v1.0 level curve (designed around 1x XP) breaks.
 
-**Why it happens:** Offline-first is promised but conflict resolution is punted to "we'll figure it out." Supabase doesn't provide built-in offline-first with conflict resolution — it's a server-first database with a REST API. The gap between "works offline" and "syncs correctly after offline" is massive.
+**Why it happens:** Each feature team adds XP rewards in isolation, reasoning locally: "Boss battle should give a big reward." "Friday is special, make it 2x." "Duo quest completion should feel epic." Nobody models the combined effect. Classic game economy mistake — additive multipliers without a ceiling create hyperinflation.
 
 **Consequences:**
-- Users complete Fajr, go offline, complete it again (or on another device) — now they have 2x XP or a missing entry
-- Streak data becomes inconsistent between local and server
-- Users lose trust: "I know I logged this, where did it go?"
-- Data integrity issues compound over time and become unfixable
+- Users who play optimally (complete duo quests on Fridays during boss battles) level up 5-10x faster than solo players
+- Titles earned through aggressive multiplier stacking feel hollow — "I'm 'Guardian of Dawn' but only because I gamed the Friday XP"
+- Non-social users (no buddies) feel disadvantaged — the game is now better for social players in a way that undermines fairness
+- Level curve breakage requires a retroactive rebalance that feels like punishment to early users
 
 **Prevention:**
-- Design the local data layer FIRST with conflict resolution strategy before touching Supabase
-- Use CRDT-inspired approaches or last-write-wins with vector clocks for habit completions
-- For habit completions specifically: idempotent by (user_id, habit_id, date) — completing the same habit on the same date twice is a no-op, not a duplicate
-- Store a local operation log (event sourcing lite) that replays against the server
-- Supabase sync should be one-directional push with server reconciliation, not bidirectional merge
-- Use WatermelonDB or similar for the local database layer — it has built-in sync primitives designed for this pattern
-- Test offline scenarios: airplane mode for 3 days, then sync. Two devices offline, then both sync. Mid-sync network failure.
+- Before implementing any v2.0 XP source, build an XP economy spreadsheet that models: baseline daily XP, 2x Friday XP, boss battle rewards, duo quest rewards, and detox rewards — all simultaneously at 100% participation.
+- Implement a daily XP cap that multipliers cannot exceed. Friday 2x means you hit the cap with less effort, not that the cap doubles.
+- Model multipliers as soft bonuses (reaching the daily cap faster, not infinite XP beyond cap) rather than true multipliers.
+- Boss battle rewards should be structured XP within the existing curve — not massive bonuses that dwarf daily habit XP.
+- Detox challenge XP should be meaningful but not larger than completing all daily habits — it's an alternative path, not a shortcut.
+- After modeling, compare: "What is the maximum XP a fully engaged v2.0 user can earn in one week?" vs "What is the maximum a v1.0 user could earn?" The ratio should be at most 1.5x, not 4-8x.
 
 **Detection:**
-- Users report XP totals that don't match their habit history
-- Duplicate entries in the database
-- Streak counts that differ between devices
+- Modeled max-engagement XP per week in v2.0 is more than 2x the v1.0 equivalent
+- First week of v2.0 beta users are already at level caps from v1.0 by day 3
+- Title unlock conditions that took months in v1.0 are reachable in days in v2.0
 
-**Phase relevance:** Phase B (MVP) — this is an architecture decision that must be made before writing any data layer code. Retrofitting conflict resolution is a near-complete rewrite of the data layer.
+**Phase relevance:** Economy design phase, before any v2.0 feature is coded. This is a pre-code modeling task.
+
+**Confidence:** HIGH — XP hyperinflation from stacking multipliers is a well-documented game economy failure pattern, verified by multiple game economy design sources.
 
 ---
 
-### Pitfall 5: Game Economy Inflation and Meaningless Progression
+### Pitfall E: Boss Battle State Persistence Across Days on a Mobile Device
 
-**What goes wrong:** XP and levels come too fast or mean nothing. By week 2, users are "Level 15" but nothing has changed in their experience. Or: XP curves are linear, so Level 50 takes the same effort as Level 5, making levels feel cheap. Titles and rewards feel arbitrary because they're not tied to real behavioral change.
+**What goes wrong:** Nafs Boss Arena runs multi-day battles (3-7 day arcs). The boss HP, daily damage dealt, battle phase, and active buffs must survive: app kills, device restarts, OS updates, time-zone changes, and the user not opening the app for 1-2 days. If boss state is stored only in memory or in a cache that gets cleared, users return to find their 5-day boss battle reset to zero.
 
-**Why it happens:** Developers focus on making early progression feel good (it does) but don't model the long-term economy. No one plans what Level 100 means or how XP rates should change at month 6. The economy is designed for the first 2 weeks, then breaks.
+**Why it happens:** Multi-day state is more complex than daily habit completion records. Developers store battle state in AsyncStorage or memory without thinking through the full persistence lifecycle. The boss battle entity has more complex state transitions than a simple habit log row.
 
 **Consequences:**
-- "Number go up" loses its dopamine hit after 2-3 weeks
-- Users plateau at a level and feel stuck — or reach max level too fast
-- Titles feel meaningless ("Guardian of Dawn" after 3 days of Fajr?)
-- No reason to keep engaging with the game layer — it becomes decoration
+- User at 80% boss HP on day 4 opens app on day 5 to find the battle reset
+- User who didn't open the app for 2 days discovers boss auto-lost without their knowledge
+- Inconsistent boss state between local SQLite and Supabase (especially if the user was offline during daily damage calculation)
+- Daily damage not credited if the user didn't open the app that day — silent failure
 
 **Prevention:**
-- Model the XP economy on a spreadsheet before building: plot levels 1-100, time-to-level, XP-per-action, and what unlocks at each tier
-- Use logarithmic or exponential leveling curves — each level should take meaningfully more effort
-- Tie titles to real consistency milestones: "Guardian of Dawn" requires 40 consecutive Fajr (a spiritually significant number), not 3
-- Create XP sinks: cosmetic unlocks, title upgrades, and optional challenges that cost XP/effort
-- Plan for 6-month and 12-month engagement — what does the game look like for a daily user after 6 months?
-- Separate "total XP" (lifetime discipline) from "current level" (active engagement tier)
+- Boss battle state must be persisted in SQLite with explicit schema: `boss_battles` table with `battle_id`, `boss_archetype`, `started_at`, `expected_end_at`, `current_hp`, `max_hp`, `daily_damage_dealt` (array or joined table), `status` (active/won/lost/abandoned).
+- Daily damage should be calculated server-side by a Supabase Edge Function (scheduled or triggered on daily login), not client-side. If the user doesn't open the app, the server still processes that day's state.
+- Design boss battles as time-locked events: a boss starts on day X and ends on day X+N regardless of whether the user plays every day. Missing days means less damage dealt (and potentially failing), but does not require the user to "be there" for the timer to tick.
+- On app open, always sync boss state from server before showing the boss arena. Never trust local state alone for boss HP.
+- Handle the case where a user was offline for 2+ days during a boss battle: show a clear "You were away for N days — here's what happened" summary on reconnect.
 
 **Detection:**
-- Playtesters reach high levels within days
-- User feedback: "levels don't mean anything"
-- Engagement metrics show game layer interactions dropping after week 2
+- Boss HP in SQLite doesn't match Supabase after 3 days
+- Users reporting boss "reset" after phone restart
+- Daily damage logging inconsistent when user opens app at midnight
 
-**Phase relevance:** Phase A (Blueprint) — the 16-section design doc MUST include a full economy model with progression curves. Phase B (MVP) — implement with the modeled curves, but expect to tune based on real user data.
+**Phase relevance:** Boss battle architecture phase. State schema and server-side daily processing must be designed before boss battle UI is built.
 
----
-
-## Moderate Pitfalls
+**Confidence:** HIGH — multi-day state persistence in mobile apps is a well-known problem area. The async multiplayer literature confirms "ghosting" (player abandonment) and state divergence are the primary failure modes for async multi-day mechanics.
 
 ---
 
-### Pitfall 6: React Native Animation Jank Killing the "Ferrari" Feel
+### Pitfall F: Dopamine Detox Timer Cannot Survive iOS Background Kill
 
-**What goes wrong:** The app promises "Ferrari x 16-bit" premium feel, but React Native animations stutter at 30fps on mid-range Android devices. JS-driven animations block the main thread. Lottie animations for game elements cause frame drops. The app feels cheap instead of premium.
+**What goes wrong:** The Dopamine Detox Dungeon runs 2-8 hour voluntary "no phone" challenges. The challenge timer must survive the user locking their phone, switching apps, and the app being backgrounded for hours. On iOS, React Native's JS thread pauses when the app is backgrounded or the screen locks. The timer stops. A user who locks their phone for 2 hours returns to find the timer showing 2 hours less than expected — or shows the wrong elapsed time entirely.
 
-**Why it happens:** Developers prototype on iPhone 15 Pro, ship to Samsung Galaxy A14. React Native's JS bridge introduces latency for animations. Using Animated API from React Native core instead of Reanimated 3 means animations run on the JS thread instead of the UI thread.
+**Why it happens:** This is a documented iOS/React Native limitation: `setInterval` and JavaScript timers do not fire when the app is backgrounded on iOS (confirmed by multiple GitHub issues on `react-native-background-timer`, React Native core issue #1282). Developers assume "I'll just use a timer" without accounting for the platform's lifecycle.
+
+**Consequences:**
+- 4-hour detox challenge timer shows only 30 minutes elapsed after the phone was locked for 3.5 hours
+- XP is not granted at challenge completion because the timer never finished
+- Users feel cheated: "I did the detox and the app doesn't know it"
+- Worse: a timer-based lock (if implemented to enforce the detox) releases too early or never releases
 
 **Prevention:**
-- Use React Native Reanimated 3 for ALL animations — it runs on the UI thread via worklets
-- Use `useAnimatedStyle` and `withTiming`/`withSpring` instead of Animated.Value
-- Avoid Lottie for frequently-triggered animations (XP gains, habit completions) — use Reanimated + SVG instead
-- Lottie is fine for one-off celebrations (level up, quest complete) but test on low-end Android
-- Set a performance budget: all transitions must hit 60fps on a device 3 years old
-- Profile with Flipper and the React Native performance monitor early and often
-- Avoid `LayoutAnimation` on Android — it causes crashes and jank in some scenarios
-- Sprite-based 16-bit animations should be sprite sheets rendered via Skia (@shopify/react-native-skia), not individual image swaps
+- Never rely on in-memory JavaScript timers for the detox challenge duration. Store `challenge_started_at` timestamp in SQLite and calculate elapsed time as `Date.now() - challenge_started_at` on every app open.
+- This means the "timer" is wall-clock based, not tick-based. When the user opens the app, compute elapsed time from stored start timestamp. If `elapsed >= challenge_duration`, the challenge is complete — regardless of whether the app was open.
+- Use `expo-task-manager` with a background fetch task to check challenge completion periodically on Android (iOS has strict limitations on background tasks beyond audio/location/voip).
+- For challenge completion notification ("Your detox is complete!"), use a pre-scheduled local notification via `expo-notifications` at `started_at + duration`. This fires reliably even when the app is backgrounded.
+- The detox challenge completion should also be verified on next app open: if `started_at + duration < now`, complete the challenge — even if the user was offline and the notification didn't fire.
 
 **Detection:**
-- Frame drops visible during habit completion animations
-- Android users report "laggy" or "slow" app
-- Performance monitor showing JS thread > 16ms per frame during animations
+- iOS device locked for 2 hours shows detox timer having only ticked 5 minutes
+- Users report completing the full challenge duration but not receiving XP
+- Challenge completion notifications arriving hours late or not at all
 
-**Phase relevance:** Phase B (MVP) — choose Reanimated 3 + Skia from the start. Migrating from Animated API to Reanimated later is painful. The "16-bit premium" feel is a core differentiator that must work on day one.
+**Phase relevance:** Detox Dungeon implementation phase. The timer architecture must use wall-clock time from the start — not tick-based.
+
+**Confidence:** HIGH — confirmed by multiple GitHub issues (react-native-background-timer #69, React Native core #1282) and Expo documentation. This is a well-known React Native/iOS limitation.
 
 ---
 
-### Pitfall 7: Muhasabah (Reflection) Becoming a Chore
+### Pitfall G: Friday Power-Up Timezone Edge Cases and Continuous Activation
 
-**What goes wrong:** Nightly reflection is designed as a meaningful self-review, but becomes another checkbox. Users write "good" every night to get XP, or skip it entirely because it feels like homework. The feature that should create the deepest engagement becomes the most skipped.
+**What goes wrong:** "2x XP on Fridays" seems simple. It is not. A user in UTC+14 (Line Islands) hits Friday 14 hours before a user in UTC-12 (Baker Island). A user who crosses the International Date Line on a Thursday experiences two Fridays in a row — or skips Friday entirely. The Supabase server that grants the 2x multiplier runs in UTC, which may disagree with the user's local Friday. Users near timezone boundaries notice the multiplier turning on/off at seemingly random times.
 
-**Why it happens:** Free-form text input has high cognitive load. Users are tired at night (when Muhasabah happens). The "right" amount of reflection varies wildly between users. Forcing depth backfires.
+**Why it happens:** Developers check `new Date().getDay() === 5` on the server (UTC) without accounting for user timezone. This is correct for UTC users and wrong for everyone else.
+
+**Consequences:**
+- Users in UTC+13/+14 see Friday XP on Thursday
+- Users in UTC-10 to -12 see Friday XP on Saturday
+- Users crossing timezones mid-Friday lose the multiplier mid-session
+- Manipulation: users learn to change device timezone settings to extend their "Friday"
 
 **Prevention:**
-- Offer structured prompts, not blank text fields: "What was your best moment of discipline today?" with 3-4 tap-to-select options plus optional free text
-- Make it 30-60 seconds max, not a journaling session
-- Vary prompts daily so it doesn't feel repetitive
-- Allow skip without penalty (but offer bonus XP for completion, never subtract for skipping)
-- Consider a "mood + one word" minimal mode for tired nights
-- Show past reflections as a personal growth timeline — make the history valuable so users want to contribute quality entries
+- Friday detection must use the user's local timezone, not server UTC. Store the user's timezone in their profile (already used for prayer times with adhan-js — reuse this). Calculate local Friday server-side using the stored timezone.
+- Gate the Friday multiplier on local time: `isUserLocalFriday(user.timezone, Date.now())`. This must be consistent across all XP grants (client grant + server verification).
+- For the Surah Al-Kahf challenge specifically: treat Friday as a 24-hour window from Fajr on the user's local Friday to Fajr on their local Saturday. This aligns with Islamic day reckoning.
+- Handle the timezone manipulation attack: server verifies Friday status using stored profile timezone, not a client-supplied timezone at grant time. Users cannot change their "grant timezone" mid-session.
 
 **Detection:**
-- Analytics show >50% skip rate for Muhasabah within first 2 weeks
-- Free-text entries are 1-2 words long on average
-- Users mention it feels "like homework" in feedback
+- Users in Australia or Pacific islands report 2x XP appearing on the wrong day
+- Server logs show XP grants on Saturday (UTC) for users whose local time is Friday
 
-**Phase relevance:** Phase A (Blueprint) — design the prompt system with minimal and deep modes. Phase B (MVP) — ship with structured prompts, not just a text box.
+**Phase relevance:** Friday Power-Up implementation. Timezone handling must be part of the initial design, not a post-ship fix.
+
+**Confidence:** MEDIUM — day-of-week detection across timezones is a known problem. The specific Islamic calendar alignment for Jumu'ah timing is inferred from prayer time app patterns; no authoritative source on this specific edge case was found.
 
 ---
 
-### Pitfall 8: Expo Build and OTA Update Footguns
+### Pitfall H: Buddy Invite Code Abuse and Username Search Privacy
 
-**What goes wrong:** Expo's managed workflow limits native module access. When you need a native feature (background notifications for prayer times, precise alarm scheduling), you discover you need to eject or use a dev client. OTA updates via EAS Update can silently break the app if JS and native layers drift out of sync.
+**What goes wrong:** Username search for buddy connections creates a privacy leak: any user can search for any username and learn that person is a HalalHabits user. Combined with the app's explicit Muslim identity focus, this is a meaningful privacy risk for users in countries with religious minority pressures. Invite codes can be mass-distributed, enabling strangers to connect and send messages to users who did not intend to be discoverable.
 
-**Why it happens:** Expo's managed workflow is magical until it isn't. Developers start in managed, then need background task scheduling for prayer reminders, local notifications that fire at calculated prayer times, or background location for travel-aware prayer times.
+**Why it happens:** Developers think "it's just a username" without considering that app membership itself is sensitive data for some users. The app's name and purpose make membership a form of religious identity disclosure.
+
+**Consequences:**
+- Users in vulnerable regions (authoritarian governments, anti-Muslim contexts) can be identified as Muslim by their app membership
+- Invite codes posted publicly on social media lead to strangers connecting
+- Users receive messages from people they don't know and feel unsafe
+- Privacy-conscious users refuse to use buddy features, eliminating the social layer
 
 **Prevention:**
-- Start with Expo Dev Client (custom development build), not Expo Go — this gives native module access while keeping Expo tooling
-- Use `expo-notifications` with scheduled local notifications for prayer reminders — this works in managed workflow
-- For precise prayer-time scheduling, use `expo-task-manager` with background fetch (but test battery impact)
-- Pin Expo SDK versions and test OTA updates on a staging channel before production
-- Keep a "native escape hatch" plan: know which features would require a config plugin or custom native module
-- Test on physical devices from day one — Expo Go on simulator hides real notification/background behavior
+- Username search should return zero results unless the searched username has opted into discoverability in their settings. Default to not discoverable.
+- Invite codes should be single-use or expire within 48 hours. No persistent public invite links.
+- When accepting a buddy request, show the user who is requesting (name, avatar, when they joined) and require explicit confirmation. Never auto-accept.
+- Add a "Block and Report" feature from day one of buddy connections — not a later addition.
+- Clearly communicate in onboarding: "Your account is private by default. Your buddy never sees your prayer logs."
+- Consider limiting invite-code distribution: each user gets N invite codes per month to share with people they know personally.
 
 **Detection:**
-- Discovering mid-build that a needed feature requires ejection
-- OTA update causes crash for users on older native binary
-- Prayer notifications firing at wrong times or not at all on Android (Doze mode kills background tasks)
+- Users report receiving buddy requests from strangers
+- Users in privacy-sensitive regions complain about being findable by name
+- Invite codes appearing in public Islamic community forums
 
-**Phase relevance:** Phase B (MVP) — set up Expo Dev Client and EAS Build pipeline in the first sprint. This is infrastructure that gets harder to change later.
+**Phase relevance:** Social system design phase. Privacy architecture for the social layer must be specified before building the invite/discovery system.
+
+**Confidence:** HIGH — Muslim app privacy sensitivity is documented in real incidents (Muslim Pro location data scandal) and is a well-known concern in the community. Islamic social app discoverability is a genuine risk vector.
 
 ---
 
-### Pitfall 9: Religious Content Copy That Offends or Alienates
+## v2.0 Moderate Pitfalls
 
-**What goes wrong:** A well-meaning non-scholar writes game-flavored copy that trivializes Islamic concepts. "Level up your iman!" or "Unlock the Salah Power-Up!" reads as disrespectful. Or: copy is too sectarian (Sunni-only terminology alienates Shia users and vice versa). Or: Quranic verses used as "flavor text" for game elements feels irreverent.
+---
 
-**Why it happens:** Game designers think in game language. Islamic concepts don't map cleanly to game mechanics. What feels fun in a game context can feel blasphemous in a religious context. The line is context-dependent and requires Islamic literacy to navigate.
+### Pitfall I: Supabase Realtime Connection Limits in a Buddy-Active App
+
+**What goes wrong:** Each active buddy relationship with live chat requires a Supabase Realtime WebSocket subscription. A user with 20 buddies who all happen to be online simultaneously requires 20 concurrent channel subscriptions. Supabase's free tier enforces connection and channel limits that an active social app can exceed quickly. When limits are hit, new subscriptions fail silently — messages stop arriving, and users think the app is broken.
+
+**Why it happens:** Developers build on the free tier and test with 2-3 simultaneous connections. The app ships, a moderately active user base forms, and the limit is hit in production. Supabase's documentation confirms: "Connections will be disconnected if your project is generating too many messages per second."
+
+**Consequences:**
+- Message delivery fails silently for active users with many buddies
+- Realtime subscription failures cause "ghost" online status (user appears online but messages don't arrive)
+- Database "presence" feature (online/offline) breaks under load
 
 **Prevention:**
-- Establish an "Adab Copy Guide" — a document listing acceptable and unacceptable language patterns
-- Rules: never gamify Quranic ayat (don't use them as rewards or achievements), never imply levels of faith, never use casual/joking tone with Allah's names or prophetic traditions
-- Keep game language and worship language in separate conceptual layers: the game rewards "discipline actions" and the Islamic layer provides "spiritual context"
-- Use inclusive terminology: "Salah" not "Namaz" (or support both), avoid sect-specific fiqh positions
-- Have 3+ practicing Muslims from different backgrounds review all copy before launch
-- When in doubt, err toward reverent and understated over exciting and game-y
+- Architect chat as pull-first with push for active sessions: on app open, always poll for missed messages via REST. Use Realtime only for the active foreground session.
+- Implement a single multiplexed channel per user (not one per buddy conversation) where possible.
+- Design for Supabase Pro plan limits from the start — budget for the upgrade in the project plan.
+- Add a "polling fallback" that activates when WebSocket connection fails: fall back to polling every 30 seconds so messages are not lost.
+- Monitor connection counts from day one of beta, before connection limits are hit in production.
 
 **Detection:**
-- Beta testers from different Islamic backgrounds flag copy as inappropriate
-- Social media criticism of screenshots/marketing materials
-- Internal discomfort when reading game copy next to Islamic terminology
+- Users with many buddies report messages arriving late or not at all
+- Supabase Realtime dashboard shows connections near or at plan limits
+- Chat messages appear after app restart (indicating they were queued, not real-time)
 
-**Phase relevance:** Phase A (Blueprint) — create the Adab Copy Guide as part of the content pack section. Phase B (MVP) — every screen with Islamic content goes through adab review before shipping.
+**Phase relevance:** Social infrastructure phase. Multiplexed channel design must be decided before messaging is implemented.
+
+**Confidence:** MEDIUM — Supabase Realtime limits are documented. The specific impact on a 20-buddy architecture is inferred, not directly tested.
 
 ---
 
-### Pitfall 10: Retention Through Guilt Instead of Intrinsic Motivation
+### Pitfall J: Duo Quest "Ghost Partner" — One User Abandons, Other Is Stuck
 
-**What goes wrong:** Push notifications become guilt trips: "You haven't prayed Fajr yet!" Missed-day messaging creates shame spirals. The app inadvertently becomes another source of religious guilt that users already struggle with. Users associate the app with feeling bad about themselves.
+**What goes wrong:** User A and User B accept a duo quest. User B stops using the app (life happens, Ramadan, exams). User A completes their half of the duo quest daily for 7 days and never gets credit because the server is waiting for both sides to complete. User A has no way to exit the quest, reassign it, or get partial credit. The duo quest system requires both players to be active — which in practice never lasts long enough.
 
-**Why it happens:** Standard mobile retention playbooks use loss-aversion and FOMO. These patterns work (in the short term) but are explicitly forbidden by Adab Safety Rails #4 and #5. The temptation to use them is strong because they measurably boost short-term metrics.
+**Why it happens:** Duo quest systems are designed for the happy path (both users active). The abandonment path is not modeled. Duolingo Friends Quests face this same problem — the partner fails to contribute and the quest expires incomplete.
+
+**Consequences:**
+- User A (the engaged player) is punished for User B's inactivity
+- User A becomes frustrated with the social system entirely ("buddy features don't work")
+- User B feels guilty when they return and see they blocked their buddy's progress
+- Duo quests become abandoned so frequently that the feature feels broken
 
 **Prevention:**
-- Notifications should be invitations, not accusations: "Fajr window is open" not "You haven't prayed Fajr"
-- Never reference what users DIDN'T do. Only reference what they CAN do.
-- After-absence messaging: "Welcome back! Your journey continues." not "You've been gone for 5 days"
-- Build re-engagement around curiosity (new quests available, new title within reach) not guilt (streak lost, falling behind)
-- Implement a "notification tone" review: read every notification out loud and ask "does this sound like a supportive coach or a disappointed parent?"
-- Track the ratio of positive to negative emotional triggers in the UX — aim for 5:1 positive
+- Duo quests should have individual and shared reward tiers: "Complete your half = individual reward. Both halves complete = bonus shared reward." Individual progress is always credited.
+- Include a "pause duo quest" feature: if a buddy is inactive for 48 hours, the duo quest pauses (no penalty to either player) until they return.
+- Allow exiting a duo quest after 72 hours of partner inactivity, with partial credit for days completed.
+- Show realistic completion rate statistics when creating a duo quest: "Duo quests have a higher success rate when both buddies open the app at least 3 times this week."
+- Frame duo quests as collaborative bonuses, not requirements. The core loop (solo habits) should be rewarding enough that duo quest abandonment doesn't feel devastating.
 
 **Detection:**
-- User feedback mentions feeling "guilted" or "shamed"
-- Uninstall rate spikes after push notification campaigns
-- Users disable notifications within the first week (signals notifications feel hostile)
+- Beta users who create duo quests with inactive buddies report feeling "stuck" or "punished"
+- Completion rate for duo quests in beta is below 30%
 
-**Phase relevance:** Phase A (Blueprint) — define notification philosophy and tone. Phase B (MVP) — implement with coach-mode language. Never ship guilt-based notifications, even as "growth experiments."
+**Phase relevance:** Duo quest design phase. The abandonment path must be specified alongside the happy path.
 
----
-
-## Minor Pitfalls
+**Confidence:** MEDIUM — the ghost partner pattern is documented in async co-op games. Verified by Duolingo Friends Quest UX patterns and async multiplayer game design literature.
 
 ---
 
-### Pitfall 11: Day Boundary Edge Cases
+### Pitfall K: Boss Archetype Copy Trivializing Internal Spiritual Struggle
 
-**What goes wrong:** "Today's habits" roll over at midnight, but Islamic days begin at Maghrib. A user completes Isha at 11pm, then the app rolls over at midnight and shows it as tomorrow's progress. Or: Fajr at 4:30am — is that today or yesterday's Fajr?
+**What goes wrong:** The Nafs Boss Arena pits users against personified struggles: Procrastination, Anger, Arrogance, Distraction, Despair. This concept is compelling and Islamically grounded (nafs al-ammara). The pitfall is in the execution: copy and visuals that make the nafs battle feel like punching cartoon villains. "DEFEAT ARROGANCE!" with a big health bar and damage numbers trivializes what Islam treats as a serious internal jihad. Scholars or users with deeper Islamic literacy will find this tone disrespectful.
+
+**Why it happens:** Game designers default to combat metaphor (boss HP, damage, defeat). The Islamic concept of nafs struggle is about growth, awareness, and mercy — not violence or defeat. The two framings are in tension.
+
+**Consequences:**
+- Islamic scholars or community leaders object to the "fighting your nafs" combat framing as theologically inappropriate
+- Users feel the feature is disrespectful to the concept of tazkiyah (purification of the soul)
+- The feature that could have been the app's deepest differentiator becomes its most controversial
 
 **Prevention:**
-- Define day boundaries explicitly in the data model: either use Fajr-to-Fajr (most intuitive for habits) or midnight-to-midnight (simpler)
-- Document the choice and its implications
-- Whatever you choose, be consistent — never mix day boundaries
-- Store habit completions with both UTC timestamp and "habit day" date (which may differ from calendar date)
-
-**Phase relevance:** Phase A (Blueprint) — day boundary definition. Phase B (MVP) — implement consistently across all habit types.
-
----
-
-### Pitfall 12: Android Notification Reliability
-
-**What goes wrong:** Android's battery optimization (Doze mode, app standby, OEM-specific killers like MIUI, Samsung, Huawei) silently kills background services. Prayer time notifications don't fire. Users miss reminders and blame the app.
-
-**Prevention:**
-- Use `expo-notifications` with exact alarm scheduling where possible
-- Guide users through battery optimization exemption (unfortunately necessary on Android)
-- Test on Samsung, Xiaomi, Huawei, and OnePlus specifically — each has unique background task killers
-- Implement a "notification health check" that verifies notifications are working
-- Reference dontkillmyapp.com for per-manufacturer workarounds
-
-**Phase relevance:** Phase B (MVP) — Android notification testing must be a dedicated QA effort, not an afterthought.
-
----
-
-### Pitfall 13: Supabase Row-Level Security Complexity
-
-**What goes wrong:** RLS policies seem simple but become complex with relational habit data. A user's habit completions reference habits, which reference categories, which may be shared templates. Poorly written RLS policies either leak data between users or block legitimate reads, causing mysterious "empty state" bugs.
-
-**Prevention:**
-- Design RLS policies on paper before implementing
-- Keep the data model flat where possible — deep joins through RLS policies are error-prone
-- Test RLS by querying as different users (Supabase provides `auth.uid()` in policies)
-- Use a service role for admin operations and never expose the service key to the client
-- Log RLS denials in development to catch "silent empty results" bugs
-
-**Phase relevance:** Phase B (MVP) — data model and RLS design in early sprints.
-
----
-
-### Pitfall 14: Overbuilding the Game Layer Before Validating the Core Loop
-
-**What goes wrong:** Developers spend 3 months on quest systems, boss battles, and elaborate progression trees before validating that users actually want to track Islamic habits with this app. The game layer is polished but nobody downloads the app because the core value proposition wasn't validated.
-
-**Prevention:**
-- MVP must validate: "Do Muslims want to track habits in a game-styled app?" before building Phase 2 features
-- Ship the core loop (habit tracking + XP + streaks + Mercy Mode) and validate retention before building Nafs Boss Arena
-- The Blueprint phase should plan for this: Phase B features are the minimum to test the hypothesis
-- Measure: do users return daily? Do they complete habits? Do they engage with the game layer or ignore it?
+- Frame boss battles as "discipline challenges against inner struggles," not "fighting" or "defeating" — language matters here.
+- Boss HP should represent "how much this struggle has receded through consistent discipline" — not damage dealt. Reframe: "Resistance Fading" instead of "Boss HP."
+- Avoid violent visual metaphors: no swords, punches, or battle damage. Prefer: a dark cloud lifting, a chain weakening, a weight becoming lighter — visual metaphors aligned with Islamic tazkiyah concepts.
+- Each boss archetype needs copy written by someone with Islamic literacy: Procrastination connects to niyyah (intention), Anger to hilm (forbearance), Arrogance to tawadu (humility). The Islamic framing makes the feature deeper, not shallower.
+- Test boss copy with 3+ practicing Muslims of different backgrounds before launch.
 
 **Detection:**
-- Months into development with no user testing
-- Building Phase 2 features before Phase B is shipped
-- Game features getting more attention than core habit tracking UX
+- Beta users describe boss battles as "cool but kind of weird for an Islamic app"
+- Any beta tester with religious knowledge expresses discomfort
+- Boss visuals look like a standard mobile RPG battle screen
 
-**Phase relevance:** Phase A (Blueprint) — scope Phase B to minimum viable game layer. Phase B — ship and validate before Phase 2.
+**Phase relevance:** Boss battle design phase. Visual and copy direction must be established before any UI is built.
+
+**Confidence:** HIGH — based on the app's own adab safety rails and the known sensitivity around gamifying Islamic concepts.
 
 ---
 
-### Pitfall 15: Accessibility and Internationalization Afterthoughts
+### Pitfall L: Detox Challenge Encouraging Phone Absence Makes App-Level Features Unreachable
 
-**What goes wrong:** 16-bit pixel art with small text is unreadable for users with visual impairments. Arabic script rendering in a pixel-art UI breaks layout. RTL support is missing. App is English-only despite a global Muslim audience.
+**What goes wrong:** The Dopamine Detox Dungeon encourages users to put down their phone for 2-8 hours. During this period, the user may miss: the Fajr habit tracking window, a duo quest reminder, a boss battle daily damage opportunity, or a Friday Power-Up window. The feature that is supposed to help users is directly competing with other features that require phone interaction. A perfectly executed 8-hour detox on a Friday means missing the Friday 2x XP window for most of the day.
+
+**Why it happens:** Features are designed in isolation. The team building detox challenges optimizes for "users should put the phone down." The team building Friday Power-Ups optimizes for "engagement on Fridays." The conflict between them is not caught until users experience it.
 
 **Prevention:**
-- Support dynamic text scaling from day one (React Native's `allowFontScaling`)
-- Design pixel-art UI elements at sizes that remain readable at 1.5x text scale
-- Plan for Arabic/RTL from the start — it's much harder to add later than to design for initially
-- Use `I18next` or similar from the beginning, even if launching English-only — string extraction is painful to retrofit
-- Test with VoiceOver/TalkBack for critical flows (habit completion, prayer tracking)
+- Detox challenges should not count against any daily habit streak — if a user is in a verified detox, the streak remains intact regardless of non-completion.
+- The detox challenge itself should grant enough XP to be comparable to completing all daily habits — so the user is not economically punished for the feature.
+- Friday detox challenges should grant double XP (same 2x Friday multiplier applies to detox completion) — a user doing a phone detox on a Friday is showing exemplary discipline.
+- Duo quest daily progress should not expire during a partner's active detox — pause that partner's daily window.
+- Design the detox feature as a "superpower" that amplifies other systems, not one that competes with them.
 
-**Phase relevance:** Phase A (Blueprint) — RTL and i18n architecture decisions. Phase B (MVP) — English-first but with i18n infrastructure in place.
+**Detection:**
+- Beta users report not doing detox challenges because "I don't want to miss my streak"
+- Users complete detox challenges only on weekdays they know have no other time-sensitive features
+- Users describe the detox challenge as "punishing"
+
+**Phase relevance:** Detox and cross-feature integration design phase. Conflict modeling between all v2.0 features must happen before any individual feature ships.
+
+**Confidence:** HIGH — this is a cross-feature dependency conflict, a pattern well-documented in product design. The specific interaction is unique to this app but the meta-pattern is universal.
 
 ---
 
-## Phase-Specific Warnings
+## v2.0 Minor Pitfalls
+
+---
+
+### Pitfall M: Friday Surah Al-Kahf Challenge Without Content Integrity
+
+**What goes wrong:** The Surah Al-Kahf challenge is a significant religious practice with hadith basis (reading Surah Al-Kahf on Fridays). The app cannot verify whether the user actually read it. If the challenge is just a checkbox with 2x XP reward, users will tap it without reading. The feature becomes a game mechanic that trivializes the practice. Alternatively: if the app provides Surah Al-Kahf text for the challenge, the Quranic text must be meticulously correct — any text error in a Quranic display is a serious failure.
+
+**Prevention:**
+- Frame the challenge as a commitment, not a verification: "Mark as read when you've completed your recitation of Surah Al-Kahf." This is honest about the app's inability to verify and puts intention on the user.
+- If Quranic text is displayed: use a well-established, verified Quranic text source (Tanzil API or pre-loaded verified text). Never display self-typed or LLM-generated Quranic text. Have the text verified by at least one person with Quranic knowledge before shipping.
+- Include a transliteration and translation, but make the Arabic primary.
+- The challenge notification should include the hadith basis (with proper attribution) for context, not just a game prompt.
+
+**Phase relevance:** Friday Power-Up content review phase.
+
+**Confidence:** HIGH — Quranic text accuracy is non-negotiable; this is documented Islamic app guidance.
+
+---
+
+### Pitfall N: Shared Habit Goals Syncing to Wrong User's Local Data
+
+**What goes wrong:** When buddies create a shared habit goal ("We'll both read Quran for 10 minutes before Dhuhr"), the shared goal must exist in both users' SQLite databases as a habit entity. If the sync logic creates duplicate habit IDs, or if one user's edit to the shared habit overwrites the other's, data inconsistency occurs. One user sees the habit as "completed today," the other sees it as "not started."
+
+**Prevention:**
+- Shared habits should have server-assigned UUIDs with a `shared_habit_id` field that cannot be overwritten locally.
+- Use server as the source of truth for shared habit definitions (not individual habit completions — those are still personal).
+- The shared habit completion is tracked per user independently: User A's completion of the shared habit is stored in User A's local SQLite. Shared progress visibility is computed server-side.
+- Never allow one buddy to edit the shared habit goal after both have accepted it — require mutual consent for changes (or simply prohibit editing shared habits entirely in v2.0).
+
+**Phase relevance:** Shared habit design phase.
+
+**Confidence:** MEDIUM — inferred from general distributed data design patterns.
+
+---
+
+### Pitfall O: RLS Policy Gaps Exposing Buddy Data Across Users
+
+**What goes wrong:** v2.0 adds buddy relationship tables, shared habits, duo quest records, and message tables. Each of these requires careful RLS policies. A gap in RLS means: User A can read User C's buddy messages (even without being a buddy), or User B can see User A's shared habit completion details. With social features, RLS complexity scales non-linearly — the v1.0 patterns (user can only read their own rows) no longer cover all cases.
+
+**Prevention:**
+- For buddy data: RLS policy must verify `auth.uid() IN (buddy_a_id, buddy_b_id)` for any buddy-relationship-gated row.
+- For message tables: sender and receiver must both have RLS access — but only to their own conversation, not others'.
+- For duo quest tables: both quest participants have read access; only the server (via Edge Function with service key) has write access to quest state.
+- Write RLS policy tests for every new v2.0 table before shipping: attempt to read another user's buddy data from a different user's authenticated session.
+- Maintain a "RLS policy map" document that explicitly states who can read/write each table and under what conditions.
+
+**Phase relevance:** Social backend phase.
+
+**Confidence:** HIGH — Supabase RLS complexity with relational social data is a well-known challenge, confirmed in Supabase documentation.
+
+---
+
+## Phase-Specific Warnings (v2.0)
 
 | Phase Topic | Likely Pitfall | Mitigation |
 |-------------|---------------|------------|
-| Phase A: Blueprint | Over-designing game economy without playtest data | Model on spreadsheet, but mark all numbers as "initial values, tune with data" |
-| Phase A: Blueprint | Adab copy guide skipped as "we'll figure it out" | Make it a required section of the design doc |
-| Phase B: Data layer | Choosing Supabase sync without local-first strategy | Decide on WatermelonDB / MMKV / SQLite + sync protocol before writing data code |
-| Phase B: Animations | Prototyping with Animated API, planning to "switch later" | Start with Reanimated 3 + Skia from sprint 1 |
-| Phase B: Notifications | Testing only on iOS, assuming Android works similarly | Dedicate QA time to Samsung/Xiaomi/Huawei notification testing |
-| Phase B: Prayer times | Hardcoding one calculation method | Ship with configurable calculation methods from the start |
-| Phase B: Streaks | Shipping streaks without Mercy Mode | Never ship streaks without recovery — they are the same feature |
-| Phase 2: Social features | Public accountability becoming public worship display | Private Accountability Duos must never show worship completion details to partners |
-| Phase 2: Boss battles | Nafs Boss Arena trivializing spiritual struggle | Frame as "discipline challenges" not "fighting your nafs" — maintain reverence |
+| Social architecture design | Offline-first and social-online coexistence | Establish hard boundary: personal = SQLite, social = Supabase authoritative, before any code |
+| Buddy system design | Riya via private accountability features | Default to minimum buddy visibility; each visible data point must be explicitly approved |
+| Messaging design | Arabic/religious context moderation failure | Custom blocklist + reporter flow before messaging ships |
+| XP economy rebalancing | Multiplier stacking inflating level curve | Economy spreadsheet model with all v2.0 sources before any feature is coded |
+| Boss battle design | Nafs framing trivializing spiritual struggle | Islamic-literate copy review; reframe combat metaphor as resistance/lifting |
+| Boss battle implementation | Multi-day state failing on device restart | Wall-clock timestamps in SQLite, server-side daily state processing |
+| Detox challenge implementation | iOS timer killed when backgrounded | Wall-clock `started_at` + pre-scheduled local notification at `started_at + duration` |
+| Friday Power-Up | Wrong day in non-UTC timezones | Use stored user timezone (already in profile) for local Friday detection server-side |
+| Duo quest design | Ghost partner blocking engaged user | Individual reward tier + 48-hour inactivity pause + exit after 72 hours |
+| Cross-feature integration | Detox competing with streaks/XP windows | Detox counts as streak preservation; streak never penalized during verified detox |
+| Social backend (RLS) | Buddy data leaking across user boundaries | RLS policy tests for every new v2.0 table, buddy-pair scoped policies |
+| Invite system | Username search privacy leak | Opt-in discoverability by default; single-use expiring invite codes |
+| Surah Al-Kahf content | Quranic text error | Pre-loaded verified text from Tanzil or equivalent, reviewed before ship |
+| Supabase Realtime | Connection limits with 20-buddy architecture | Multiplexed channel design + polling fallback, plan for Pro tier |
 
 ---
 
 ## Sources
 
-- Training data knowledge of React Native/Expo ecosystem, gamification design patterns, Islamic app design considerations, offline-first architecture patterns
-- Confidence: MEDIUM overall — claims are based on well-established patterns in training data but could not be verified against current (2026) documentation due to web search unavailability
-- Specific confidence notes:
-  - React Native animation pitfalls (Reanimated 3, Skia): HIGH confidence from extensive training data
-  - Supabase offline limitations: HIGH confidence — Supabase is known to be server-first
-  - Streak psychology and gamification pitfalls: HIGH confidence — well-documented in behavioral design literature
-  - Prayer time calculation complexity: HIGH confidence — well-known domain challenge
-  - Expo managed workflow limitations: MEDIUM confidence — Expo evolves rapidly, specifics may have changed
-  - Android notification reliability: HIGH confidence — this is a persistent, well-documented Android platform issue
+**v1.0 pitfalls (Pitfalls 1-15):**
+- Training data knowledge of React Native/Expo ecosystem, gamification design patterns, Islamic app design considerations, offline-first architecture patterns. Confidence: MEDIUM overall.
+
+**v2.0 pitfalls (Pitfalls A-O), verified via web search 2026-03-19:**
+- Offline-first + social tension: [How We Added Offline Sync Without Breaking Everything](https://medium.com/@saritasa/how-we-added-offline-sync-to-a-mobile-app-without-breaking-everything-1b739c23a23b), [Build an offline-first app — Android Developers](https://developer.android.com/topic/architecture/data-layer/offline-first) — MEDIUM confidence
+- Supabase Realtime limits: [Supabase Realtime Limits docs](https://supabase.com/docs/guides/realtime/limits), [Stack Diagnosis: max connections](https://drdroid.io/stack-diagnosis/supabase-realtime-the-client-has-reached-the-maximum-number-of-allowed-connections) — HIGH confidence for documented limits
+- iOS background timer kill: [react-native-background-timer issue #69](https://github.com/ocetnik/react-native-background-timer/issues/69), [React Native core issue #1282](https://github.com/facebook/react-native/issues/1282) — HIGH confidence, confirmed bug reports
+- Chat moderation Arabic support: [WebPurify multilingual](https://www.webpurify.com/profanity-filter/), [Stream AutoMod React Native](https://getstream.io/chat/docs/react-native/moderation/) — MEDIUM confidence for Islamic-specific limitations
+- XP economy inflation: [Designing Game Economies: Inflation, Resource Management](https://medium.com/@msahinn21/designing-game-economies-inflation-resource-management-and-balance-fa1e6c894670), [Progression & XP Inflation in MMORPGs](https://clockwork-labs.medium.com/progression-xp-inflation-in-mmorpgs-5b8e52e75ea7) — HIGH confidence for documented game economy patterns
+- Async multi-day mechanics: [Asynchronous Multiplayer: Reclaiming Time in Mobile Gaming](https://www.wayline.io/blog/asynchronous-multiplayer-reclaiming-time-mobile-gaming) — MEDIUM confidence
+- Muslim app privacy sensitivity: [When Data Privacy Becomes a Subject of Faith](https://www.yesmagazine.org/social-justice/2021/06/16/app-data-collection-muslims-in-tech), [Muslim Pro location data incident, Buzzfeed](https://www.buzzfeednews.com/article/ikrd/pillars-app) — HIGH confidence for documented privacy concern
