@@ -53,3 +53,16 @@ describe('AccountNudgeBanner wiring in index.tsx', () => {
     expect(content).toMatch(/titleRepo\.getUserTitles/);
   });
 });
+
+describe('your-data.tsx userId propagation', () => {
+  const YOUR_DATA_PATH = path.resolve(__dirname, '../../app/your-data.tsx');
+  const yourDataContent = fs.readFileSync(YOUR_DATA_PATH, 'utf-8');
+
+  it('does not assign a hardcoded default-user constant', () => {
+    expect(yourDataContent).not.toMatch(/const\s+\w*USER_ID\s*=\s*['"]default-user['"]/);
+  });
+
+  it('imports useAuthStore', () => {
+    expect(yourDataContent).toMatch(/import\s+\{[^}]*useAuthStore[^}]*\}\s+from/);
+  });
+});
