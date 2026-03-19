@@ -9,17 +9,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Blueprint Document
 
-- [ ] **BLUE-01**: Executive product vision with market gap analysis and differentiation narrative
-- [ ] **BLUE-02**: Player fantasy and behavioral model (first 60 seconds, daily return, identity transformation, behavioral science)
-- [ ] **BLUE-03**: Game Design Bible (core/meta/long loops, progression, XP model, streak model, boss progression, failure/recovery, anti-burnout)
-- [ ] **BLUE-04**: Worldbuilding and lore framework (discipline metaphor, environments, enemy/boss archetypes, titles, seasonal events)
-- [ ] **BLUE-05**: Feature systems detailed specs (Habit Forge, Quest Board, Salah Streak Shield, Nafs Boss Arena, Dopamine Detox Dungeon, Mercy Mode, Identity Titles, Friday Power-Ups, Muhasabah, Accountability Duos, Barakah economy)
-- [ ] **BLUE-06**: Information architecture and full UX flow (onboarding-to-day-30 journey, nav model, key paths, drop-off risks, edge states)
-- [ ] **BLUE-07**: Screen-by-screen product spec (12+ screens with purpose, layout, components, interactions, animations, copy tone, edge states)
-- [ ] **BLUE-08**: UI system and design tokens (colors, typography, spacing, radius, HUD components, cards/buttons/inputs, iconography, motion, accessibility modes)
-- [ ] **BLUE-09**: Sound and haptic direction (sound identity, event map, haptic rules, audio boundaries, focus mode)
-- [ ] **BLUE-10**: Greenfield tech architecture (frontend, backend, data, auth, sync, analytics, notifications, offline, config)
-- [ ] **BLUE-11**: Data model and API contract (entities, relationships, versioning, migration, privacy boundaries, endpoints, schemas)
+- [x] **BLUE-01**: Executive product vision with market gap analysis and differentiation narrative
+- [x] **BLUE-02**: Player fantasy and behavioral model (first 60 seconds, daily return, identity transformation, behavioral science)
+- [x] **BLUE-03**: Game Design Bible (core/meta/long loops, progression, XP model, streak model, boss progression, failure/recovery, anti-burnout)
+- [x] **BLUE-04**: Worldbuilding and lore framework (discipline metaphor, environments, enemy/boss archetypes, titles, seasonal events)
+- [x] **BLUE-05**: Feature systems detailed specs (Habit Forge, Quest Board, Salah Streak Shield, Nafs Boss Arena, Dopamine Detox Dungeon, Mercy Mode, Identity Titles, Friday Power-Ups, Muhasabah, Accountability Duos, Barakah economy)
+- [x] **BLUE-06**: Information architecture and full UX flow (onboarding-to-day-30 journey, nav model, key paths, drop-off risks, edge states)
+- [x] **BLUE-07**: Screen-by-screen product spec (12+ screens with purpose, layout, components, interactions, animations, copy tone, edge states)
+- [x] **BLUE-08**: UI system and design tokens (colors, typography, spacing, radius, HUD components, cards/buttons/inputs, iconography, motion, accessibility modes)
+- [x] **BLUE-09**: Sound and haptic direction (sound identity, event map, haptic rules, audio boundaries, focus mode)
+- [x] **BLUE-10**: Greenfield tech architecture (frontend, backend, data, auth, sync, analytics, notifications, offline, config)
+- [x] **BLUE-11**: Data model and API contract (entities, relationships, versioning, migration, privacy boundaries, endpoints, schemas)
 - [x] **BLUE-12**: Telemetry and experimentation plan (privacy-safe events, north-star metric, retention metrics, burnout indicators, A/B tests, anti-metric traps)
 - [x] **BLUE-13**: QA and balance plan (test strategy, XP/streak simulation, timezone edge cases, exploit testing, accessibility QA, content sensitivity checklist)
 - [x] **BLUE-14**: Delivery roadmap (Phase 0-4 with deliverables, dependencies, risks, staffing, definition of done)
@@ -71,17 +71,17 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Home HUD
 
-- [ ] **HUD-01**: Home screen displays game-world HUD with current level, XP bar, streak count, and active quests
+- [x] **HUD-01**: Home screen displays game-world HUD with current level, XP bar, streak count, and active quests
 - [x] **HUD-02**: HUD uses 16-bit pixel art aesthetic with crisp rendering (Skia FilterQuality.None)
-- [ ] **HUD-03**: XP gain and level-up animations are smooth 60fps (Reanimated)
-- [ ] **HUD-04**: Haptic feedback on habit completion, level-up, and quest completion
+- [x] **HUD-03**: XP gain and level-up animations are smooth 60fps (Reanimated)
+- [x] **HUD-04**: Haptic feedback on habit completion, level-up, and quest completion
 
 ### Muhasabah
 
-- [ ] **MUHA-01**: Nightly Muhasabah presents structured reflection prompts (30-60 seconds, not journaling)
-- [ ] **MUHA-02**: User can review today's completions and set intention for tomorrow
-- [ ] **MUHA-03**: Muhasabah data is private (device-only, never synced)
-- [ ] **MUHA-04**: User can skip Muhasabah without penalty or shame
+- [x] **MUHA-01**: Nightly Muhasabah presents structured reflection prompts (30-60 seconds, not journaling)
+- [x] **MUHA-02**: User can review today's completions and set intention for tomorrow
+- [x] **MUHA-03**: Muhasabah data is private (device-only, never synced)
+- [x] **MUHA-04**: User can skip Muhasabah without penalty or shame
 
 ### Onboarding
 
@@ -154,11 +154,13 @@ Deferred to future release. Tracked but not in current roadmap.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | BLUE-01 through BLUE-16 | Phase 1: Master Blueprint | Complete (01-VERIFICATION) |
-| FOUN-01 through FOUN-07 | Phase 2 + Phase 9 (verification) | Partial (code complete, verification pending) |
-| HBIT-01, HBIT-02, HBIT-05 | Phase 3 + Phase 9 (verification) | Unsatisfied (code exists, no verification trail) |
-| HBIT-03, HBIT-04, HBIT-06 | Phase 3: Core Habit Loop | Partial (listed in SUMMARYs, no VERIFICATION) |
-| PRAY-01 through PRAY-04 | Phase 3 + Phase 9 (verification) | Orphaned (code exists, never tracked) |
-| STRK-01 through STRK-05 | Phase 3: Core Habit Loop | Partial (listed in SUMMARYs, no VERIFICATION) |
+| FOUN-01 | Phase 2 + Phase 9 (verification) | Partial (EAS Build deferred; scaffold + config complete, 02-VERIFICATION) |
+| FOUN-02 through FOUN-07 | Phase 2 + Phase 9 (verification) | Complete (02-VERIFICATION) |
+| HBIT-01, HBIT-02, HBIT-05 | Phase 3 + Phase 9 (verification) | Complete (03-VERIFICATION) |
+| HBIT-03, HBIT-04, HBIT-06 | Phase 3 + Phase 9 (verification) | Complete (03-VERIFICATION) |
+| PRAY-01 through PRAY-03 | Phase 3 + Phase 9 (verification) | Complete (03-VERIFICATION) |
+| PRAY-04 | Phase 3 + Phase 6 + Phase 9 (verification) | Complete (03-VERIFICATION, implemented in Phase 06) |
+| STRK-01 through STRK-05 | Phase 3 + Phase 9 (verification) | Complete (03-VERIFICATION) |
 | GAME-01 through GAME-06 | Phase 4: Game Engine and Progression | Complete (04-VERIFICATION) |
 | HUD-01 through HUD-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Complete (05-VERIFICATION) |
 | MUHA-01 through MUHA-04 | Phase 5: HUD, Visual Identity, and Muhasabah | Complete (05-VERIFICATION) |
@@ -170,11 +172,11 @@ Deferred to future release. Tracked but not in current roadmap.
 **Coverage:**
 - v1 requirements: 62 total
 - Mapped to phases: 62 (+ 2 gap closure phases)
-- Satisfied: 50
-- Partial: 12 (verification gaps)
-- Unsatisfied: 7 (Phase 9 will close)
+- Satisfied: 61
+- Partial: 1 (FOUN-01: EAS Build deferred)
+- Unsatisfied: 0
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-07*
-*Last updated: 2026-03-07 after roadmap creation*
+*Last updated: 2026-03-19 after Phase 9 atomic checkbox sweep*
