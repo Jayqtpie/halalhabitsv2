@@ -64,9 +64,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **GAME-01**: User earns XP for habit completions (effort-based, not outcome-based)
 - [x] **GAME-02**: User levels up through XP accumulation with logarithmic progression curve
-- [ ] **GAME-03**: User unlocks Identity Titles at milestone thresholds (e.g., "The Steadfast" at 40 consecutive Fajr)
+- [x] **GAME-03**: User unlocks Identity Titles at milestone thresholds (e.g., "The Steadfast" at 40 consecutive Fajr)
 - [x] **GAME-04**: Quest Board presents daily and weekly quests with rotating variety
-- [ ] **GAME-05**: User can complete quests for bonus XP and progression
+- [x] **GAME-05**: User can complete quests for bonus XP and progression
 - [x] **GAME-06**: XP economy modeled and balanced (levels 1-100 progression curve)
 
 ### Home HUD
@@ -94,7 +94,7 @@ Requirements for initial release. Each maps to roadmap phases.
 
 - [x] **PROF-01**: User can view profile with title, level, XP, streak history, and achievements
 - [x] **PROF-02**: User can access settings for notifications, prayer calculation method, and privacy controls
-- [ ] **PROF-03**: User can export or delete all personal data
+- [x] **PROF-03**: User can export or delete all personal data
 - [x] **PROF-04**: Dark mode supported (default or system-auto)
 
 ### Backend and Sync

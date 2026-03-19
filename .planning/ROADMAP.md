@@ -21,7 +21,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Backend, Auth, and Sync** - Supabase auth, sync engine with conflict resolution, push notifications, and RLS enforcement (completed 2026-03-18)
 - [x] **Phase 8: Critical Integration Wiring** - Wire sync queue into repos, replace hardcoded userId in tabs, render AccountNudgeBanner — closes 2 critical audit gaps (completed 2026-03-18)
 - [x] **Phase 9: Verification and Audit Cleanup** - Create missing VERIFICATION.md for Phases 02/03, update REQUIREMENTS.md checkboxes and traceability table (completed 2026-03-19)
-- [ ] **Phase 10: Title Pipeline and Integration Fixes** - Wire real mercyRecoveries/muhasabahStreak into title checks, fix your-data userId, fix quest progress parameter bug
+- [x] **Phase 10: Title Pipeline and Integration Fixes** - Wire real mercyRecoveries/muhasabahStreak into title checks, fix your-data userId, fix quest progress parameter bug (completed 2026-03-19)
 
 ## Phase Details
 
@@ -222,4 +222,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Backend, Auth, and Sync | 5/5 | Complete | 2026-03-18 |
 | 8. Critical Integration Wiring | 2/2 | Complete | 2026-03-18 |
 | 9. Verification and Audit Cleanup | 2/2 | Complete   | 2026-03-19 |
-| 10. Title Pipeline and Integration Fixes | 0/1 | Planned | — |
+| 10. Title Pipeline and Integration Fixes | 1/1 | Complete   | 2026-03-19 |

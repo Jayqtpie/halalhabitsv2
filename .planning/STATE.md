@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_plan: Not yet planned
 status: in_progress
-stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-03-19T01:23:42.795Z"
-last_activity: 2026-03-18 -- Gap closure phases 8-9 added to roadmap
+stopped_at: Completed 10-01-PLAN.md
+last_updated: "2026-03-19T21:25:38.731Z"
 progress:
-  total_phases: 9
-  completed_phases: 9
-  total_plans: 37
-  completed_plans: 37
+  total_phases: 10
+  completed_phases: 10
+  total_plans: 38
+  completed_plans: 38
 ---
 
 ---
@@ -55,17 +53,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Phase 7 in progress — Supabase client + auth service foundation complete (07-01), sync engine next (07-02)
+**Current focus:** Phase 10 — title-pipeline-and-integration-fixes
 
 ## Current Position
 
-Phase: 8 of 9 (Critical Integration Wiring — ready to plan)
-Current Plan: Not yet planned
-Status: Gap closure phases created from milestone audit. Phase 8 needs planning.
-Last activity: 2026-03-18 -- Gap closure phases 8-9 added to roadmap
-
-Progress: [█████████░] 93% overall (33/33 original plans complete, 2 gap phases added)
-Overall: 7 original phases complete (Phase 01-07), 2 gap closure phases pending (08, 09)
+Phase: 10 (title-pipeline-and-integration-fixes) — EXECUTING
+Plan: 1 of 1
 
 ## Performance Metrics
 
@@ -120,6 +113,7 @@ Overall: 7 original phases complete (Phase 01-07), 2 gap closure phases pending 
 | Phase 08-critical-integration-wiring P02 | 15 | 2 tasks | 5 files |
 | Phase 09-verification-and-audit-cleanup P01 | 15 | 2 tasks | 2 files |
 | Phase 09-verification-and-audit-cleanup P02 | 15 | 2 tasks | 2 files |
+| Phase 10-title-pipeline-and-integration-fixes P01 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -218,6 +212,9 @@ Recent decisions affecting current work:
 - [Phase 09]: PRAY-04 attributed to Phase 06 in 03-VERIFICATION.md — deferred by design with explicit TODO in 03-06, implemented in 06-01/06-04
 - [Phase 09]: BLUE-01..11 were unchecked despite Phase 1 being verified complete via 01-VERIFICATION.md — pure checkbox oversight, fixed in sweep
 - [Phase 09]: PRAY-04 credited to Phase 3 + Phase 6 in traceability table — deferred with TODO in 03-06, implemented in 06-01/06-04
+- [Phase 10-01]: Static file analysis chosen for all 4 integration gap tests (same pattern as Phase 08-02)
+- [Phase 10-01]: Promise.all for streakRepo.getAllForUser + muhasabahRepo.getStreak in checkTitles (parallel queries)
+- [Phase 10-01]: isRebuilt filter on getAllForUser result counts mercy recoveries (no new repo method needed)
 
 ### Pending Todos
 
@@ -240,6 +237,6 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-03-19T01:19:21.900Z
-Stopped at: Completed 09-02-PLAN.md
+Last session: 2026-03-19T21:25:38.727Z
+Stopped at: Completed 10-01-PLAN.md
 Resume file: None
