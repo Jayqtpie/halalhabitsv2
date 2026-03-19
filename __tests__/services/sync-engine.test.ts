@@ -21,6 +21,7 @@ jest.mock('../../src/lib/supabase', () => ({
   supabase: {
     from: jest.fn(),
   },
+  supabaseConfigured: true,
 }));
 
 jest.mock('../../src/stores/authStore', () => ({

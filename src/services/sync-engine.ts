@@ -13,7 +13,7 @@
  * Pure TypeScript, no React imports.
  */
 import NetInfo from '@react-native-community/netinfo';
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseConfigured } from '../lib/supabase';
 import { useAuthStore } from '../stores/authStore';
 import { syncQueueRepo } from '../db/repos/syncQueueRepo';
 import { assertSyncable } from './privacy-gate';
@@ -27,6 +27,8 @@ const MAX_RETRIES = 5;
  * No-ops silently if not authenticated or if offline.
  */
 export async function flushQueue(): Promise<void> {
+  if (!supabaseConfigured) return;
+
   const { isAuthenticated } = useAuthStore.getState();
   if (!isAuthenticated) return;
 

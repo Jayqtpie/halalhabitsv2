@@ -9,7 +9,7 @@
  * - deleteAccount is the only path that wipes local data
  * - migrateGuestData re-keys 'default-user' rows to the real auth UUID in a transaction
  */
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseConfigured } from '../lib/supabase';
 import { getDb } from '../db/client';
 import { deleteAllUserData } from './data-export';
 
@@ -26,6 +26,10 @@ export async function signUp(
   password: string,
   keepProgress: boolean,
 ): Promise<{ userId: string | null; error: string | null }> {
+  if (!supabaseConfigured) {
+    return { userId: null, error: 'Supabase is not configured. Set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in .env' };
+  }
+
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
@@ -50,6 +54,10 @@ export async function signIn(
   email: string,
   password: string,
 ): Promise<{ userId: string | null; error: string | null }> {
+  if (!supabaseConfigured) {
+    return { userId: null, error: 'Supabase is not configured.' };
+  }
+
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   if (error) {
@@ -69,6 +77,10 @@ export async function signIn(
  * The authStore session is reset via the onAuthStateChange listener, not here.
  */
 export async function signOut(): Promise<{ error: string | null }> {
+  if (!supabaseConfigured) {
+    return { error: 'Supabase is not configured.' };
+  }
+
   const { error } = await supabase.auth.signOut({ scope: 'local' });
 
   if (error) {
@@ -89,6 +101,10 @@ export async function signOut(): Promise<{ error: string | null }> {
 export async function deleteAccount(
   userId: string,
 ): Promise<{ error: string | null }> {
+  if (!supabaseConfigured) {
+    return { error: 'Supabase is not configured.' };
+  }
+
   // Delete server-side data via Supabase function
   const { error: rpcError } = await supabase.rpc('delete_user');
 

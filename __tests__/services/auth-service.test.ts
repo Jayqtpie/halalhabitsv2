@@ -19,6 +19,7 @@ jest.mock('../../src/lib/supabase', () => {
       auth: mockAuth,
       rpc: mockRpc,
     },
+    supabaseConfigured: true,
   };
 });
 

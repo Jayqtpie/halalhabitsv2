@@ -34,7 +34,7 @@ import { MuhasabahModal } from '../src/components/muhasabah/MuhasabahModal';
 import { useSettingsStore } from '../src/stores/settingsStore';
 import { useMuhasabahStore } from '../src/stores/muhasabahStore';
 import * as NotificationService from '../src/services/notification-service';
-import { supabase } from '../src/lib/supabase';
+import { supabase, supabaseConfigured } from '../src/lib/supabase';
 import { useAuthStore } from '../src/stores/authStore';
 import { flushQueue } from '../src/services/sync-engine';
 import type { CalcMethodKey } from '../src/types/habits';
@@ -61,6 +61,7 @@ let appStateListenerRegistered = false;
 if (!appStateListenerRegistered) {
   appStateListenerRegistered = true;
   AppState.addEventListener('change', (state) => {
+    if (!supabaseConfigured || !supabase) return;
     if (state === 'active') {
       supabase.auth.startAutoRefresh();
     } else {
@@ -72,7 +73,7 @@ if (!appStateListenerRegistered) {
 export default function RootLayout() {
   const router = useRouter();
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
     'Inter-Bold': require('../assets/fonts/Inter-Bold.ttf'),
     'Inter-SemiBold': require('../assets/fonts/Inter-SemiBold.ttf'),
@@ -102,7 +103,10 @@ export default function RootLayout() {
       })),
     );
 
-  const appReady = fontsLoaded && !!migrationsComplete && hydrated;
+  // CTFontManagerError 104 = font already registered (Expo Go cache clear race).
+  // Treat as loaded — the font is usable even though re-registration failed.
+  const fontsReady = fontsLoaded || !!fontError;
+  const appReady = fontsReady && !!migrationsComplete && hydrated;
 
   useEffect(() => {
     if (appReady) {
@@ -114,6 +118,8 @@ export default function RootLayout() {
   // Subscribes to Supabase auth events and syncs session into authStore.
   // Also registers push token on every SIGNED_IN event (handles reinstall/new device).
   useEffect(() => {
+    if (!supabaseConfigured) return;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         useAuthStore.getState().setSession(session);

@@ -25,6 +25,7 @@ jest.mock('../../src/lib/supabase', () => ({
       }),
     }),
   },
+  supabaseConfigured: true,
 }));
 
 // Mock authStore

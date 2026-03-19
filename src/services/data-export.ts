@@ -23,7 +23,7 @@ import { useSettingsStore } from '../stores/settingsStore';
 import { useGameStore } from '../stores/gameStore';
 import { useHabitStore } from '../stores/habitStore';
 import { useAuthStore } from '../stores/authStore';
-import { supabase } from '../lib/supabase';
+import { supabase, supabaseConfigured } from '../lib/supabase';
 import { getDb } from '../db/client';
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -133,7 +133,7 @@ export async function exportUserData(userId: string): Promise<void> {
 export async function deleteAllUserData(userId: string): Promise<void> {
   // If authenticated, delete server-side data first
   const { isAuthenticated } = useAuthStore.getState();
-  if (isAuthenticated) {
+  if (isAuthenticated && supabaseConfigured) {
     try {
       // Delete from all syncable tables on server
       const syncableTables = ['xp_ledger', 'user_titles', 'quests', 'habits', 'settings', 'users'];
