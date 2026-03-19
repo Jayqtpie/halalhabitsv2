@@ -29,7 +29,7 @@ Full details: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 
 **Milestone Goal:** Add a private accountability buddy system with shared activities and filtered messaging, plus three solo game features — Friday Power-Ups, Dopamine Detox Dungeon, and Nafs Boss Arena.
 
-- [ ] **Phase 11: Schema & Privacy Gate Foundation** - Lay data foundation for all v2.0 features before any feature code runs
+- [x] **Phase 11: Schema & Privacy Gate Foundation** - Lay data foundation for all v2.0 features before any feature code runs (completed 2026-03-19)
 - [ ] **Phase 12: Friday Power-Ups** - Make every Friday a game event with 2x XP and Al-Kahf challenge
 - [ ] **Phase 13: Dopamine Detox Dungeon** - Give players a voluntary anti-doomscrolling challenge system
 - [ ] **Phase 14: Nafs Boss Arena** - Let players battle personified nafs struggles in multi-day boss fights
@@ -140,7 +140,7 @@ Plans:
 | 8. Critical Integration Wiring | v1.0 | 2/2 | Complete | 2026-03-18 |
 | 9. Verification and Audit Cleanup | v1.0 | 2/2 | Complete | 2026-03-19 |
 | 10. Title Pipeline and Integration Fixes | v1.0 | 1/1 | Complete | 2026-03-19 |
-| 11. Schema & Privacy Gate Foundation | 1/2 | In Progress|  | - |
+| 11. Schema & Privacy Gate Foundation | 2/2 | Complete   | 2026-03-19 | - |
 | 12. Friday Power-Ups | v2.0 | 0/TBD | Not started | - |
 | 13. Dopamine Detox Dungeon | v2.0 | 0/TBD | Not started | - |
 | 14. Nafs Boss Arena | v2.0 | 0/TBD | Not started | - |

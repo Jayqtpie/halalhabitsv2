@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
-status: unknown
-stopped_at: Completed 11-01-PLAN.md (schema + privacy gate extension)
-last_updated: "2026-03-19T23:53:43.086Z"
+status: phase-complete
+stopped_at: Completed 11-02-PLAN.md (Supabase migrations + XP economy model)
+last_updated: "2026-03-19T00:00:00.000Z"
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 2
-  completed_plans: 1
+  completed_plans: 2
 ---
 
 # Project State
@@ -23,8 +23,8 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 
 ## Current Position
 
-Phase: 11 (schema-privacy-gate-foundation) — EXECUTING
-Plan: 2 of 2
+Phase: 11 (schema-privacy-gate-foundation) — COMPLETE
+Plan: 2 of 2 (all plans complete)
 
 ## Accumulated Context
 
@@ -38,6 +38,9 @@ Plan: 2 of 2
 - XP economy spreadsheet must be built in Phase 11 before any XP feature ships
 - Decisions logged in PROJECT.md Key Decisions table.
 - [Phase 11]: Drizzle table SQL names accessed via Symbol.for('drizzle:Name'), not _.name — discovered during auto-validation test
+- [Phase 11]: Buddies table uses dual-owner RLS (user_a OR user_b) — both users own the pair equally
+- [Phase 11]: XP economy worst-case ~1,330 XP/day cannot level up at level 10+ (requires 2,302 XP) — cap proven sufficient
+- [Phase 11]: Actual salah XP base values (fajr=50, others=15) differ from Blueprint template (30/20) — economy model uses actual values
 
 ### Pending Todos
 
@@ -56,6 +59,6 @@ Plan: 2 of 2
 
 ## Session Continuity
 
-Last session: 2026-03-19T23:53:43.083Z
-Stopped at: Completed 11-01-PLAN.md (schema + privacy gate extension)
+Last session: 2026-03-19T00:00:00.000Z
+Stopped at: Completed 11-02-PLAN.md (Supabase migrations + XP economy model) — Phase 11 COMPLETE
 Resume file: None
