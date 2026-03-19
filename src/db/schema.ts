@@ -1,5 +1,5 @@
 /**
- * Drizzle ORM schema definitions for all 13 HalalHabits entities
+ * Drizzle ORM schema definitions for all 19 HalalHabits entities
  * plus the _zustand_store utility table.
  *
  * Privacy classifications are enforced by the Privacy Gate module
@@ -211,6 +211,118 @@ export const syncQueue = sqliteTable('sync_queue', {
   lastError: text('last_error'),
 }, (table) => ([
   index('idx_sync_entity').on(table.entityType, table.entityId),
+]));
+
+// ─── Buddies ────────────────────────────────────────────────────────
+// Privacy: SYNCABLE — connection metadata both users need
+export const buddies = sqliteTable('buddies', {
+  id: text('id').primaryKey(),
+  userA: text('user_a').notNull().references(() => users.id),
+  userB: text('user_b').notNull().references(() => users.id),
+  status: text('status').notNull().default('pending'),
+  inviteCode: text('invite_code'),
+  createdAt: text('created_at').notNull(),
+  acceptedAt: text('accepted_at'),
+  updatedAt: text('updated_at').notNull(),
+}, (table) => ([
+  index('idx_buddy_user_a').on(table.userA),
+  index('idx_buddy_user_b').on(table.userB),
+  uniqueIndex('idx_buddy_invite_code').on(table.inviteCode),
+]));
+
+// ─── Boss Battles ─────────────────────────────────────────────────────
+// Privacy: PRIVATE — nafs archetype reveals personal struggle, never synced
+export const bossBattles = sqliteTable('boss_battles', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  archetype: text('archetype').notNull(),
+  bossHp: integer('boss_hp').notNull(),
+  bossMaxHp: integer('boss_max_hp').notNull(),
+  currentDay: integer('current_day').notNull().default(1),
+  maxDays: integer('max_days').notNull(),
+  dailyLog: text('daily_log').notNull().default('[]'),
+  status: text('status').notNull().default('active'),
+  mercyMode: integer('mercy_mode', { mode: 'boolean' }).notNull().default(false),
+  startedAt: text('started_at').notNull(),
+  endedAt: text('ended_at'),
+  updatedAt: text('updated_at').notNull(),
+}, (table) => ([
+  index('idx_boss_user_status').on(table.userId, table.status),
+]));
+
+// ─── Detox Sessions ─────────────────────────────────────────────────
+// Privacy: LOCAL_ONLY — ephemeral session data, no persistence after completion
+export const detoxSessions = sqliteTable('detox_sessions', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  variant: text('variant').notNull(),
+  durationHours: integer('duration_hours').notNull(),
+  status: text('status').notNull().default('active'),
+  xpEarned: integer('xp_earned').notNull().default(0),
+  xpPenalty: integer('xp_penalty').notNull().default(0),
+  startedAt: text('started_at').notNull(),
+  endedAt: text('ended_at'),
+  createdAt: text('created_at').notNull(),
+}, (table) => ([
+  index('idx_detox_user_status').on(table.userId, table.status),
+]));
+
+// ─── Messages ───────────────────────────────────────────────────────
+// Privacy: SYNCABLE — offline cache + Supabase sync
+export const messages = sqliteTable('messages', {
+  id: text('id').primaryKey(),
+  buddyPairId: text('buddy_pair_id').notNull().references(() => buddies.id),
+  senderId: text('sender_id').notNull().references(() => users.id),
+  content: text('content').notNull(),
+  status: text('status').notNull().default('sent'),
+  createdAt: text('created_at').notNull(),
+  syncedAt: text('synced_at'),
+}, (table) => ([
+  index('idx_message_pair_created').on(table.buddyPairId, table.createdAt),
+  index('idx_message_sender').on(table.senderId),
+]));
+
+// ─── Shared Habits ──────────────────────────────────────────────────
+// Privacy: SYNCABLE — both buddies need to see shared goal
+export const sharedHabits = sqliteTable('shared_habits', {
+  id: text('id').primaryKey(),
+  buddyPairId: text('buddy_pair_id').notNull().references(() => buddies.id),
+  createdByUserId: text('created_by_user_id').notNull().references(() => users.id),
+  habitType: text('habit_type').notNull(),
+  name: text('name').notNull(),
+  targetFrequency: text('target_frequency').notNull().default('daily'),
+  status: text('status').notNull().default('active'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+}, (table) => ([
+  index('idx_shared_habit_pair').on(table.buddyPairId),
+  index('idx_shared_habit_creator').on(table.createdByUserId),
+]));
+
+// ─── Duo Quests ─────────────────────────────────────────────────────
+// Privacy: SYNCABLE — both buddies need to see quest progress
+export const duoQuests = sqliteTable('duo_quests', {
+  id: text('id').primaryKey(),
+  buddyPairId: text('buddy_pair_id').notNull().references(() => buddies.id),
+  createdByUserId: text('created_by_user_id').notNull().references(() => users.id),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  xpRewardEach: integer('xp_reward_each').notNull(),
+  xpRewardBonus: integer('xp_reward_bonus').notNull().default(0),
+  targetType: text('target_type').notNull(),
+  targetValue: integer('target_value').notNull(),
+  userAProgress: integer('user_a_progress').notNull().default(0),
+  userBProgress: integer('user_b_progress').notNull().default(0),
+  userACompleted: integer('user_a_completed', { mode: 'boolean' }).notNull().default(false),
+  userBCompleted: integer('user_b_completed', { mode: 'boolean' }).notNull().default(false),
+  status: text('status').notNull().default('active'),
+  expiresAt: text('expires_at').notNull(),
+  completedAt: text('completed_at'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+}, (table) => ([
+  index('idx_duo_quest_pair_status').on(table.buddyPairId, table.status),
+  index('idx_duo_quest_expires').on(table.expiresAt),
 ]));
 
 // ─── Zustand Store ───────────────────────────────────────────────────

@@ -20,6 +20,12 @@ import type {
   settings,
   niyyah,
   syncQueue,
+  buddies,
+  bossBattles,
+  detoxSessions,
+  messages,
+  sharedHabits,
+  duoQuests,
 } from '../db/schema';
 
 // ─── User ────────────────────────────────────────────────────────────
@@ -69,3 +75,27 @@ export type NewNiyyah = InferInsertModel<typeof niyyah>;
 // ─── Sync Queue ──────────────────────────────────────────────────────
 export type SyncQueueItem = InferSelectModel<typeof syncQueue>;
 export type NewSyncQueueItem = InferInsertModel<typeof syncQueue>;
+
+// ─── Buddy ──────────────────────────────────────────────────────────
+export type Buddy = InferSelectModel<typeof buddies>;
+export type NewBuddy = InferInsertModel<typeof buddies>;
+
+// ─── Boss Battle ────────────────────────────────────────────────────
+export type BossBattle = InferSelectModel<typeof bossBattles>;
+export type NewBossBattle = InferInsertModel<typeof bossBattles>;
+
+// ─── Detox Session ──────────────────────────────────────────────────
+export type DetoxSession = InferSelectModel<typeof detoxSessions>;
+export type NewDetoxSession = InferInsertModel<typeof detoxSessions>;
+
+// ─── Message ────────────────────────────────────────────────────────
+export type Message = InferSelectModel<typeof messages>;
+export type NewMessage = InferInsertModel<typeof messages>;
+
+// ─── Shared Habit ───────────────────────────────────────────────────
+export type SharedHabit = InferSelectModel<typeof sharedHabits>;
+export type NewSharedHabit = InferInsertModel<typeof sharedHabits>;
+
+// ─── Duo Quest ──────────────────────────────────────────────────────
+export type DuoQuest = InferSelectModel<typeof duoQuests>;
+export type NewDuoQuest = InferInsertModel<typeof duoQuests>;

@@ -39,7 +39,11 @@ export type XPSourceType =
   | 'quest'
   | 'muhasabah'
   | 'mercy_recovery'
-  | 'milestone';
+  | 'milestone'
+  | 'boss_defeat'
+  | 'detox_completion'
+  | 'friday_bonus'
+  | 'duo_quest';
 
 /** User dark mode preference */
 export type DarkMode = 'auto' | 'dark' | 'light';
