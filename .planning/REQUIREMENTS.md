@@ -111,51 +111,51 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUN-01 | TBD | Pending |
-| FOUN-02 | TBD | Pending |
-| FOUN-03 | TBD | Pending |
-| FRDY-01 | TBD | Pending |
-| FRDY-02 | TBD | Pending |
-| FRDY-03 | TBD | Pending |
-| FRDY-04 | TBD | Pending |
-| DTOX-01 | TBD | Pending |
-| DTOX-02 | TBD | Pending |
-| DTOX-03 | TBD | Pending |
-| DTOX-04 | TBD | Pending |
-| DTOX-05 | TBD | Pending |
-| DTOX-06 | TBD | Pending |
-| BOSS-01 | TBD | Pending |
-| BOSS-02 | TBD | Pending |
-| BOSS-03 | TBD | Pending |
-| BOSS-04 | TBD | Pending |
-| BOSS-05 | TBD | Pending |
-| BOSS-06 | TBD | Pending |
-| BOSS-07 | TBD | Pending |
-| BOSS-08 | TBD | Pending |
-| BUDY-01 | TBD | Pending |
-| BUDY-02 | TBD | Pending |
-| BUDY-03 | TBD | Pending |
-| BUDY-04 | TBD | Pending |
-| BUDY-05 | TBD | Pending |
-| BUDY-06 | TBD | Pending |
-| BUDY-07 | TBD | Pending |
-| DUOQ-01 | TBD | Pending |
-| DUOQ-02 | TBD | Pending |
-| DUOQ-03 | TBD | Pending |
-| DUOQ-04 | TBD | Pending |
-| DUOQ-05 | TBD | Pending |
-| MSSG-01 | TBD | Pending |
-| MSSG-02 | TBD | Pending |
-| MSSG-03 | TBD | Pending |
-| MSSG-04 | TBD | Pending |
-| MSSG-05 | TBD | Pending |
-| MSSG-06 | TBD | Pending |
+| FOUN-01 | Phase 11 | Pending |
+| FOUN-02 | Phase 11 | Pending |
+| FOUN-03 | Phase 11 | Pending |
+| FRDY-01 | Phase 12 | Pending |
+| FRDY-02 | Phase 12 | Pending |
+| FRDY-03 | Phase 12 | Pending |
+| FRDY-04 | Phase 12 | Pending |
+| DTOX-01 | Phase 13 | Pending |
+| DTOX-02 | Phase 13 | Pending |
+| DTOX-03 | Phase 13 | Pending |
+| DTOX-04 | Phase 13 | Pending |
+| DTOX-05 | Phase 13 | Pending |
+| DTOX-06 | Phase 13 | Pending |
+| BOSS-01 | Phase 14 | Pending |
+| BOSS-02 | Phase 14 | Pending |
+| BOSS-03 | Phase 14 | Pending |
+| BOSS-04 | Phase 14 | Pending |
+| BOSS-05 | Phase 14 | Pending |
+| BOSS-06 | Phase 14 | Pending |
+| BOSS-07 | Phase 14 | Pending |
+| BOSS-08 | Phase 14 | Pending |
+| BUDY-01 | Phase 15 | Pending |
+| BUDY-02 | Phase 15 | Pending |
+| BUDY-03 | Phase 15 | Pending |
+| BUDY-04 | Phase 15 | Pending |
+| BUDY-05 | Phase 15 | Pending |
+| BUDY-06 | Phase 15 | Pending |
+| BUDY-07 | Phase 15 | Pending |
+| DUOQ-01 | Phase 16 | Pending |
+| DUOQ-02 | Phase 16 | Pending |
+| DUOQ-03 | Phase 16 | Pending |
+| DUOQ-04 | Phase 16 | Pending |
+| DUOQ-05 | Phase 16 | Pending |
+| MSSG-01 | Phase 17 | Pending |
+| MSSG-02 | Phase 17 | Pending |
+| MSSG-03 | Phase 17 | Pending |
+| MSSG-04 | Phase 17 | Pending |
+| MSSG-05 | Phase 17 | Pending |
+| MSSG-06 | Phase 17 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 38 total
-- Mapped to phases: 0
-- Unmapped: 38
+- Mapped to phases: 38
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-19*
-*Last updated: 2026-03-19 after initial definition*
+*Last updated: 2026-03-19 — traceability populated after roadmap creation*
