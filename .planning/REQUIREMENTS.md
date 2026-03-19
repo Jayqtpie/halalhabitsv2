@@ -29,9 +29,9 @@ Requirements for initial release. Each maps to roadmap phases.
 ### Foundation
 
 - [x] **FOUN-01**: Expo project scaffold with development builds (not Expo Go) and EAS Build pipeline
-- [ ] **FOUN-02**: Expo Router navigation structure with tab-based layout
+- [x] **FOUN-02**: Expo Router navigation structure with tab-based layout
 - [x] **FOUN-03**: SQLite database schema with migrations for habits, completions, streaks, XP, titles, quests, muhasabah
-- [ ] **FOUN-04**: Zustand state management with domain-split stores (habits, game, ui, settings)
+- [x] **FOUN-04**: Zustand state management with domain-split stores (habits, game, ui, settings)
 - [x] **FOUN-05**: Privacy Gate module classifying data as private (device-only) vs syncable
 - [x] **FOUN-06**: Design token system (colors, typography, spacing, 16-bit aesthetic tokens)
 - [x] **FOUN-07**: i18n infrastructure (i18next) for future RTL/Arabic support
@@ -47,10 +47,10 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Prayer Integration
 
-- [ ] **PRAY-01**: App calculates prayer times locally using adhan library based on user location
-- [ ] **PRAY-02**: User can select calculation method (ISNA, MWL, Egyptian, etc.)
-- [ ] **PRAY-03**: Salah habits display contextual time windows (e.g., Dhuhr available 12:05-3:30pm)
-- [ ] **PRAY-04**: Prayer time notifications remind user before each salah window
+- [x] **PRAY-01**: App calculates prayer times locally using adhan library based on user location
+- [x] **PRAY-02**: User can select calculation method (ISNA, MWL, Egyptian, etc.)
+- [x] **PRAY-03**: Salah habits display contextual time windows (e.g., Dhuhr available 12:05-3:30pm)
+- [x] **PRAY-04**: Prayer time notifications remind user before each salah window
 
 ### Streaks and Recovery
 
