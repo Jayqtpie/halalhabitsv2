@@ -47,7 +47,10 @@ Full details: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
   1. Privacy Gate correctly routes all 6 new tables — buddies and messages sync to Supabase, boss_battles stays local, detox_sessions are ephemeral, and no unknown-table error is thrown anywhere in the codebase
   2. All 6 SQLite tables exist after migration runs with correct columns, foreign keys, and indexes
   3. The XP economy model document shows combined daily cap math — Friday 2x + streak multiplier + boss/detox rewards never causes hyperinflation at any level
-**Plans**: TBD
+**Plans**: 2 plans
+Plans:
+- [ ] 11-01-PLAN.md — Schema tables, Privacy Gate extension, types, and tests
+- [ ] 11-02-PLAN.md — Supabase migrations with RLS policies and XP economy model
 
 ### Phase 12: Friday Power-Ups
 **Goal**: Every Friday becomes a distinct game event — players see a 2x XP boost on the HUD, receive the Surah Al-Kahf quest card, and read one of 10 vetted hadith-sourced messages
@@ -137,7 +140,7 @@ Full details: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 | 8. Critical Integration Wiring | v1.0 | 2/2 | Complete | 2026-03-18 |
 | 9. Verification and Audit Cleanup | v1.0 | 2/2 | Complete | 2026-03-19 |
 | 10. Title Pipeline and Integration Fixes | v1.0 | 1/1 | Complete | 2026-03-19 |
-| 11. Schema & Privacy Gate Foundation | v2.0 | 0/TBD | Not started | - |
+| 11. Schema & Privacy Gate Foundation | v2.0 | 0/2 | In progress | - |
 | 12. Friday Power-Ups | v2.0 | 0/TBD | Not started | - |
 | 13. Dopamine Detox Dungeon | v2.0 | 0/TBD | Not started | - |
 | 14. Nafs Boss Arena | v2.0 | 0/TBD | Not started | - |
