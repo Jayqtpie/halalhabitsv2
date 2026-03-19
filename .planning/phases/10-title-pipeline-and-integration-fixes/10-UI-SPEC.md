@@ -34,7 +34,7 @@ celebration overlay.
 | Preset | not applicable | no components.json by design |
 | Component library | React Native core (View, Text, Pressable, ScrollView, SafeAreaView) | PROJECT.md / CLAUDE.md |
 | Icon library | React Native Image with pixel art PNGs at 32x32 | Phase 05-04 decision |
-| Font — body | Inter (Inter-Regular, Inter-SemiBold, Inter-Bold) | src/tokens/typography.ts |
+| Font — body | Inter (Inter-Regular, Inter-Bold) | src/tokens/typography.ts |
 | Font — pixel UI | PressStart2P-Regular | src/tokens/typography.ts |
 | Dark-only | Yes — dark theme tokens active; light tokens exist but unused for v1 | Phase 02 decision |
 
@@ -55,15 +55,19 @@ Source: `src/tokens/spacing.ts` — all multiples of 4. No exceptions for this p
 
 Component presets (from `src/tokens/spacing.ts` `componentSpacing`):
 
-| Preset | Value |
-|--------|-------|
-| cardPadding | 16px |
-| buttonPaddingVertical | 12px |
-| buttonPaddingHorizontal | 24px |
-| listItemPaddingVertical | 12px |
-| listItemPaddingHorizontal | 16px |
-| modalPadding | 24px |
-| modalElementGap | 16px |
+| Preset | Value | Note |
+|--------|-------|------|
+| cardPadding | 16px | 4-unit value |
+| buttonPaddingVertical | 12px | 3-unit value — intentional for button ergonomics; reviewed and approved |
+| buttonPaddingHorizontal | 24px | 6-unit value |
+| listItemPaddingVertical | 12px | 3-unit value — intentional for list density; reviewed and approved |
+| listItemPaddingHorizontal | 16px | 4-unit value |
+| modalPadding | 24px | 6-unit value |
+| modalElementGap | 16px | 4-unit value |
+
+The 12px component presets (buttonPaddingVertical, listItemPaddingVertical) are 3-unit
+values on the 4px grid. These are intentional ergonomic compromises carried forward from
+Phase 02 and are not spacing violations.
 
 Exceptions: Touch targets minimum 44x44px per ui-ux-pro-max accessibility rule. The
 destructive "Delete All Data" button in `your-data.tsx` must meet this floor.
@@ -73,23 +77,35 @@ destructive "Delete All Data" button in `your-data.tsx` must meet this floor.
 ## Typography
 
 Source: `src/tokens/typography.ts` — pre-existing token system. Phase 10 makes no changes
-to typography. Values below are the active tokens for surfaces this phase touches.
+to typography. Values below are scoped to the surfaces this phase touches.
+
+### your-data.tsx — Primary Surface (4 sizes, 2 weights)
 
 | Role | Token | Size | Family | Weight | Line Height |
 |------|-------|------|--------|--------|-------------|
 | Screen heading | headingLg | 24px | Inter-Bold | 700 | 32px (1.33) |
-| Section heading | headingMd | 20px | Inter-SemiBold | 600 | 28px (1.4) |
 | Body default | bodyMd | 15px | Inter-Regular | 400 | 22px (1.47) |
 | Body small / meta | bodySm | 13px | Inter-Regular | 400 | 18px (1.38) |
 | Caption / label | caption | 11px | Inter-Regular | 400 | 16px (1.45) |
+
+Active weights on this surface: 400 (Inter-Regular) and 700 (Inter-Bold). No third weight
+used on `your-data.tsx`.
+
+### TitleUnlockOverlay — Per-Surface Sub-Table
+
+The overlay uses pixel-font tokens for HUD-style display elements. These are additive
+to the above table and apply only to `TitleUnlockOverlay` renders.
+
+| Role | Token | Size | Family | Weight | Line Height |
+|------|-------|------|--------|--------|-------------|
 | HUD level display | hudLevel | 16px | PressStart2P-Regular | 700 | 20px |
 | HUD XP display | hudXp | 12px | PressStart2P-Regular | 700 | 16px |
 
+Active weights on overlay surface: 700 (PressStart2P-Regular). Overlay body copy (title
+name, rarity label) uses Inter tokens from the primary surface table above.
+
 Auth screen override (Phase 07-03 decision): PressStart2P at 18px for auth titles,
 overriding headingLg. No auth screens in Phase 10 — not applicable.
-
-Active weights in this phase: 400 (Inter-Regular) and 700 (Inter-Bold / PressStart2P).
-Inter-SemiBold (600) used only for headingMd section headers.
 
 ---
 
@@ -135,6 +151,11 @@ Phase 10 touches exactly two existing screens. No new screens or modals are intr
 
 **Visual delta:** Zero. The screen layout, copy, color, and component tree are
 unchanged. The userId flows invisibly into the export and delete service calls.
+
+**Focal point:** The "Export My Data" primary action button (emerald fill, top of action
+group) is the visual anchor of the screen. The "Delete All Data" button (ruby fill, below
+export) reads as secondary-destructive — same size, lower visual weight due to ruby vs
+emerald contrast against the dark surface.
 
 **Interaction contract (unchanged):**
 - Export: Pressable "Export My Data" → async → ActivityIndicator replaces label during
@@ -185,7 +206,7 @@ codebase. Listed here as the contract baseline for the surfaces this phase touch
 | Delete CTA | "Delete All Data" | existing |
 | Delete confirmation title | "Delete All Data?" | existing |
 | Delete confirmation body | "This will permanently delete all your habits, streaks, XP, and progress. This cannot be undone." | existing |
-| Delete confirmation cancel | "Cancel" | existing |
+| Delete confirmation cancel | "Keep My Data" | updated — replaces generic "Cancel"; uses Alert.alert `text` property |
 | Delete confirmation confirm | "Delete Everything" | existing |
 | Delete success | App navigates to onboarding — no copy, screen transition | existing |
 | Delete error | "Failed to delete data. Please try again." | existing |
@@ -194,6 +215,7 @@ codebase. Listed here as the contract baseline for the surfaces this phase touch
 - No shame copy on delete: "Delete Everything" not "Lose All Progress"
 - No guilt copy anywhere in your-data.tsx
 - Delete confirmation framing: neutral fact-stating, not warning/guilt
+- Dismiss button reads "Keep My Data" (affirmative, data-safe) paired with "Delete Everything" (explicit destructive)
 
 **New title copy — scope clarification:** Title names and unlock messages are defined in
 `TITLE_SEED_DATA` (src/db/seeds/title-seeds.ts). Phase 10 does not add new title
