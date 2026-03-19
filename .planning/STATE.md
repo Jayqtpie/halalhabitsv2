@@ -1,15 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: "HalalHabits Ferrari 16-Bit Edition"
-status: complete
-stopped_at: "Milestone v1.0 complete and archived"
-last_updated: "2026-03-19T22:00:00.000Z"
+milestone: v2.0
+milestone_name: "Social & Battle Systems"
+status: active
+stopped_at: "Defining requirements"
+last_updated: "2026-03-19T23:00:00.000Z"
 progress:
-  total_phases: 10
-  completed_phases: 10
-  total_plans: 38
-  completed_plans: 38
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -19,18 +19,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Milestone v1.0 complete — next milestone planning pending
+**Current focus:** v2.0 — Social & Battle Systems
 
 ## Current Position
 
-Milestone: v1.0 — COMPLETE (shipped 2026-03-19)
-Next: `/gsd:new-milestone` to define v1.1 or v2.0
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-19 — Milestone v2.0 started
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions logged in PROJECT.md Key Decisions table.
+- Boss unlock lowered to Level 10+ (from Blueprint's 15+) for faster engagement
+- Up to 20 buddies (expanded from original "duo" concept)
+- Chat filter approach to be decided during planning phase
+- Decisions logged in PROJECT.md Key Decisions table.
 
 ### Pending Todos
 
@@ -48,5 +53,5 @@ Decisions logged in PROJECT.md Key Decisions table.
 ## Session Continuity
 
 Last session: 2026-03-19
-Stopped at: Milestone v1.0 archived
+Stopped at: Defining v2.0 requirements
 Resume file: None

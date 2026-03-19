@@ -31,18 +31,37 @@ Players build real-world Islamic discipline through game mechanics that motivate
 
 ### Active
 
-(None — next milestone requirements to be defined via `/gsd:new-milestone`)
+<!-- Current scope: v2.0 milestone -->
+
+- [ ] Private Accountability Buddies — social buddy system (up to 20 connections)
+- [ ] Buddy invite codes + username search connection mechanism
+- [ ] Shared habit goals between buddies
+- [ ] Duo quests requiring both players to complete
+- [ ] In-app filtered messaging between buddies
+- [ ] Nafs Boss Arena — multi-day boss battles against personified struggles
+- [ ] Dopamine Detox Dungeon — voluntary anti-doomscrolling challenges
+- [ ] Friday Power-Ups — Jumu'ah 2x XP multiplier + Surah Al-Kahf challenge
 
 ### Out of Scope
 
 - Fatwa engine or religious authority claims — app motivates behavior, not spiritual judgment
 - Public leaderboards for worship — violates adab safety rails (riya)
-- Social features — Private Accountability Duos deferred to v2
-- Nafs Boss Arena, Dopamine Detox Dungeon, Friday Power-Ups — deferred to v2
+- ~~Private Accountability Duos~~ — moved to v2.0 Active
+- ~~Nafs Boss Arena, Dopamine Detox Dungeon, Friday Power-Ups~~ — moved to v2.0 Active
 - Apple/Google OAuth — email/password only for v1 (scoping choice)
 - Monetization — future cosmetic-only Barakah shop
 - Web version — mobile-first, App Store priority
 - Apple Watch / wearable, tablet layouts, widgets — scope control for solo dev
+
+## Current Milestone: v2.0 Social & Battle Systems
+
+**Goal:** Add a social buddy system with shared activities and filtered messaging, plus three game features — Nafs Boss Arena, Dopamine Detox Dungeon, and Friday Power-Ups.
+
+**Target features:**
+- Private Accountability Buddies (up to 20, invite codes + username search, shared habits, duo quests, filtered chat)
+- Nafs Boss Arena (multi-day boss battles, 5 boss archetypes, unlock at Level 10+)
+- Dopamine Detox Dungeon (voluntary 2-8hr anti-doomscrolling, daily + weekly deep variant)
+- Friday Power-Ups (2x XP on Fridays, Surah Al-Kahf challenge, hadith-sourced messages)
 
 ## Context
 
@@ -92,6 +111,8 @@ Players build real-world Islamic discipline through game mechanics that motivate
 | WatermelonDB skipped for expo-sqlite | Simpler, direct SQL, lower complexity | ✓ Good — worked well with Drizzle |
 | Dark-only theme for v1 | Matches retro aesthetic, ship faster | — Pending user feedback |
 | SDK 54 for Expo Go compatibility | iPhone testing without Apple Dev account | ⚠️ Revisit — upgrade path needed |
+| Boss unlock lowered to Level 10+ | Faster engagement, let players hit bosses sooner | — Pending |
+| Up to 20 buddies (not strict duo) | More social, user preference | — Pending |
 
 ---
-*Last updated: 2026-03-19 after v1.0 milestone*
+*Last updated: 2026-03-19 after v2.0 milestone start*
