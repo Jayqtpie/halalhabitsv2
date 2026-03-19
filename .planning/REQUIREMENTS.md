@@ -9,8 +9,8 @@ Requirements for v2.0 milestone. Each maps to roadmap phases.
 
 ### Schema & Foundation
 
-- [ ] **FOUN-01**: Privacy Gate updated with 6 new table classifications (buddies, messages, duo_quests, shared_habits = SYNCABLE; boss_battles = PRIVATE; detox_sessions = LOCAL_ONLY)
-- [ ] **FOUN-02**: 6 new SQLite tables created via Drizzle migration (buddies, messages, duo_quests, shared_habits, boss_battles, detox_sessions)
+- [x] **FOUN-01**: Privacy Gate updated with 6 new table classifications (buddies, messages, duo_quests, shared_habits = SYNCABLE; boss_battles = PRIVATE; detox_sessions = LOCAL_ONLY)
+- [x] **FOUN-02**: 6 new SQLite tables created via Drizzle migration (buddies, messages, duo_quests, shared_habits, boss_battles, detox_sessions)
 - [ ] **FOUN-03**: XP economy model accounts for all v2.0 sources with daily cap preventing hyperinflation
 
 ### Friday Power-Ups
@@ -111,8 +111,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUN-01 | Phase 11 | Pending |
-| FOUN-02 | Phase 11 | Pending |
+| FOUN-01 | Phase 11 | Complete |
+| FOUN-02 | Phase 11 | Complete |
 | FOUN-03 | Phase 11 | Pending |
 | FRDY-01 | Phase 12 | Pending |
 | FRDY-02 | Phase 12 | Pending |

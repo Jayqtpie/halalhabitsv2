@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
-status: planning
-stopped_at: Phase 11 context gathered
-last_updated: "2026-03-19T23:19:03.883Z"
-last_activity: 2026-03-19 — v2.0 roadmap created (7 phases, 38 requirements mapped)
+status: unknown
+stopped_at: Completed 11-01-PLAN.md (schema + privacy gate extension)
+last_updated: "2026-03-19T23:53:43.086Z"
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_plans: 2
+  completed_plans: 1
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Phase 11 — Schema & Privacy Gate Foundation
+**Current focus:** Phase 11 — schema-privacy-gate-foundation
 
 ## Current Position
 
-Phase: 11 of 17 (Schema & Privacy Gate Foundation)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-03-19 — v2.0 roadmap created (7 phases, 38 requirements mapped)
-
-Progress: [░░░░░░░░░░] 0% (v2.0 milestone)
+Phase: 11 (schema-privacy-gate-foundation) — EXECUTING
+Plan: 2 of 2
 
 ## Accumulated Context
 
@@ -43,6 +37,7 @@ Progress: [░░░░░░░░░░] 0% (v2.0 milestone)
 - Detox sessions are LOCAL_ONLY — ephemeral, no sync needed
 - XP economy spreadsheet must be built in Phase 11 before any XP feature ships
 - Decisions logged in PROJECT.md Key Decisions table.
+- [Phase 11]: Drizzle table SQL names accessed via Symbol.for('drizzle:Name'), not _.name — discovered during auto-validation test
 
 ### Pending Todos
 
@@ -61,6 +56,6 @@ Progress: [░░░░░░░░░░] 0% (v2.0 milestone)
 
 ## Session Continuity
 
-Last session: 2026-03-19T23:19:03.880Z
-Stopped at: Phase 11 context gathered
-Resume file: .planning/phases/11-schema-privacy-gate-foundation/11-CONTEXT.md
+Last session: 2026-03-19T23:53:43.083Z
+Stopped at: Completed 11-01-PLAN.md (schema + privacy gate extension)
+Resume file: None
