@@ -1,6 +1,6 @@
 /**
  * Privacy Gate tests.
- * Verifies that ALL 13 entities have correct privacy classification
+ * Verifies that ALL 19 entities have correct privacy classification
  * and that sync guards enforce the classifications.
  */
 import {
@@ -17,6 +17,7 @@ const PRIVATE_TABLES = [
   'streaks',
   'muhasabah_entries',
   'niyyah',
+  'boss_battles',
 ] as const;
 
 const SYNCABLE_TABLES = [
@@ -27,13 +28,17 @@ const SYNCABLE_TABLES = [
   'user_titles',
   'quests',
   'settings',
+  'buddies',
+  'messages',
+  'duo_quests',
+  'shared_habits',
 ] as const;
 
-const LOCAL_ONLY_TABLES = ['sync_queue'] as const;
+const LOCAL_ONLY_TABLES = ['sync_queue', 'detox_sessions', '_zustand_store'] as const;
 
 describe('Privacy Gate', () => {
   describe('PRIVACY_MAP completeness', () => {
-    it('classifies exactly 12 entities (4 PRIVATE + 7 SYNCABLE + 1 LOCAL_ONLY)', () => {
+    it('classifies exactly 19 entities (5 PRIVATE + 11 SYNCABLE + 3 LOCAL_ONLY)', () => {
       const allTables = [...PRIVATE_TABLES, ...SYNCABLE_TABLES, ...LOCAL_ONLY_TABLES];
       expect(Object.keys(PRIVACY_MAP)).toHaveLength(allTables.length);
 
@@ -91,12 +96,22 @@ describe('Privacy Gate', () => {
       expect(() => assertSyncable('sync_queue')).toThrow('PRIVACY VIOLATION');
       expect(() => assertSyncable('sync_queue')).toThrow('LOCAL_ONLY');
     });
+
+    it('throws PRIVACY VIOLATION for boss_battles (PRIVATE)', () => {
+      expect(() => assertSyncable('boss_battles')).toThrow('PRIVACY VIOLATION');
+      expect(() => assertSyncable('boss_battles')).toThrow('PRIVATE');
+    });
+
+    it('throws PRIVACY VIOLATION for detox_sessions (LOCAL_ONLY)', () => {
+      expect(() => assertSyncable('detox_sessions')).toThrow('PRIVACY VIOLATION');
+      expect(() => assertSyncable('detox_sessions')).toThrow('LOCAL_ONLY');
+    });
   });
 
   describe('getPrivateTables', () => {
-    it('returns exactly 4 private tables', () => {
+    it('returns exactly 5 private tables', () => {
       const privateTables = getPrivateTables();
-      expect(privateTables).toHaveLength(4);
+      expect(privateTables).toHaveLength(5);
       for (const table of PRIVATE_TABLES) {
         expect(privateTables).toContain(table);
       }
@@ -104,11 +119,33 @@ describe('Privacy Gate', () => {
   });
 
   describe('getSyncableTables', () => {
-    it('returns exactly 7 syncable tables', () => {
+    it('returns exactly 11 syncable tables', () => {
       const syncableTables = getSyncableTables();
-      expect(syncableTables).toHaveLength(7);
+      expect(syncableTables).toHaveLength(11);
       for (const table of SYNCABLE_TABLES) {
         expect(syncableTables).toContain(table);
+      }
+    });
+  });
+
+  describe('PRIVACY_MAP auto-validation', () => {
+    it('every exported sqliteTable in schema.ts has a PRIVACY_MAP entry', () => {
+      // Drizzle table objects expose their SQL table name via Symbol(drizzle:Name)
+      const drizzleNameSymbol = Symbol.for('drizzle:Name');
+      const schemaExports = require('../../src/db/schema');
+      const tableNames = Object.values(schemaExports)
+        .filter((v: any): boolean =>
+          typeof v === 'object' && v !== null && typeof v[drizzleNameSymbol] === 'string'
+        )
+        .map((t: any) => t[drizzleNameSymbol] as string);
+
+      expect(tableNames.length).toBeGreaterThanOrEqual(19);
+
+      for (const tableName of tableNames) {
+        expect(PRIVACY_MAP).toHaveProperty(
+          tableName,
+          expect.any(String),
+        );
       }
     });
   });

@@ -5,7 +5,7 @@
  * This is the structural guarantee that worship data (salah completion logs,
  * Muhasabah reflections, streaks, niyyah) never leaves the device.
  *
- * All 13 entities must have explicit classification. Unknown tables throw.
+ * All 19 entities must have explicit classification. Unknown tables throw.
  * The assertSyncable function is the ONLY path for sync queue writes.
  *
  * @see blueprint/11-data-model.md for privacy justifications
@@ -14,11 +14,11 @@
 import type { PrivacyLevel } from '../types/common';
 
 /**
- * Privacy classification map for all 13 entities.
+ * Privacy classification map for all 19 entities.
  *
- * PRIVATE (4): Worship data that never leaves the device
- * SYNCABLE (7): Profile/game data safe for cloud backup
- * LOCAL_ONLY (1): Infrastructure tables (sync queue itself)
+ * PRIVATE (5): Worship data that never leaves the device
+ * SYNCABLE (11): Profile/game data safe for cloud backup
+ * LOCAL_ONLY (3): Infrastructure/ephemeral tables
  */
 export const PRIVACY_MAP: Record<string, PrivacyLevel> = {
   // PRIVATE - worship data, sacred privacy
@@ -26,6 +26,7 @@ export const PRIVACY_MAP: Record<string, PrivacyLevel> = {
   streaks: 'PRIVATE',
   muhasabah_entries: 'PRIVATE',
   niyyah: 'PRIVATE',
+  boss_battles: 'PRIVATE',       // nafs archetype reveals personal struggle
 
   // SYNCABLE - profile and game data
   users: 'SYNCABLE',
@@ -35,9 +36,15 @@ export const PRIVACY_MAP: Record<string, PrivacyLevel> = {
   user_titles: 'SYNCABLE',
   quests: 'SYNCABLE',
   settings: 'SYNCABLE',
+  buddies: 'SYNCABLE',           // connection metadata both users need
+  messages: 'SYNCABLE',          // offline cache + Supabase sync
+  duo_quests: 'SYNCABLE',        // both buddies need to see quest progress
+  shared_habits: 'SYNCABLE',     // both buddies need to see shared goal
 
   // LOCAL_ONLY - infrastructure
   sync_queue: 'LOCAL_ONLY',
+  detox_sessions: 'LOCAL_ONLY',  // ephemeral session data
+  _zustand_store: 'LOCAL_ONLY',  // Zustand persist infrastructure
 } as const;
 
 /**
