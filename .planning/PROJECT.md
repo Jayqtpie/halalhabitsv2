@@ -12,7 +12,17 @@ Players build real-world Islamic discipline through game mechanics that motivate
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Core daily loop — habits tracked, XP earned, streaks maintained (Validated in Phase 3: Core Habit Loop)
+- [x] Salah Streak Shield system (Validated in Phase 3: Core Habit Loop)
+- [x] Habit Forge — custom habit creation and tracking (Validated in Phase 3: Core Habit Loop)
+- [x] Quest Board — daily/weekly quests (Validated in Phase 3: Core Habit Loop)
+- [x] Nightly Muhasabah — evening reflection (Validated in Phase 5: HUD, Visual Identity & Muhasabah)
+- [x] Mercy Mode — compassionate streak recovery (Validated in Phase 3: Core Habit Loop)
+- [x] Identity Titles and progression system (Validated in Phase 4: Game Engine & Progression, wiring completed Phase 10)
+- [x] Home HUD with game-world feel (Validated in Phase 5: HUD, Visual Identity & Muhasabah)
+- [x] Offline-first with sync (Validated in Phase 7: Backend, Auth & Sync)
+- [x] Privacy-first defaults — all worship data local (Validated in Phase 7: Backend, Auth & Sync)
+- [x] Title pipeline wired to real data — integration gaps closed (Validated in Phase 10: Title Pipeline & Integration Fixes)
 
 ### Active
 
@@ -86,4 +96,4 @@ Players build real-world Islamic discipline through game mechanics that motivate
 | Local-first worship data | Privacy is a hard constraint; sync for non-sensitive data only | -- Pending |
 
 ---
-*Last updated: 2026-03-07 after initialization*
+*Last updated: 2026-03-19 after Phase 10 completion — all 10 phases complete*
