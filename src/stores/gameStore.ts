@@ -16,7 +16,7 @@ import { selectQuestTemplates, evaluateQuestProgress } from '../domain/quest-eng
 import { getLevelUpCopy } from '../domain/level-copy';
 import { TITLE_SEED_DATA } from '../domain/title-seed-data';
 import { QUEST_TEMPLATES } from '../domain/quest-templates';
-import { xpRepo, titleRepo, questRepo, userRepo, habitRepo } from '../db/repos';
+import { xpRepo, titleRepo, questRepo, userRepo, habitRepo, streakRepo, muhasabahRepo } from '../db/repos';
 import { generateId } from '../utils/uuid';
 import type { Title, UserTitle, Quest } from '../types/database';
 import type { PlayerStats } from '../domain/title-engine';
@@ -316,14 +316,21 @@ export const useGameStore = create<GameState>((set, get) => ({
       const completedQuests = await questRepo.getCompleted(userId);
       const questCompletions = completedQuests.length;
 
+      // Query real mercy recoveries and muhasabah streak in parallel
+      const [allUserStreaks, muhasabahStreak] = await Promise.all([
+        streakRepo.getAllForUser(userId),
+        muhasabahRepo.getStreak(userId),
+      ]);
+      const mercyRecoveries = allUserStreaks.filter(s => s.isRebuilt).length;
+
       const stats: PlayerStats = {
         currentLevel: state.currentLevel,
         habitStreaks: habitStreakMap,
         habitTypes: habitTypeMap,
         totalCompletions: Object.values(habitStoreState.completions).filter(Boolean).length,
         questCompletions,
-        mercyRecoveries: 0, // Phase 5 TODO: track mercy recoveries in DB
-        muhasabahStreak: 0, // Phase 5 TODO: compute from muhasabah entries
+        mercyRecoveries,
+        muhasabahStreak,
         activeHabitCount: userHabits.length,
         simultaneousStreaks14,
         simultaneousStreaks90,
@@ -439,7 +446,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           }));
         } else {
           // Partial progress
-          await questRepo.updateProgressAtomic(quest.id, quest.targetValue);
+          await questRepo.updateProgressAtomic(quest.id, newProgress);
 
           // Update local state
           set((s) => ({

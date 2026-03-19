@@ -20,8 +20,7 @@ import {
 import { useRouter } from 'expo-router';
 import { colors, typography, fontFamilies, spacing } from '../src/tokens';
 import { exportUserData, deleteAllUserData } from '../src/services/data-export';
-
-const USER_ID = 'default-user';
+import { useAuthStore } from '../src/stores/authStore';
 
 const DATA_CATEGORIES = [
   { key: 'habits', label: 'Habits', description: 'Your habit names, types, and settings' },
@@ -44,13 +43,14 @@ const DATA_CATEGORIES = [
 
 export default function YourDataScreen() {
   const router = useRouter();
+  const userId = useAuthStore((s) => s.userId);
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
   const handleExport = async () => {
     setExporting(true);
     try {
-      await exportUserData(USER_ID);
+      await exportUserData(userId);
     } catch (err) {
       Alert.alert('Export Failed', 'Unable to export your data. Please try again.');
     } finally {
@@ -70,7 +70,7 @@ export default function YourDataScreen() {
           onPress: async () => {
             setDeleting(true);
             try {
-              await deleteAllUserData(USER_ID);
+              await deleteAllUserData(userId);
               // Navigate to onboarding
               router.replace('/(onboarding)/welcome' as any);
             } catch (err) {
