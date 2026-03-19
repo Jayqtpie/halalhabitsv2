@@ -201,6 +201,10 @@ Plans:
   4. `updateQuestProgress` passes correct progress value (not targetValue) for partial quests
   5. E2E flow "Mercy Mode → title unlock" passes
   6. E2E flow "Muhasabah → title unlock" passes
+**Plans**: 1 plan
+
+Plans:
+- [ ] 10-01-PLAN.md — TDD tests + 4 integration fixes (mercyRecoveries, muhasabahStreak, quest partial-progress, your-data userId)
 
 ## Progress
 
@@ -218,4 +222,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 | 7. Backend, Auth, and Sync | 5/5 | Complete | 2026-03-18 |
 | 8. Critical Integration Wiring | 2/2 | Complete | 2026-03-18 |
 | 9. Verification and Audit Cleanup | 2/2 | Complete   | 2026-03-19 |
-| 10. Title Pipeline and Integration Fixes | 0/0 | Planned | — |
+| 10. Title Pipeline and Integration Fixes | 0/1 | Planned | — |
