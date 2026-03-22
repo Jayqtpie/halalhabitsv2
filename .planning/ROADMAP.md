@@ -80,7 +80,7 @@ Plans:
 **Plans**: 4 plans
 Plans:
 - [x] 13-01-PLAN.md — Domain engine (detox-engine.ts) and repository (detoxRepo.ts) with TDD
-- [ ] 13-02-PLAN.md — Store wiring (detoxStore), title engine extension, streak protection, gameStore integration
+- [x] 13-02-PLAN.md — Store wiring (detoxStore), title engine extension, streak protection, gameStore integration
 - [ ] 13-03-PLAN.md — DungeonSheet, DetoxCountdownTimer, EarlyExitConfirmation, DetoxShieldBadge UI
 - [ ] 13-04-PLAN.md — HUD dungeon theme, DungeonDoorIcon, WelcomeBackToast, DungeonClearedFanfare
 
@@ -151,7 +151,7 @@ Plans:
 | 10. Title Pipeline and Integration Fixes | v1.0 | 1/1 | Complete | 2026-03-19 |
 | 11. Schema & Privacy Gate Foundation | 2/2 | Complete    | 2026-03-20 | - |
 | 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
-| 13. Dopamine Detox Dungeon | v2.0 | 1/4 | In Progress|  |
+| 13. Dopamine Detox Dungeon | v2.0 | 2/4 | In Progress|  |
 | 14. Nafs Boss Arena | v2.0 | 0/TBD | Not started | - |
 | 15. Buddy Connection System | v2.0 | 0/TBD | Not started | - |
 | 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |

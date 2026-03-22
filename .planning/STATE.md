@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Ready to execute
-stopped_at: Completed 13-01-PLAN.md
-last_updated: "2026-03-22T22:10:56.523Z"
+stopped_at: Completed 13-02-PLAN.md
+last_updated: "2026-03-22T22:17:56.774Z"
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 13 (dopamine-detox-dungeon) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 
 ## Accumulated Context
 
@@ -49,6 +49,9 @@ Plan: 2 of 4
 - [Phase 12-friday-power-ups]: JumuahToggle state is local to HabitCard — honor system toggle with no persistence, no XP awarded
 - [Phase 13-dopamine-detox-dungeon]: detox-engine daily XP formula: 50+(clampedHours-2)*25, clamp(h,2-6); deep always 300
 - [Phase 13-dopamine-detox-dungeon]: detoxRepo uses caller-supplied day/week boundaries — getTodaySessions(dayStart,dayEnd), getThisWeekDeepSessions(weekStart)
+- [Phase 13-dopamine-detox-dungeon]: detoxStore uses no persist middleware — session data lives in SQLite (LOCAL_ONLY invariant)
+- [Phase 13-dopamine-detox-dungeon]: Full-day window used for streak protection during active detox (dayStart to dayEnd) — simplest correct approach
+- [Phase 13-dopamine-detox-dungeon]: Title count expanded to 27 with The Unplugged (detox_completions, 10 sessions, sortOrder 27)
 
 ### Pending Todos
 
@@ -67,6 +70,6 @@ Plan: 2 of 4
 
 ## Session Continuity
 
-Last session: 2026-03-22T22:10:56.519Z
-Stopped at: Completed 13-01-PLAN.md
+Last session: 2026-03-22T22:17:56.771Z
+Stopped at: Completed 13-02-PLAN.md
 Resume file: None
