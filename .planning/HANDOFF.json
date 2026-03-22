@@ -1,58 +1,45 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-22T20:54:24.921Z",
+  "timestamp": "2026-03-22T21:58:13.561Z",
   "phase": "13",
   "phase_name": "Dopamine Detox Dungeon",
   "phase_dir": ".planning/phases/13-dopamine-detox-dungeon",
   "plan": null,
   "task": null,
-  "total_tasks": null,
+  "total_tasks": 9,
   "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "Phase 13 context gathering (discuss-phase)", "status": "done", "commit": "5e4d233"}
+    {"id": 1, "name": "Phase 13 context gathering (discuss-phase)", "status": "done", "commit": "5e4d233"},
+    {"id": 2, "name": "UI-SPEC design contract", "status": "done", "commit": "1b9be7f"},
+    {"id": 3, "name": "Research", "status": "done", "commit": "1b9b0d3"},
+    {"id": 4, "name": "Validation strategy", "status": "done", "commit": "00bb953"},
+    {"id": 5, "name": "Planning (4 plans, 3 waves) + verification", "status": "done"}
   ],
   "remaining_tasks": [
-    {"id": 2, "name": "Plan phase 13 (/gsd:plan-phase 13)", "status": "not_started"},
-    {"id": 3, "name": "Execute phase 13 (/gsd:execute-phase 13)", "status": "not_started"}
+    {"id": 6, "name": "Execute Plan 01 (Wave 1) — detox-engine TDD + detoxRepo", "status": "not_started"},
+    {"id": 7, "name": "Execute Plan 02 (Wave 2) — detoxStore, streak protection, titles, gameStore", "status": "not_started"},
+    {"id": 8, "name": "Execute Plan 03 (Wave 3) — DungeonSheet UI, timer, early exit, shield badge", "status": "not_started"},
+    {"id": 9, "name": "Execute Plan 04 (Wave 3) — HUD dungeon theme, door icon, fanfare, toast", "status": "not_started"}
   ],
   "blockers": [],
   "human_actions_pending": [
     {"action": "Phase 12 Friday UAT still pending (7 items require Friday device test)", "context": "Carried from Phase 12 — FridayBoostBadge, 2x XP, Al-Kahf quest, section chips, Jumuah toggle, haptics, banner auto-dismiss", "blocking": false}
   ],
   "decisions": [
+    {"decision": "4 plans in 3 waves: domain+repo → store+integrations → UI (parallel)", "rationale": "Dependency order: pure functions first, then store orchestration, then UI in parallel", "phase": "13"},
+    {"decision": "Plan 04 is non-autonomous (has checkpoint)", "rationale": "HUD dungeon theme transformation needs visual review", "phase": "13"},
     {"decision": "HUD pixel dungeon door icon opens bottom sheet for session controls", "rationale": "Quick access without adding a full navigation tab", "phase": "13"},
     {"decision": "Preset duration chips (2hr, 4hr, 6hr, 8hr) with Daily/Deep toggle", "rationale": "Fast tap selection, clear variant distinction", "phase": "13"},
     {"decision": "Full dungeon HUD theme during active session", "rationale": "Dramatic immersive experience — HUD transforms with stone walls, torches, new palette", "phase": "13"},
-    {"decision": "Welcome-back toast on app resume during active detox", "rationale": "Acknowledges player return, shows remaining time", "phase": "13"},
     {"decision": "Compassionate mentor voice on early exit, proportional XP penalty, one retry/day", "rationale": "No-shame philosophy, fair scaling, balanced forgiveness", "phase": "13"},
-    {"decision": "Dungeon Cleared fanfare with XP animation on completion", "rationale": "Should feel like beating a game level", "phase": "13"},
     {"decision": "Visible shield icon on habit cards during active detox (overlapping habits only)", "rationale": "Reduces anxiety, prevents gaming by scoping to session window", "phase": "13"},
     {"decision": "Detox-specific Identity Title (e.g., Dungeon Master)", "rationale": "Long-term motivation for repeated detox sessions", "phase": "13"}
   ],
   "uncommitted_files": [
-    "__tests__/db/muhasabahRepo.test.ts",
-    "__tests__/db/repos/syncQueueWiring.test.ts",
-    "__tests__/services/auth-service.test.ts",
-    "__tests__/stores/gameStore.test.ts",
-    "src/components/hud/HudScene.tsx",
-    "src/components/quests/AlKahfQuestCard.tsx",
-    "src/db/repos/completionRepo.ts",
-    "src/db/repos/habitRepo.ts",
-    "src/db/repos/muhasabahRepo.ts",
-    "src/db/repos/questRepo.ts",
-    "src/db/repos/settingsRepo.ts",
-    "src/db/repos/streakRepo.ts",
-    "src/db/repos/titleRepo.ts",
-    "src/db/repos/userRepo.ts",
-    "src/db/repos/xpRepo.ts",
-    "src/domain/streak-engine.ts",
-    "src/services/auth-service.ts",
-    "src/services/data-export.ts",
-    "src/stores/gameStore.ts",
-    "src/stores/habitStore.ts",
-    "src/types/habits.ts",
+    ".planning/ROADMAP.md",
+    ".planning/STATE.md",
     "src/stores/bridge.ts"
   ],
-  "next_action": "Run /gsd:plan-phase 13 to create execution plans from the gathered context",
-  "context_notes": "Phase 13 context fully gathered — all 4 gray areas discussed (entry, session, exit, completion). Phase 12 Friday Power-Ups has uncommitted working tree changes from execution (plans complete per STATE.md). Ready to plan Phase 13."
+  "next_action": "Run /gsd:execute-phase 13 to execute all 4 plans across 3 waves",
+  "context_notes": "Phase 13 is fully planned and verified. All 4 PLAN.md files passed the plan checker across all 10 dimensions. Research identified no new packages needed — schema and types already exist from Phase 11. Planner hit a usage limit mid-session but had already written all 4 plans. Checker confirmed full DTOX-01..06 coverage. Ready to execute."
 }
