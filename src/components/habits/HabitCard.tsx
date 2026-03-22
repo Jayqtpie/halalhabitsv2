@@ -22,7 +22,7 @@
  *   habit-dua.png     — Raised open hands (warm amber)
  *   habit-custom.png  — 4-pointed sparkle star (bright gold)
  */
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   Text,
   StyleSheet,
@@ -37,6 +37,8 @@ import { useSettingsStore } from '../../stores/settingsStore';
 import { PrayerTimeWindow } from '../prayer/PrayerTimeWindow';
 import type { HabitWithStatus } from '../../types/habits';
 import { colors, palette, typography, spacing, radius, duration } from '../../tokens';
+import { isFriday } from '../../domain/friday-engine';
+import { JumuahToggle } from './JumuahToggle';
 
 // ── Pixel art icon map ───────────────────────────────────────────────────────
 // Keyed by habit.category (PresetCategory) with 'custom' as fallback.
@@ -63,6 +65,10 @@ interface HabitCardProps {
 export function HabitCard({ habit, onComplete, onLongPress, onCompleteWithPosition }: HabitCardProps) {
   const hapticEnabled = useSettingsStore((s) => s.hapticEnabled);
   const completed = habit.completedToday;
+
+  // Friday-only: Jumu'ah toggle for Dhuhr slot
+  const isDhuhr = habit.type === 'salah_dhuhr';
+  const [jumuahToggled, setJumuahToggled] = useState(false);
 
   // Ref for measuring card position
   const cardRef = useRef<View>(null);
@@ -180,12 +186,19 @@ export function HabitCard({ habit, onComplete, onLongPress, onCompleteWithPositi
 
         {/* Center: Name, time window, streak */}
         <View style={styles.centerContent}>
-          <Text
-            style={[styles.habitName, completed && styles.textCompleted]}
-            numberOfLines={1}
-          >
-            {habit.name}
-          </Text>
+          <View style={styles.nameRow}>
+            <Text
+              style={[styles.habitName, completed && styles.textCompleted]}
+              numberOfLines={1}
+            >
+              {habit.name}
+            </Text>
+            {isDhuhr && isFriday() && (
+              <View style={styles.jumuahInlineBadge}>
+                <Text style={styles.jumuahInlineBadgeText}>{"Jumu'ah"}</Text>
+              </View>
+            )}
+          </View>
           <PrayerTimeWindow prayerWindow={habit.prayerWindow} />
           <View style={styles.metaRow}>
             {streakCount > 0 && (
@@ -214,6 +227,16 @@ export function HabitCard({ habit, onComplete, onLongPress, onCompleteWithPositi
           </View>
         </Animated.View>
       </Pressable>
+
+      {/* Friday-only: Jumu'ah toggle below Dhuhr card */}
+      {isDhuhr && isFriday() && (
+        <JumuahToggle
+          isToggled={jumuahToggled}
+          onToggle={(toggled) => {
+            setJumuahToggled(toggled);
+          }}
+        />
+      )}
     </Animated.View>
   );
 }
@@ -254,6 +277,27 @@ const styles = StyleSheet.create({
   centerContent: {
     flex: 1,
     justifyContent: 'center',
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  jumuahInlineBadge: {
+    backgroundColor: 'rgba(52,211,153,0.15)',
+    borderColor: palette['emerald-400'],
+    borderWidth: 1,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: 2,
+    flexShrink: 0,
+  },
+  jumuahInlineBadgeText: {
+    fontSize: typography.caption.fontSize,
+    lineHeight: typography.caption.lineHeight,
+    fontFamily: typography.caption.fontFamily,
+    letterSpacing: typography.caption.letterSpacing,
+    color: palette['emerald-400'],
   },
   habitName: {
     fontSize: typography.bodyLg.fontSize,
