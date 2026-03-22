@@ -43,11 +43,10 @@ describe('checkTitles -- PlayerStats wiring', () => {
 });
 
 describe('updateQuestProgress -- partial progress fix', () => {
-  it('partial branch uses newProgress not quest.targetValue', () => {
-    // Find the else branch (partial progress) and verify it uses newProgress.
-    // The completed branch correctly uses quest.targetValue; the partial else block must use newProgress.
+  it('partial branch uses setProgress with newProgress', () => {
+    // Find the else branch (partial progress) and verify it passes newProgress as the second arg.
     const partialBranchMatch = gameStoreContent.match(
-      /\/\/ Partial progress[\s\S]*?updateProgressAtomic\(quest\.id,\s*([\w.]+)\)/
+      /\/\/ Partial progress[\s\S]*?setProgress\(quest\.id,\s*([\w.]+),/
     );
     expect(partialBranchMatch).not.toBeNull();
     expect(partialBranchMatch![1]).toBe('newProgress');

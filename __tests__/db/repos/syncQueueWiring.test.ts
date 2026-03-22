@@ -212,11 +212,24 @@ describe('habitRepo sync wiring', () => {
 });
 
 describe('xpRepo sync wiring', () => {
-  it('Test 6: create() calls enqueue with entityType xp_ledger', async () => {
+  it('Test 6: create() calls enqueue with entityType xp_ledger and redacted source fields', async () => {
     await xpRepo.create(testXPEntry as any);
     await flushAsync();
 
-    expect(mockEnqueue).toHaveBeenCalledWith('xp_ledger', testXPEntry.id, 'INSERT', testXPEntry);
+    // Privacy: sourceId and sourceType are stripped before sync to prevent
+    // worship completion reconstruction on the server
+    expect(mockEnqueue).toHaveBeenCalledWith(
+      'xp_ledger',
+      testXPEntry.id,
+      'INSERT',
+      expect.objectContaining({
+        id: testXPEntry.id,
+        userId: testXPEntry.userId,
+        amount: testXPEntry.amount,
+        sourceId: null,
+        sourceType: 'redacted',
+      }),
+    );
   });
 });
 

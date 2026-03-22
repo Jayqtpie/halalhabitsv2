@@ -23,7 +23,7 @@ describe('muhasabahRepo', () => {
     it('exports muhasabahRepo with expected methods', () => {
       // Dynamic require to avoid triggering db initialization
       jest.mock('../../src/db/client', () => ({
-        db: {
+        getDb: jest.fn(() => ({
           insert: jest.fn().mockReturnValue({
             values: jest.fn().mockReturnValue({
               returning: jest.fn().mockResolvedValue([]),
@@ -38,7 +38,7 @@ describe('muhasabahRepo', () => {
               }),
             }),
           }),
-        },
+        })),
       }));
 
       const { muhasabahRepo } = require('../../src/db/repos/muhasabahRepo');
@@ -57,7 +57,7 @@ describe('muhasabahRepo', () => {
       ]);
 
       jest.mock('../../src/db/client', () => ({
-        db: {
+        getDb: jest.fn(() => ({
           select: jest.fn().mockReturnValue({
             from: jest.fn().mockReturnValue({
               where: jest.fn().mockReturnValue({
@@ -67,7 +67,7 @@ describe('muhasabahRepo', () => {
               }),
             }),
           }),
-        },
+        })),
       }));
 
       // Clear module cache to pick up fresh mock
@@ -83,7 +83,7 @@ describe('muhasabahRepo', () => {
       const mockLimit = jest.fn().mockResolvedValue([todayEntry]);
 
       jest.mock('../../src/db/client', () => ({
-        db: {
+        getDb: jest.fn(() => ({
           select: jest.fn().mockReturnValue({
             from: jest.fn().mockReturnValue({
               where: jest.fn().mockReturnValue({
@@ -93,7 +93,7 @@ describe('muhasabahRepo', () => {
               }),
             }),
           }),
-        },
+        })),
       }));
 
       jest.resetModules();

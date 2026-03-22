@@ -33,7 +33,7 @@ const mockExecSync = jest.fn();
 jest.mock('../../src/db/client', () => ({
   getDb: jest.fn(() => ({
     $client: {
-      execSync: mockExecSync,
+      runSync: mockExecSync,
     },
   })),
 }));
@@ -117,7 +117,7 @@ describe('Auth Service', () => {
 
   it('Test 5: migrateGuestData calls UPDATE on all syncable tables to re-key default-user rows', async () => {
     await migrateGuestData('new-auth-uid');
-    // Should have called execSync multiple times (users table + all FK tables)
+    // Should have called runSync multiple times (users table + all FK tables)
     expect(mockExecSync).toHaveBeenCalled();
     const calls = mockExecSync.mock.calls.map((c: unknown[]) => c[0] as string);
     // users table id re-key
@@ -133,7 +133,7 @@ describe('Auth Service', () => {
   it('Test 6: signUp with keepProgress=true triggers migrateGuestData', async () => {
     const result = await signUp('test@example.com', 'password123', true);
     expect(result.userId).toBe('test-uid');
-    // migrateGuestData should have run execSync calls
+    // migrateGuestData should have run runSync calls
     expect(mockExecSync).toHaveBeenCalled();
   });
 
@@ -141,7 +141,7 @@ describe('Auth Service', () => {
 
   it('Test 7: signUp with keepProgress=false does NOT call migrateGuestData', async () => {
     await signUp('test@example.com', 'password123', false);
-    // execSync should NOT be called (no migration)
+    // runSync should NOT be called (no migration)
     expect(mockExecSync).not.toHaveBeenCalled();
   });
 });

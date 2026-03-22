@@ -118,6 +118,17 @@ None — no external service configuration required.
 - getCompletedCount is wired for title engine in plan 13-04
 - No blockers
 
+## Self-Check: PASSED
+
+- FOUND: src/domain/detox-engine.ts
+- FOUND: src/db/repos/detoxRepo.ts
+- FOUND: __tests__/domain/detox-engine.test.ts
+- FOUND: __tests__/db/detoxRepo.test.ts
+- FOUND commit 3bdd381 (test RED)
+- FOUND commit 9da9c2c (feat GREEN)
+- FOUND commit 2651cd1 (feat repo)
+- FOUND commit 9ca465f (docs metadata)
+
 ---
 *Phase: 13-dopamine-detox-dungeon*
 *Completed: 2026-03-22*
