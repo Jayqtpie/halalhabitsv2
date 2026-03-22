@@ -112,3 +112,28 @@ export function getStreakMilestoneBody(count: number, habitName: string): string
 export function getQuestExpiringBody(questName: string, timeLeft: string): string {
   return `"${questName}" is still within reach — ${timeLeft} remaining. Press forward.`;
 }
+
+// ─── Friday Power-Up Messages ────────────────────────────────────────────
+
+const FRIDAY_MESSAGES: Array<{ text: string; source: string }> = [
+  { text: "Jumu'ah blessings activated. All completions earn 2x XP today.", source: '' },
+  { text: 'The best day the sun rises on is Friday. Make it count \u2014 2x XP active.', source: 'Muslim 854' },
+  { text: 'Friday: a day of gathering, gratitude, and double rewards. 2x XP until Maghrib.', source: 'General Islamic teaching' },
+  { text: 'There is an hour on Friday during which no Muslim asks Allah for anything but He grants it. 2x XP is our small way of honoring that.', source: 'Bukhari 935' },
+  { text: 'Send salawat upon the Prophet (peace be upon him) today. Your efforts earn double.', source: 'Abu Dawud 1047' },
+  { text: "Jumu'ah mubarak. Every habit completion today earns 2x XP \u2014 a Friday gift.", source: '' },
+  { text: 'Adam was created on Friday. The Hour will come on a Friday. Today, your discipline earns double.', source: 'Muslim 854' },
+  { text: "Read Surah Al-Kahf. Complete your habits. Earn double XP. Jumu'ah at its finest.", source: 'Based on Bayhaqi' },
+  { text: 'Friday blessings: 2x XP on all completions. The best day for the best effort.', source: '' },
+  { text: "Jumu'ah power-up active. Stack your completions \u2014 every one counts double today.", source: '' },
+];
+
+/** Returns the Friday message for a given week number. Same week = same message. */
+export function getFridayMessage(weekNumber: number): { text: string; source: string } {
+  return FRIDAY_MESSAGES[weekNumber % FRIDAY_MESSAGES.length];
+}
+
+/** Returns the Friday push notification title */
+export function getFridayMessageTitle(): string {
+  return "Jumu'ah Mubarak \u2014 2x XP Active";
+}

@@ -14,6 +14,8 @@ import {
   getMorningMotivation,
   getStreakMilestoneBody,
   getQuestExpiringBody,
+  getFridayMessage,
+  getFridayMessageTitle,
 } from '../../src/domain/notification-copy';
 import type { PrayerName } from '../../src/types/habits';
 
@@ -159,5 +161,66 @@ describe('getQuestExpiringBody', () => {
 
   it('contains no forbidden guilt words', () => {
     checkNoForbiddenWords(getQuestExpiringBody('Test Quest', '1 hour'), 'getQuestExpiringBody');
+  });
+});
+
+// ─── Friday Power-Up Tests ────────────────────────────────────────────
+
+describe('getFridayMessage', () => {
+  it('returns object with text and source fields', () => {
+    const msg = getFridayMessage(0);
+    expect(msg).toHaveProperty('text');
+    expect(msg).toHaveProperty('source');
+  });
+
+  it('returns same message for same week number', () => {
+    expect(getFridayMessage(42)).toEqual(getFridayMessage(42));
+  });
+
+  it('cycles through all 10 messages', () => {
+    const uniqueTexts = new Set(
+      Array.from({ length: 10 }, (_, i) => getFridayMessage(i).text)
+    );
+    expect(uniqueTexts.size).toBe(10);
+  });
+
+  it('returns non-empty text for every index 0-9', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(getFridayMessage(i).text.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('getFridayMessageTitle', () => {
+  it('returns the correct title string', () => {
+    expect(getFridayMessageTitle()).toBe("Jumu'ah Mubarak \u2014 2x XP Active");
+  });
+
+  it('returns a non-empty string', () => {
+    expect(getFridayMessageTitle().length).toBeGreaterThan(0);
+  });
+});
+
+describe('Friday messages adab', () => {
+  const FORBIDDEN = ['missed', 'failed', 'shame', 'disappointed', 'lazy', 'forgot'];
+  it('contains no guilt/shame words', () => {
+    for (let i = 0; i < 10; i++) {
+      const msg = getFridayMessage(i);
+      const lower = msg.text.toLowerCase();
+      for (const word of FORBIDDEN) {
+        expect(lower).not.toContain(word);
+      }
+    }
+  });
+});
+
+describe('week stability', () => {
+  it('same ISO week returns same message', () => {
+    // Two dates in the same week (Monday and Friday of same week)
+    const mon = new Date('2026-03-23T10:00:00'); // Monday
+    const fri = new Date('2026-03-27T10:00:00'); // Friday same week
+    const weekMon = Math.floor((mon.getTime() / 86400000 + 4) / 7);
+    const weekFri = Math.floor((fri.getTime() / 86400000 + 4) / 7);
+    expect(getFridayMessage(weekMon)).toEqual(getFridayMessage(weekFri));
   });
 });
