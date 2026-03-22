@@ -1,27 +1,32 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-20T00:03:34.240Z",
-  "phase": "11",
-  "phase_name": "schema-privacy-gate-foundation",
-  "phase_dir": ".planning/phases/11-schema-privacy-gate-foundation",
-  "plan": 2,
+  "timestamp": "2026-03-22T06:39:35.489Z",
+  "phase": "12",
+  "phase_name": "friday-power-ups",
+  "phase_dir": ".planning/phases/12-friday-power-ups",
+  "plan": 3,
   "task": 2,
   "total_tasks": 2,
   "status": "phase_complete",
   "completed_tasks": [
-    {"id": 1, "name": "Add 6 new Drizzle table definitions + extend XPSourceType + add database types", "status": "done", "commit": "19cf356"},
-    {"id": 2, "name": "Extend Privacy Gate PRIVACY_MAP + update tests + add auto-validation test", "status": "done", "commit": "b024de5"},
-    {"id": 3, "name": "Create Supabase schema + RLS migrations for 4 SYNCABLE tables", "status": "done", "commit": "55e6353"},
-    {"id": 4, "name": "Write XP economy model document proving cap prevents hyperinflation", "status": "done", "commit": "c93e10f"}
+    {"id": "12-01", "name": "Friday Domain Engine", "status": "done", "commit": "88cb262"},
+    {"id": "12-02", "name": "Store Wiring & HUD Components", "status": "done", "commit": "e9eef44"},
+    {"id": "12-03", "name": "Al-Kahf Quest Card & Jumuah Toggle", "status": "done", "commit": "2e27890"}
   ],
   "remaining_tasks": [],
   "blockers": [],
-  "human_actions_pending": [],
-  "decisions": [
-    {"decision": "Used Symbol.for('drizzle:Name') instead of _.name for Drizzle table name detection in auto-validation test", "rationale": "_.name was wrong — Drizzle uses Symbol.for('drizzle:Name') for table name access. Discovered during test execution.", "phase": "11"},
-    {"decision": "Used actual habitStore.ts XP values (fajr=50, others=15) in economy model instead of plan-assumed values (fajr=30, others=20)", "rationale": "Plan said 'use actual values from habitStore.ts'. Total 5-salah base XP is 110 either way.", "phase": "11"}
+  "human_actions_pending": [
+    {"action": "Run 7 human UAT items on a Friday (device testing)", "context": "All items are date-gated to Friday — FridayBoostBadge, 2x XP, Al-Kahf quest, section chips, Jumuah toggle, haptics, banner auto-dismiss", "blocking": false}
   ],
-  "uncommitted_files": [],
-  "next_action": "Run /gsd:plan-phase 12 to plan Friday Power-Ups phase",
-  "context_notes": "Phase 11 fully complete and verified (7/7 must-haves). All v2.0 data layer foundation is in place — 19 Drizzle tables, 19 Privacy Gate entries, 4 Supabase migrations with buddy-pair RLS, XP economy model validated. Phase 12 (Friday Power-Ups) is next on the roadmap."
+  "decisions": [
+    {"decision": "Quest XP path left at 1.0 (no Friday multiplier on quest completion)", "rationale": "Al-Kahf quest already awards 100 XP bonus — doubling would over-reward", "phase": "12"},
+    {"decision": "FridayMessageBanner rendered as React Native sibling outside Skia Canvas", "rationale": "Skia Canvas cannot render React Native Text/accessibility — sibling approach preserves accessibilityRole='alert'", "phase": "12"}
+  ],
+  "uncommitted_files": [
+    ".planning/ROADMAP.md",
+    ".planning/STATE.md",
+    ".planning/phases/12-friday-power-ups/12-VERIFICATION.md"
+  ],
+  "next_action": "Commit uncommitted planning files, then either run human UAT on Friday or proceed to /gsd:plan-phase 13 (Dopamine Detox Dungeon)",
+  "context_notes": "Phase 12 fully executed and verified (13/13 must-haves passed). 7 human UAT items pending — all require a Friday device test. Phase marked complete in ROADMAP. Next phase is 13-dopamine-detox-dungeon."
 }

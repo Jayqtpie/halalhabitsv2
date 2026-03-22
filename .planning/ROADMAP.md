@@ -145,7 +145,7 @@ Plans:
 | 9. Verification and Audit Cleanup | v1.0 | 2/2 | Complete | 2026-03-19 |
 | 10. Title Pipeline and Integration Fixes | v1.0 | 1/1 | Complete | 2026-03-19 |
 | 11. Schema & Privacy Gate Foundation | 2/2 | Complete    | 2026-03-20 | - |
-| 12. Friday Power-Ups | v2.0 | 3/3 | Complete   | 2026-03-22 |
+| 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
 | 13. Dopamine Detox Dungeon | v2.0 | 0/TBD | Not started | - |
 | 14. Nafs Boss Arena | v2.0 | 0/TBD | Not started | - |
 | 15. Buddy Connection System | v2.0 | 0/TBD | Not started | - |
