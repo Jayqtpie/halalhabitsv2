@@ -14,3 +14,4 @@ export { completionRepo } from './completionRepo';
 export { streakRepo } from './streakRepo';
 export { muhasabahRepo } from './muhasabahRepo';
 export { syncQueueRepo } from './syncQueueRepo';
+export { detoxRepo } from './detoxRepo';
