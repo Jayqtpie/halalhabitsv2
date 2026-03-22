@@ -29,6 +29,7 @@ import {
   View,
   AccessibilityInfo,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   Canvas,
   Image,
@@ -85,6 +86,7 @@ interface HudSceneProps {
 
 export function HudScene({ level }: HudSceneProps) {
   const { width: screenW, height: screenH } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const environmentId = getEnvironmentForLevel(level);
   const bg = useImage(ENVIRONMENT_IMAGES[environmentId]);
 
@@ -255,8 +257,8 @@ export function HudScene({ level }: HudSceneProps) {
         />
       )}
 
-      {/* DTOX dungeon door entry point — top-right corner of HUD */}
-      <View style={styles.dungeonDoorContainer}>
+      {/* DTOX dungeon door entry point — top-right corner of HUD, below status bar */}
+      <View style={[styles.dungeonDoorContainer, { top: insets.top + 8 }]}>
         <DungeonDoorIcon
           activeSession={activeSession}
           onPress={() => setDungeonSheetVisible(true)}
@@ -291,7 +293,7 @@ export function HudScene({ level }: HudSceneProps) {
 const styles = StyleSheet.create({
   dungeonDoorContainer: {
     position: 'absolute',
-    top: 16,
+    // top is set dynamically with safe area insets
     right: 16,
     zIndex: 10,
   },
