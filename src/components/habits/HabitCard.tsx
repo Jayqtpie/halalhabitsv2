@@ -39,6 +39,9 @@ import type { HabitWithStatus } from '../../types/habits';
 import { colors, palette, typography, spacing, radius, duration } from '../../tokens';
 import { isFriday } from '../../domain/friday-engine';
 import { JumuahToggle } from './JumuahToggle';
+import { useDetoxStore } from '../../stores/detoxStore';
+import { isProtectedByDetox, getSessionEndTime } from '../../domain/detox-engine';
+import { DetoxShieldBadge } from '../detox/DetoxShieldBadge';
 
 // ── Pixel art icon map ───────────────────────────────────────────────────────
 // Keyed by habit.category (PresetCategory) with 'custom' as fallback.
@@ -147,6 +150,19 @@ export function HabitCard({ habit, onComplete, onLongPress, onCompleteWithPositi
     habit.prayerWindow?.status === 'active' &&
     habit.type === 'salah';
 
+  // ── Detox Protection Badge ───────────────────────────────────────────
+  // Show PROTECTED badge when an active detox session overlaps the habit's
+  // full-day window (00:00 to 23:59 local time today).
+  const activeDetox = useDetoxStore((s) => s.activeSession);
+  const showDetoxShield = (() => {
+    if (!activeDetox) return false;
+    const today = new Date();
+    const dayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
+    const dayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString();
+    const sessionEnd = getSessionEndTime(activeDetox.startedAt, activeDetox.durationHours);
+    return isProtectedByDetox(dayStart, dayEnd, activeDetox.startedAt, sessionEnd);
+  })();
+
   // Interpolate glow opacity to border color
   const glowBorderColor = glowOpacity.interpolate({
     inputRange: [0, 1],
@@ -198,6 +214,7 @@ export function HabitCard({ habit, onComplete, onLongPress, onCompleteWithPositi
                 <Text style={styles.jumuahInlineBadgeText}>{"Jumu'ah"}</Text>
               </View>
             )}
+            {showDetoxShield && <DetoxShieldBadge />}
           </View>
           <PrayerTimeWindow prayerWindow={habit.prayerWindow} />
           <View style={styles.metaRow}>
