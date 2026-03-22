@@ -25,6 +25,8 @@ import { QuestBoardHeader } from '../../src/components/quests/QuestBoardHeader';
 import { QuestSection } from '../../src/components/quests/QuestSection';
 import { QuestLockedState } from '../../src/components/quests/QuestLockedState';
 import { TitleGrid } from '../../src/components/quests/TitleGrid';
+import { AlKahfQuestCard } from '../../src/components/quests/AlKahfQuestCard';
+import { isFriday } from '../../src/domain/friday-engine';
 import { colors, typography, spacing } from '../../src/tokens';
 import { titleRepo } from '../../src/db/repos';
 import type { Title, Quest } from '../../src/types/database';
@@ -105,6 +107,9 @@ export default function QuestsScreen() {
   const weeklyQuests: Quest[] = quests.filter(q => q.type === 'weekly');
   const stretchQuests: Quest[] = quests.filter(q => q.type === 'stretch');
 
+  // Friday-only: Al-Kahf quest (templateId === 'friday-alkahf')
+  const alkahfQuest = quests.find(q => q.templateId === 'friday-alkahf');
+
   // ── Titles tab: build data ─────────────────────────────────────────────────
 
   const unlockedTitleIds = new Set(userTitles.map(ut => ut.titleId));
@@ -170,6 +175,9 @@ export default function QuestsScreen() {
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
           >
+            {isFriday() && alkahfQuest && (
+              <AlKahfQuestCard quest={alkahfQuest} />
+            )}
             <QuestSection title="Daily Quests" quests={dailyQuests} />
             <QuestSection title="Weekly Quests" quests={weeklyQuests} />
             {currentLevel >= 8 && (
