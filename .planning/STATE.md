@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Ready to execute
-stopped_at: Completed 13-02-PLAN.md
-last_updated: "2026-03-22T22:17:56.774Z"
+stopped_at: Completed 13-03-PLAN.md
+last_updated: "2026-03-22T22:23:54.460Z"
 progress:
   total_phases: 7
   completed_phases: 2
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 13 (dopamine-detox-dungeon) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 
 ## Accumulated Context
 
@@ -52,6 +52,8 @@ Plan: 3 of 4
 - [Phase 13-dopamine-detox-dungeon]: detoxStore uses no persist middleware — session data lives in SQLite (LOCAL_ONLY invariant)
 - [Phase 13-dopamine-detox-dungeon]: Full-day window used for streak protection during active detox (dayStart to dayEnd) — simplest correct approach
 - [Phase 13-dopamine-detox-dungeon]: Title count expanded to 27 with The Unplugged (detox_completions, 10 sessions, sortOrder 27)
+- [Phase 13-dopamine-detox-dungeon]: EarlyExitConfirmation rendered as sibling Modal outside DungeonSheet to avoid z-index nesting issues
+- [Phase 13-dopamine-detox-dungeon]: DetoxCountdownTimer uses setInterval + getRemainingMs (no Reanimated per-tick) — matches UI-SPEC timer performance contract
 
 ### Pending Todos
 
@@ -70,6 +72,6 @@ Plan: 3 of 4
 
 ## Session Continuity
 
-Last session: 2026-03-22T22:17:56.771Z
-Stopped at: Completed 13-02-PLAN.md
+Last session: 2026-03-22T22:23:54.456Z
+Stopped at: Completed 13-03-PLAN.md
 Resume file: None
