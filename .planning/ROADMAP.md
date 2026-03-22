@@ -30,7 +30,7 @@ Full details: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 **Milestone Goal:** Add a private accountability buddy system with shared activities and filtered messaging, plus three solo game features — Friday Power-Ups, Dopamine Detox Dungeon, and Nafs Boss Arena.
 
 - [x] **Phase 11: Schema & Privacy Gate Foundation** - Lay data foundation for all v2.0 features before any feature code runs (completed 2026-03-19)
-- [ ] **Phase 12: Friday Power-Ups** - Make every Friday a game event with 2x XP and Al-Kahf challenge
+- [x] **Phase 12: Friday Power-Ups** - Make every Friday a game event with 2x XP and Al-Kahf challenge (completed 2026-03-22)
 - [ ] **Phase 13: Dopamine Detox Dungeon** - Give players a voluntary anti-doomscrolling challenge system
 - [ ] **Phase 14: Nafs Boss Arena** - Let players battle personified nafs struggles in multi-day boss fights
 - [ ] **Phase 15: Buddy Connection System** - Enable private accountability partnerships with up to 20 connections
@@ -65,7 +65,7 @@ Plans:
 Plans:
 - [x] 12-01-PLAN.md — Friday domain engine, copy, Al-Kahf template, and unit tests
 - [x] 12-02-PLAN.md — Store wiring (XP multiplier, quest generation, notifications) and HUD components
-- [ ] 12-03-PLAN.md — AlKahfQuestCard and JumuahToggle UI components
+- [x] 12-03-PLAN.md — AlKahfQuestCard and JumuahToggle UI components
 
 ### Phase 13: Dopamine Detox Dungeon
 **Goal**: Players can voluntarily enter a timed anti-doomscrolling challenge, earn XP for completing it, and have their habit streaks protected during an active session
@@ -145,7 +145,7 @@ Plans:
 | 9. Verification and Audit Cleanup | v1.0 | 2/2 | Complete | 2026-03-19 |
 | 10. Title Pipeline and Integration Fixes | v1.0 | 1/1 | Complete | 2026-03-19 |
 | 11. Schema & Privacy Gate Foundation | 2/2 | Complete    | 2026-03-20 | - |
-| 12. Friday Power-Ups | v2.0 | 2/3 | In Progress|  |
+| 12. Friday Power-Ups | v2.0 | 3/3 | Complete   | 2026-03-22 |
 | 13. Dopamine Detox Dungeon | v2.0 | 0/TBD | Not started | - |
 | 14. Nafs Boss Arena | v2.0 | 0/TBD | Not started | - |
 | 15. Buddy Connection System | v2.0 | 0/TBD | Not started | - |
