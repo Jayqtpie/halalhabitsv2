@@ -22,7 +22,10 @@ import {
 import { sortHabitsForDisplay } from '../domain/habit-sorter';
 import { generateId } from '../utils/uuid';
 import { useGameStore } from './gameStore';
+import { registerHabitStore } from './bridge';
 import { isFriday, getFridayMultiplier, combinedMultiplier } from '../domain/friday-engine';
+import { useDetoxStore } from './detoxStore';
+import { isProtectedByDetox, getSessionEndTime } from '../domain/detox-engine';
 
 // ─── Base XP Map ──────────────────────────────────────────────────────────────
 
@@ -175,6 +178,20 @@ export const useHabitStore = create<HabitState>((set, get) => ({
           streakState.mercyMode = mercyState;
           if (mercyState.active) {
             mercyModes[s.habitId] = mercyState;
+          }
+        }
+
+        // Check detox protection before applying streak break
+        const activeDetox = useDetoxStore.getState().activeSession;
+        if (activeDetox && !completions[s.habitId]) {
+          // Use full-day window for streak protection during active detox
+          const habitWindowStart = dayStart;
+          const habitWindowEnd = dayEnd;
+          const sessionEnd = getSessionEndTime(activeDetox.startedAt, activeDetox.durationHours);
+          if (isProtectedByDetox(habitWindowStart, habitWindowEnd, activeDetox.startedAt, sessionEnd)) {
+            // Skip streak break — habit is protected during active detox session
+            streakMap[s.habitId] = streakState;
+            continue;
           }
         }
 
@@ -466,3 +483,9 @@ export const useHabitStore = create<HabitState>((set, get) => ({
     return sortHabitsForDisplay(habitsWithStatus);
   },
 }));
+
+// Register with bridge so gameStore can read without circular import
+registerHabitStore(() => {
+  const s = useHabitStore.getState();
+  return { streaks: s.streaks, completions: s.completions };
+});

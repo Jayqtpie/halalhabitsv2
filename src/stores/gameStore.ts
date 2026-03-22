@@ -19,7 +19,8 @@ import { QUEST_TEMPLATES, ALKAHF_TEMPLATE } from '../domain/quest-templates';
 import { isFriday, getAlKahfExpiry } from '../domain/friday-engine';
 import { getPrayerWindows } from '../services/prayer-times';
 import { useSettingsStore } from './settingsStore';
-import { xpRepo, titleRepo, questRepo, userRepo, habitRepo, streakRepo, muhasabahRepo } from '../db/repos';
+import { xpRepo, titleRepo, questRepo, userRepo, habitRepo, streakRepo, muhasabahRepo, detoxRepo } from '../db/repos';
+import { getHabitStoreState } from './bridge';
 import { generateId } from '../utils/uuid';
 import type { Title, UserTitle, Quest } from '../types/database';
 import type { PlayerStats } from '../domain/title-engine';
@@ -302,10 +303,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         habitTypeMap[habit.id] = habit.type;
       }
 
-      // Get streak data from habitStore state (cross-store access via import)
-      // We import dynamically to avoid circular dependency
-      const { useHabitStore } = await import('./habitStore');
-      const habitStoreState = useHabitStore.getState();
+      // Get streak data from habitStore via bridge (avoids circular dependency)
+      const habitStoreState = getHabitStoreState();
       for (const [habitId, streakState] of Object.entries(habitStoreState.streaks)) {
         habitStreakMap[habitId] = streakState.currentCount;
       }
@@ -319,10 +318,11 @@ export const useGameStore = create<GameState>((set, get) => ({
       const completedQuests = await questRepo.getCompleted(userId);
       const questCompletions = completedQuests.length;
 
-      // Query real mercy recoveries and muhasabah streak in parallel
-      const [allUserStreaks, muhasabahStreak] = await Promise.all([
+      // Query real mercy recoveries, muhasabah streak, and detox completions in parallel
+      const [allUserStreaks, muhasabahStreak, detoxCompletedCount] = await Promise.all([
         streakRepo.getAllForUser(userId),
         muhasabahRepo.getStreak(userId),
+        detoxRepo.getCompletedCount(userId),
       ]);
       const mercyRecoveries = allUserStreaks.filter(s => s.isRebuilt).length;
 
@@ -337,6 +337,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         activeHabitCount: userHabits.length,
         simultaneousStreaks14,
         simultaneousStreaks90,
+        detoxCompletions: detoxCompletedCount,
       };
 
       // Run title unlock check
@@ -429,8 +430,8 @@ export const useGameStore = create<GameState>((set, get) => ({
         if (newProgress <= quest.progress) continue; // No change
 
         if (newProgress >= quest.targetValue) {
-          // Quest complete -- update DB atomically then mark complete
-          await questRepo.updateProgressAtomic(quest.id, quest.targetValue);
+          // Quest complete -- set progress to target then mark complete
+          await questRepo.setProgress(quest.id, quest.targetValue, quest.targetValue);
           await questRepo.complete(quest.id);
 
           // Award quest XP — 1.0 intentional — quest XP excluded from Friday multiplier (D-13, FRDY-01)
@@ -449,7 +450,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           }));
         } else {
           // Partial progress
-          await questRepo.updateProgressAtomic(quest.id, newProgress);
+          await questRepo.setProgress(quest.id, newProgress, quest.targetValue);
 
           // Update local state
           set((s) => ({

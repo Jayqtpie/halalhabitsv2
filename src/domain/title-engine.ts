@@ -28,7 +28,8 @@ export interface TitleCondition {
     | 'mercy_recoveries'
     | 'simultaneous_streaks'
     | 'muhasabah_streak'
-    | 'habit_count';
+    | 'habit_count'
+    | 'detox_completions';
   /** Numeric threshold for the condition */
   unlockValue: number;
   /** For habit_type_streak: the specific habit type required (null otherwise) */
@@ -56,6 +57,8 @@ export interface PlayerStats {
   simultaneousStreaks14: number;
   /** How many habits currently have a streak of 90+ consecutive days */
   simultaneousStreaks90: number;
+  /** Total completed detox sessions */
+  detoxCompletions: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -115,6 +118,9 @@ function isTitleUnlocked(condition: TitleCondition, stats: PlayerStats): boolean
         stats.simultaneousStreaks14 >= condition.unlockValue ||
         stats.simultaneousStreaks90 >= condition.unlockValue
       );
+
+    case 'detox_completions':
+      return stats.detoxCompletions >= condition.unlockValue;
 
     default:
       return false;

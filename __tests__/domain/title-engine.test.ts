@@ -15,6 +15,7 @@ function makeStats(overrides: Partial<PlayerStats> = {}): PlayerStats {
     activeHabitCount: 0,
     simultaneousStreaks14: 0,
     simultaneousStreaks90: 0,
+    detoxCompletions: 0,
     ...overrides,
   };
 }
@@ -188,8 +189,8 @@ describe('checkTitleUnlocks', () => {
 // -----------------------------------------------------------------------
 
 describe('TITLE_SEED_DATA', () => {
-  it('has exactly 26 entries', () => {
-    expect(TITLE_SEED_DATA).toHaveLength(26);
+  it('has exactly 27 entries (26 original + The Unplugged detox title)', () => {
+    expect(TITLE_SEED_DATA).toHaveLength(27);
   });
 
   it('has exactly 10 common titles', () => {
@@ -197,9 +198,9 @@ describe('TITLE_SEED_DATA', () => {
     expect(common).toHaveLength(10);
   });
 
-  it('has exactly 10 rare titles', () => {
+  it('has exactly 11 rare titles (10 original + The Unplugged)', () => {
     const rare = TITLE_SEED_DATA.filter(t => t.rarity === 'rare');
-    expect(rare).toHaveLength(10);
+    expect(rare).toHaveLength(11);
   });
 
   it('has exactly 6 legendary titles', () => {
@@ -224,14 +225,13 @@ describe('TITLE_SEED_DATA', () => {
   it('all IDs are unique', () => {
     const ids = TITLE_SEED_DATA.map(t => t.id);
     const uniqueIds = new Set(ids);
-    expect(uniqueIds.size).toBe(26);
+    expect(uniqueIds.size).toBe(TITLE_SEED_DATA.length);
   });
 
-  it('sortOrder is 1-26 with no duplicates', () => {
-    const sortOrders = TITLE_SEED_DATA.map(t => t.sortOrder).sort((a, b) => a - b);
-    for (let i = 0; i < 26; i++) {
-      expect(sortOrders[i]).toBe(i + 1);
-    }
+  it('sortOrder values are unique (no duplicates)', () => {
+    const sortOrders = TITLE_SEED_DATA.map(t => t.sortOrder);
+    const uniqueOrders = new Set(sortOrders);
+    expect(uniqueOrders.size).toBe(TITLE_SEED_DATA.length);
   });
 
   it('common titles have sortOrder 1-10', () => {
@@ -243,12 +243,11 @@ describe('TITLE_SEED_DATA', () => {
     }
   });
 
-  it('rare titles have sortOrder 11-20', () => {
+  it('rare titles have sortOrder >= 11 (original range 11-20, detox titles use higher values)', () => {
     const rare = TITLE_SEED_DATA.filter(t => t.rarity === 'rare');
     const orders = rare.map(t => t.sortOrder);
     for (const order of orders) {
       expect(order).toBeGreaterThanOrEqual(11);
-      expect(order).toBeLessThanOrEqual(20);
     }
   });
 
@@ -280,6 +279,7 @@ describe('TITLE_SEED_DATA', () => {
       'simultaneous_streaks',
       'muhasabah_streak',
       'habit_count',
+      'detox_completions',
     ]);
     for (const title of TITLE_SEED_DATA) {
       expect(validTypes.has(title.unlockType)).toBe(true);
@@ -319,6 +319,7 @@ describe('TITLE_SEED_DATA', () => {
       activeHabitCount: 10,
       simultaneousStreaks14: 10,
       simultaneousStreaks90: 10,
+      detoxCompletions: 10,
     };
 
     const result = checkTitleUnlocks(conditions, new Set(), maxStats);

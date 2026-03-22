@@ -29,7 +29,8 @@ export interface TitleSeedEntry {
     | 'mercy_recoveries'
     | 'simultaneous_streaks'
     | 'muhasabah_streak'
-    | 'habit_count';
+    | 'habit_count'
+    | 'detox_completions';
   /** Threshold value for the unlock condition */
   unlockValue: number;
   /**
@@ -254,6 +255,16 @@ const RARE_TITLES: TitleSeedEntry[] = [
     unlockHabitType: null,
     flavorText: 'Five disciplines, fourteen days, one consistent soul. Remarkable.',
     sortOrder: 20,
+  },
+  {
+    id: 'the-unplugged',
+    name: 'The Unplugged',
+    rarity: 'rare',
+    unlockType: 'detox_completions',
+    unlockValue: 10,
+    unlockHabitType: null,
+    flavorText: 'Ten dungeons cleared. The noise no longer controls you.',
+    sortOrder: 27,
   },
 ];
 

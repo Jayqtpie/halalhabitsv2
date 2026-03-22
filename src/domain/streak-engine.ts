@@ -5,21 +5,8 @@
  * No React, no DB, no side effects. Fully unit-testable.
  */
 
-// TODO: Consolidate with src/types/habits.ts when Plan 01 creates it
-export interface MercyModeState {
-  active: boolean;
-  recoveryDay: number; // 0-3 (0 = not started, 3 = complete)
-  preBreakStreak: number;
-}
-
-export interface StreakState {
-  currentCount: number;
-  longestCount: number;
-  multiplier: number;
-  lastCompletedAt: string | null; // ISO 8601
-  isRebuilt: boolean;
-  mercyMode?: MercyModeState;
-}
+import type { StreakState, MercyModeState } from '../types/habits';
+export type { StreakState, MercyModeState };
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -203,6 +190,9 @@ export function startFreshReset(): StreakState {
     isRebuilt: false,
   };
 }
+
+// Re-export detox protection so streak-protection callers can import from one module
+export { isProtectedByDetox } from './detox-engine';
 
 /**
  * Salah Streak Shield -- returns true if the completion time falls within
