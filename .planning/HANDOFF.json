@@ -1,45 +1,30 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-22T21:58:13.561Z",
+  "timestamp": "2026-03-22T23:08:50.779Z",
   "phase": "13",
   "phase_name": "Dopamine Detox Dungeon",
   "phase_dir": ".planning/phases/13-dopamine-detox-dungeon",
-  "plan": null,
-  "task": null,
-  "total_tasks": 9,
-  "status": "paused",
+  "plan": 4,
+  "task": 3,
+  "total_tasks": 3,
+  "status": "complete",
   "completed_tasks": [
-    {"id": 1, "name": "Phase 13 context gathering (discuss-phase)", "status": "done", "commit": "5e4d233"},
-    {"id": 2, "name": "UI-SPEC design contract", "status": "done", "commit": "1b9be7f"},
-    {"id": 3, "name": "Research", "status": "done", "commit": "1b9b0d3"},
-    {"id": 4, "name": "Validation strategy", "status": "done", "commit": "00bb953"},
-    {"id": 5, "name": "Planning (4 plans, 3 waves) + verification", "status": "done"}
+    {"id": 1, "name": "Phase 13 all plans executed (13-01 through 13-04)", "status": "done", "commit": "494393c"},
+    {"id": 2, "name": "Bugfix session: migration crash, UUID, session hydration, modal stacking, icon layout", "status": "done", "commit": "010739f"},
+    {"id": 3, "name": "Commit outstanding working-tree changes (repo refactors, parameterized SQL, tests, plan docs)", "status": "done", "commit": "3827f18"}
   ],
-  "remaining_tasks": [
-    {"id": 6, "name": "Execute Plan 01 (Wave 1) — detox-engine TDD + detoxRepo", "status": "not_started"},
-    {"id": 7, "name": "Execute Plan 02 (Wave 2) — detoxStore, streak protection, titles, gameStore", "status": "not_started"},
-    {"id": 8, "name": "Execute Plan 03 (Wave 3) — DungeonSheet UI, timer, early exit, shield badge", "status": "not_started"},
-    {"id": 9, "name": "Execute Plan 04 (Wave 3) — HUD dungeon theme, door icon, fanfare, toast", "status": "not_started"}
-  ],
+  "remaining_tasks": [],
   "blockers": [],
   "human_actions_pending": [
-    {"action": "Phase 12 Friday UAT still pending (7 items require Friday device test)", "context": "Carried from Phase 12 — FridayBoostBadge, 2x XP, Al-Kahf quest, section chips, Jumuah toggle, haptics, banner auto-dismiss", "blocking": false}
+    {"action": "Phase 12 Friday UAT still pending (7 items require Friday device test)", "context": "Carried from Phase 12 -- FridayBoostBadge, 2x XP, Al-Kahf quest, section chips, Jumuah toggle, haptics, banner auto-dismiss", "blocking": false}
   ],
   "decisions": [
-    {"decision": "4 plans in 3 waves: domain+repo → store+integrations → UI (parallel)", "rationale": "Dependency order: pure functions first, then store orchestration, then UI in parallel", "phase": "13"},
-    {"decision": "Plan 04 is non-autonomous (has checkpoint)", "rationale": "HUD dungeon theme transformation needs visual review", "phase": "13"},
-    {"decision": "HUD pixel dungeon door icon opens bottom sheet for session controls", "rationale": "Quick access without adding a full navigation tab", "phase": "13"},
-    {"decision": "Preset duration chips (2hr, 4hr, 6hr, 8hr) with Daily/Deep toggle", "rationale": "Fast tap selection, clear variant distinction", "phase": "13"},
-    {"decision": "Full dungeon HUD theme during active session", "rationale": "Dramatic immersive experience — HUD transforms with stone walls, torches, new palette", "phase": "13"},
-    {"decision": "Compassionate mentor voice on early exit, proportional XP penalty, one retry/day", "rationale": "No-shame philosophy, fair scaling, balanced forgiveness", "phase": "13"},
-    {"decision": "Visible shield icon on habit cards during active detox (overlapping habits only)", "rationale": "Reduces anxiety, prevents gaming by scoping to session window", "phase": "13"},
-    {"decision": "Detox-specific Identity Title (e.g., Dungeon Master)", "rationale": "Long-term motivation for repeated detox sessions", "phase": "13"}
+    {"decision": "Replaced uuid.v4() with expo-crypto randomUUID() globally", "rationale": "React Native lacks crypto.getRandomValues; expo-crypto is already a dependency", "phase": "13"},
+    {"decision": "EarlyExitConfirmation moved inside DungeonSheet Modal", "rationale": "Android modal stacking renders sibling Modals behind each other", "phase": "13"},
+    {"decision": "DungeonSheet must call loadActiveSession on open", "rationale": "Store activeSession was never hydrated from DB -- caused stale idle view and Available Tomorrow bug", "phase": "13"},
+    {"decision": "DungeonDoorIcon wrapper uses fixed height", "rationale": "Countdown badge toggling caused layout shift", "phase": "13"}
   ],
-  "uncommitted_files": [
-    ".planning/ROADMAP.md",
-    ".planning/STATE.md",
-    "src/stores/bridge.ts"
-  ],
-  "next_action": "Run /gsd:execute-phase 13 to execute all 4 plans across 3 waves",
-  "context_notes": "Phase 13 is fully planned and verified. All 4 PLAN.md files passed the plan checker across all 10 dimensions. Research identified no new packages needed — schema and types already exist from Phase 11. Planner hit a usage limit mid-session but had already written all 4 plans. Checker confirmed full DTOX-01..06 coverage. Ready to execute."
+  "uncommitted_files": [],
+  "next_action": "Start Phase 14: Nafs Boss Arena -- run /gsd:discuss-phase to gather requirements",
+  "context_notes": "Phase 13 is fully complete and verified on device. All working-tree changes committed in clean logical groups. 542 tests passing. Working tree is clean. Next milestone phase is Phase 14 (Nafs Boss Arena)."
 }
