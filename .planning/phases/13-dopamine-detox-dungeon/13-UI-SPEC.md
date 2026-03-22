@@ -24,7 +24,7 @@ created: 2026-03-22
 | Component library | React Native core + @shopify/react-native-skia |
 | Animation library | react-native-reanimated |
 | Icon library | Pixel art PNG assets (custom, rendered at 1:1 via RN Image) |
-| Font — UI | Inter-Regular (400), Inter-SemiBold (600), Inter-Bold (700) |
+| Font — UI | Inter-Regular (400), Inter-Bold (700) |
 | Font — HUD/Game | PressStart2P-Regular (pixel font, fixed at 700) |
 | Token source | `src/tokens/` (colors, typography, spacing, radius, motion) |
 
@@ -68,12 +68,21 @@ Source: `src/tokens/spacing.ts` — pre-established, all multiples of 4.
 
 Source: `src/tokens/typography.ts` — pre-established, use existing scale directly.
 
+The type system is split into two bounded sub-scales by rendering layer. These sub-scales never appear on the same surface simultaneously — Inter is the UI layer only, PressStart2P is the HUD/game layer only.
+
+**Inter scale — UI layer only (4 sizes):**
+
 | Role | Token | Size | Weight | Line Height | Font | Usage in Phase 13 |
 |------|-------|------|--------|-------------|------|-------------------|
 | Display | `headingXl` | 28px | 700 | 36px | Inter-Bold | Fanfare "Dungeon Cleared!" heading; XP award number |
-| Heading | `headingMd` | 20px | 600 | 28px | Inter-SemiBold | Dungeon sheet title ("Dopamine Detox Dungeon"); early exit dialog title |
+| Heading | `headingMd` | 20px | 700 | 28px | Inter-Bold | Dungeon sheet title ("Dopamine Detox Dungeon"); early exit dialog title |
 | Body | `bodyMd` | 15px | 400 | 22px | Inter-Regular | Sheet description copy, mentor voice lines, shield label on habit cards |
 | Label / Caption | `caption` | 11px | 400 | 16px | Inter-Regular | Variant badge "once per week", XP penalty preview, timer sub-labels |
+
+**PressStart2P scale — HUD/game layer only (2 sizes):**
+
+| Role | Token | Size | Weight | Line Height | Font | Usage in Phase 13 |
+|------|-------|------|--------|-------------|------|-------------------|
 | HUD Level | `hudLevel` | 16px | 700 | 20px | PressStart2P | Active session countdown timer on HUD overlay |
 | HUD Label | `hudLabel` | 10px | 700 | 14px | PressStart2P | "DUNGEON ACTIVE" status badge; duration chip labels (2H, 4H, 6H, 8H) |
 
@@ -173,7 +182,7 @@ New components to build in Phase 13. Each maps to a decision in 13-CONTEXT.md.
 - XP number: display-size number at `headingXl`, with a count-up animation (0 to earned XP over 800ms — `duration.celebration`)
 - Mentor praise line: `bodyMd` (15px, Inter-Regular) in `textSecondary`, warm tone
 - Haptic burst: 3x `impactAsync(Heavy)` at 0ms/100ms/180ms (matches LevelUpOverlay pattern)
-- "Continue" button: full-width, accent fill — never auto-dismiss
+- "Continue Journey" button: full-width, accent fill — never auto-dismiss
 - Source: `CONTEXT.md D-12`
 
 ### 7. `DetoxShieldBadge` (habit card augmentation)
@@ -188,7 +197,7 @@ New components to build in Phase 13. Each maps to a decision in 13-CONTEXT.md.
 - Title: `headingMd` — "Leave the Dungeon Early?"
 - Body: `bodyMd` — compassionate mentor voice copy (see Copywriting Contract below)
 - XP penalty line: `bodyMd` with error color `#9B1B30` for the penalty amount
-- Two buttons: "Keep Going" (accent fill, primary) + "Exit Anyway" (destructive outline)
+- Two buttons: "Keep Going" (accent fill, primary) + "Exit Dungeon" (destructive outline)
 - "Keep Going" is the visually dominant choice — right position, accent color
 - Source: `CONTEXT.md D-09`, `D-10`
 
@@ -215,7 +224,7 @@ New components to build in Phase 13. Each maps to a decision in 13-CONTEXT.md.
 ### Fanfare Transition
 - HudScene dungeon theme fades OUT over `duration.slow` (500ms) when fanfare appears
 - Fanfare ZoomIn spring plays simultaneously with HUD fade
-- After "Continue" tap: HudScene normal theme fades IN over `duration.normal` (300ms)
+- After "Continue Journey" tap: HudScene normal theme fades IN over `duration.normal` (300ms)
 
 ### Early Exit Penalty Preview
 - Penalty XP value shown in real-time on the DungeonSheet "Exit Early" button label: "Exit Early (−X XP)"
@@ -253,17 +262,19 @@ Source: All mentor-voice lines follow "wise mentor, compassionate" tone establis
 | Exit early button label | "Exit Early (−[X] XP)" |
 | Early exit dialog title | "Leave the Dungeon Early?" |
 | Early exit dialog body | "Leaving now costs [X] XP, but your courage in starting still counts. Your habit streaks are already protected for this window." |
-| Early exit confirm button | "Exit Anyway" |
+| Early exit confirm button | "Exit Dungeon" |
 | Early exit cancel button | "Keep Going" |
 | Welcome-back toast | "Still in the dungeon — [X]h [Y]m remaining" |
 | Retry available copy | "Try Again Today" |
 | Retry exhausted copy | "Available Tomorrow" |
 | Fanfare heading | "Dungeon Cleared!" |
 | Fanfare mentor line | "Your discipline cut through the noise. [X] XP earned." |
+| Fanfare CTA button | "Continue Journey" |
 | Push notification title | "Dungeon Cleared!" |
 | Push notification body | "You held strong. +[X] XP added to your journey." |
 | Weekly deep variant exhausted | "Deep run complete for the week — return next week" |
 | Empty state (no sessions yet) | "The dungeon awaits. Choose a duration to begin your first detox challenge." |
+| Error — session creation failed | "Couldn't start the dungeon. Check your storage and try again." |
 
 **No shame copy rule applies to:** Expired sessions, early exits, exhausted retry. None of these surfaces use negative framing about the player's discipline or worth.
 
