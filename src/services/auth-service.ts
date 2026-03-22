@@ -126,7 +126,7 @@ export async function deleteAccount(
 /**
  * Re-key all 'default-user' rows to the new auth UUID.
  *
- * Runs raw SQL via execSync — same pattern as deleteAllUserData.
+ * Runs parameterized SQL via runSync — same pattern as deleteAllUserData.
  * Tables covered:
  *   users (id PK), habits, xp_ledger, user_titles, quests,
  *   settings, muhasabah_entries, streaks (via habit FK), niyyah
@@ -138,13 +138,14 @@ export async function migrateGuestData(newUserId: string): Promise<void> {
   const db = getDb();
   const rawDb = (db as any).$client;
 
-  if (!rawDb || typeof rawDb.execSync !== 'function') {
+  if (!rawDb || typeof rawDb.runSync !== 'function') {
     return;
   }
 
   // Re-key users table PK first (other tables FK to this)
-  rawDb.execSync(
-    `UPDATE users SET id = '${newUserId}' WHERE id = 'default-user'`,
+  rawDb.runSync(
+    `UPDATE users SET id = ? WHERE id = 'default-user'`,
+    [newUserId],
   );
 
   // Re-key all tables with user_id FK referencing users.id
@@ -159,8 +160,9 @@ export async function migrateGuestData(newUserId: string): Promise<void> {
   ];
 
   for (const table of userIdTables) {
-    rawDb.execSync(
-      `UPDATE ${table} SET user_id = '${newUserId}' WHERE user_id = 'default-user'`,
+    rawDb.runSync(
+      `UPDATE ${table} SET user_id = ? WHERE user_id = 'default-user'`,
+      [newUserId],
     );
   }
 }

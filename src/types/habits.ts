@@ -84,7 +84,7 @@ export type PresetCategory =
   | 'character';
 
 /** Difficulty tiers for habit XP calculation */
-export type DifficultyTier = 'easy' | 'medium' | 'hard';
+export type { DifficultyTier } from './common';
 
 /** Shape of a preset habit definition */
 export interface PresetHabit {

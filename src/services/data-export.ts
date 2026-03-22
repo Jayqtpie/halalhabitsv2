@@ -155,20 +155,22 @@ export async function deleteAllUserData(userId: string): Promise<void> {
     // Delete via raw SQL using the underlying expo-sqlite client
     const rawDb = (db as any).$client;
 
-    if (rawDb && typeof rawDb.execSync === 'function') {
-      rawDb.execSync(
-        `DELETE FROM habit_completions WHERE habit_id IN (SELECT id FROM habits WHERE user_id = '${userId}')`
+    if (rawDb && typeof rawDb.runSync === 'function') {
+      rawDb.runSync(
+        `DELETE FROM habit_completions WHERE habit_id IN (SELECT id FROM habits WHERE user_id = ?)`,
+        [userId],
       );
-      rawDb.execSync(
-        `DELETE FROM streaks WHERE habit_id IN (SELECT id FROM habits WHERE user_id = '${userId}')`
+      rawDb.runSync(
+        `DELETE FROM streaks WHERE habit_id IN (SELECT id FROM habits WHERE user_id = ?)`,
+        [userId],
       );
-      rawDb.execSync(`DELETE FROM xp_ledger WHERE user_id = '${userId}'`);
-      rawDb.execSync(`DELETE FROM quests WHERE user_id = '${userId}'`);
-      rawDb.execSync(`DELETE FROM muhasabah_entries WHERE user_id = '${userId}'`);
-      rawDb.execSync(`DELETE FROM user_titles WHERE user_id = '${userId}'`);
-      rawDb.execSync(`DELETE FROM habits WHERE user_id = '${userId}'`);
-      rawDb.execSync(`DELETE FROM users WHERE id = '${userId}'`);
-      rawDb.execSync(`DELETE FROM _zustand_store WHERE key = 'settings-storage'`);
+      rawDb.runSync(`DELETE FROM xp_ledger WHERE user_id = ?`, [userId]);
+      rawDb.runSync(`DELETE FROM quests WHERE user_id = ?`, [userId]);
+      rawDb.runSync(`DELETE FROM muhasabah_entries WHERE user_id = ?`, [userId]);
+      rawDb.runSync(`DELETE FROM user_titles WHERE user_id = ?`, [userId]);
+      rawDb.runSync(`DELETE FROM habits WHERE user_id = ?`, [userId]);
+      rawDb.runSync(`DELETE FROM users WHERE id = ?`, [userId]);
+      rawDb.runSync(`DELETE FROM _zustand_store WHERE key = 'settings-storage'`);
     }
   } catch {
     // Non-fatal: continue with store resets even if DB deletion partially fails

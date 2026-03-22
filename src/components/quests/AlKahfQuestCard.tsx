@@ -3,7 +3,7 @@
  *
  * Displays an 18-section progress tracker with a Maghrib deadline.
  * Section progress is stored locally in component state and synced to the
- * quest repository via updateProgressAtomic on each section tap.
+ * quest repository via setProgress on each section tap.
  *
  * Three visual states:
  *   - active:    Emerald border glow, scrollable section chips
@@ -94,10 +94,10 @@ export function AlKahfQuestCard({ quest }: AlKahfQuestCardProps) {
       const newProgress = updated.filter(Boolean).length;
 
       try {
-        await questRepo.updateProgressAtomic(quest.id, newProgress);
+        await questRepo.setProgress(quest.id, newProgress, quest.targetValue);
       } catch (e) {
         // Non-fatal: local state already updated; progress persists on next sync
-        console.warn('[AlKahfQuestCard] updateProgressAtomic error:', e);
+        console.warn('[AlKahfQuestCard] setProgress error:', e);
       }
     },
     [completedSections, isCompleted, expired, quest.id]
