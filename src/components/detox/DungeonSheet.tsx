@@ -72,6 +72,7 @@ export function DungeonSheet({ visible, onClose, userId }: DungeonSheetProps) {
   const getPenaltyPreview = useDetoxStore((s) => s.getPenaltyPreview);
   const isDailyAvailableCheck = useDetoxStore((s) => s.isDailyAvailable);
   const isDeepAvailableCheck = useDetoxStore((s) => s.isDeepAvailable);
+  const loadActiveSession = useDetoxStore((s) => s.loadActiveSession);
 
   const [selectedVariant, setSelectedVariant] = useState<Variant>('daily');
   const [selectedDuration, setSelectedDuration] = useState<number>(2);
@@ -80,10 +81,11 @@ export function DungeonSheet({ visible, onClose, userId }: DungeonSheetProps) {
   const [showEarlyExit, setShowEarlyExit] = useState<boolean>(false);
   const [penaltyXP, setPenaltyXP] = useState<number>(0);
 
-  // Availability check on mount and when sheet becomes visible
+  // Hydrate active session from DB and check availability when sheet opens
   useEffect(() => {
     if (!visible) return;
-    const checkAvailability = async () => {
+    const hydrate = async () => {
+      await loadActiveSession(userId);
       const [daily, deep] = await Promise.all([
         isDailyAvailableCheck(userId),
         isDeepAvailableCheck(userId),
@@ -91,8 +93,8 @@ export function DungeonSheet({ visible, onClose, userId }: DungeonSheetProps) {
       setDailyAvailable(daily);
       setDeepAvailable(deep);
     };
-    checkAvailability();
-  }, [visible, userId, isDailyAvailableCheck, isDeepAvailableCheck]);
+    hydrate();
+  }, [visible, userId, loadActiveSession, isDailyAvailableCheck, isDeepAvailableCheck]);
 
   // Reset to daily if deep becomes unavailable
   useEffect(() => {
@@ -178,184 +180,182 @@ export function DungeonSheet({ visible, onClose, userId }: DungeonSheetProps) {
   const ctaDisabled = loading || !ctaAvailable;
 
   return (
-    <>
-      <Modal
-        visible={visible}
-        transparent
-        animationType="slide"
-        onRequestClose={onClose}
-        accessibilityViewIsModal={true}
-      >
-        <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button" accessibilityLabel="Close dungeon sheet">
-          <View style={styles.backdrop} />
-        </TouchableWithoutFeedback>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onRequestClose={onClose}
+      accessibilityViewIsModal={true}
+    >
+      <TouchableWithoutFeedback onPress={onClose} accessibilityRole="button" accessibilityLabel="Close dungeon sheet">
+        <View style={styles.backdrop} />
+      </TouchableWithoutFeedback>
 
-        <View style={styles.sheet}>
-          {/* Drag handle */}
-          <View style={styles.handle} />
+      <View style={styles.sheet}>
+        {/* Drag handle */}
+        <View style={styles.handle} />
 
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            {activeSession ? (
-              // ── Active Session View ────────────────────────────────────────
-              <View style={styles.activeContainer}>
-                <Text style={styles.sheetTitle}>Dopamine Detox Dungeon</Text>
-                <Text style={styles.activeStatusLabel}>SESSION ACTIVE</Text>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {activeSession ? (
+            // ── Active Session View ────────────────────────────────────────
+            <View style={styles.activeContainer}>
+              <Text style={styles.sheetTitle}>Dopamine Detox Dungeon</Text>
+              <Text style={styles.activeStatusLabel}>SESSION ACTIVE</Text>
 
-                <View style={styles.timerContainer}>
-                  <DetoxCountdownTimer
-                    startedAt={activeSession.startedAt}
-                    durationHours={activeSession.durationHours}
-                    variant="sheet"
-                    onComplete={handleSessionComplete}
-                  />
-                </View>
+              <View style={styles.timerContainer}>
+                <DetoxCountdownTimer
+                  startedAt={activeSession.startedAt}
+                  durationHours={activeSession.durationHours}
+                  variant="sheet"
+                  onComplete={handleSessionComplete}
+                />
+              </View>
 
-                <Text style={styles.xpEarnedLabel}>
-                  Complete for +{calculateDetoxXP(
-                    activeSession.variant as 'daily' | 'deep',
-                    activeSession.durationHours
-                  )}{' '}
-                  XP
+              <Text style={styles.xpEarnedLabel}>
+                Complete for +{calculateDetoxXP(
+                  activeSession.variant as 'daily' | 'deep',
+                  activeSession.durationHours
+                )}{' '}
+                XP
+              </Text>
+
+              <Pressable
+                style={styles.exitEarlyButton}
+                onPress={handleExitEarlyPress}
+                accessibilityRole="button"
+                accessibilityLabel={`Exit Early, penalty ${currentPenalty} XP`}
+                android_ripple={{ color: 'rgba(155, 27, 48, 0.2)' }}
+              >
+                <Text style={styles.exitEarlyText}>
+                  {`Exit Early (−${currentPenalty} XP)`}
                 </Text>
+              </Pressable>
+            </View>
+          ) : (
+            // ── Idle State View ────────────────────────────────────────────
+            <View style={styles.idleContainer}>
+              <Text style={styles.sheetTitle}>Dopamine Detox Dungeon</Text>
+              <Text style={styles.sheetSubtitle}>
+                A voluntary challenge to reclaim your focus. Your habit streaks stay protected while you&apos;re inside.
+              </Text>
 
+              {/* Variant toggle */}
+              <View style={styles.variantToggle}>
                 <Pressable
-                  style={styles.exitEarlyButton}
-                  onPress={handleExitEarlyPress}
+                  style={[
+                    styles.variantSegment,
+                    styles.variantSegmentLeft,
+                    selectedVariant === 'daily' && styles.variantSegmentActive,
+                  ]}
+                  onPress={() => handleVariantSelect('daily')}
                   accessibilityRole="button"
-                  accessibilityLabel={`Exit Early, penalty ${currentPenalty} XP`}
-                  android_ripple={{ color: 'rgba(155, 27, 48, 0.2)' }}
+                  accessibilityLabel="Daily variant"
+                  accessibilityState={{ selected: selectedVariant === 'daily' }}
+                  android_ripple={{ color: 'rgba(13,124,61,0.2)' }}
                 >
-                  <Text style={styles.exitEarlyText}>
-                    {`Exit Early (−${currentPenalty} XP)`}
+                  <Text
+                    style={[
+                      styles.variantLabel,
+                      selectedVariant === 'daily' && styles.variantLabelActive,
+                    ]}
+                  >
+                    Daily
                   </Text>
                 </Pressable>
+
+                <Pressable
+                  style={[
+                    styles.variantSegment,
+                    styles.variantSegmentRight,
+                    selectedVariant === 'deep' && styles.variantSegmentActive,
+                    !deepAvailable && styles.variantSegmentDisabled,
+                  ]}
+                  onPress={() => handleVariantSelect('deep')}
+                  disabled={!deepAvailable}
+                  accessibilityRole="button"
+                  accessibilityLabel="Deep variant, once per week"
+                  accessibilityState={{
+                    selected: selectedVariant === 'deep',
+                    disabled: !deepAvailable,
+                  }}
+                  android_ripple={deepAvailable ? { color: 'rgba(13,124,61,0.2)' } : undefined}
+                >
+                  <Text
+                    style={[
+                      styles.variantLabel,
+                      selectedVariant === 'deep' && styles.variantLabelActive,
+                      !deepAvailable && styles.variantLabelDisabled,
+                    ]}
+                  >
+                    Deep (6-8h)
+                  </Text>
+                  <Text style={styles.variantBadge}>Once per week</Text>
+                </Pressable>
               </View>
-            ) : (
-              // ── Idle State View ────────────────────────────────────────────
-              <View style={styles.idleContainer}>
-                <Text style={styles.sheetTitle}>Dopamine Detox Dungeon</Text>
-                <Text style={styles.sheetSubtitle}>
-                  A voluntary challenge to reclaim your focus. Your habit streaks stay protected while you&apos;re inside.
-                </Text>
 
-                {/* Variant toggle */}
-                <View style={styles.variantToggle}>
-                  <Pressable
-                    style={[
-                      styles.variantSegment,
-                      styles.variantSegmentLeft,
-                      selectedVariant === 'daily' && styles.variantSegmentActive,
-                    ]}
-                    onPress={() => handleVariantSelect('daily')}
-                    accessibilityRole="button"
-                    accessibilityLabel="Daily variant"
-                    accessibilityState={{ selected: selectedVariant === 'daily' }}
-                    android_ripple={{ color: 'rgba(13,124,61,0.2)' }}
-                  >
-                    <Text
+              {/* Duration chips */}
+              <View style={styles.chipsRow}>
+                {chips.map((chip) => {
+                  const isSelected = chip.hours === effectiveDuration;
+                  return (
+                    <Pressable
+                      key={chip.hours}
                       style={[
-                        styles.variantLabel,
-                        selectedVariant === 'daily' && styles.variantLabelActive,
+                        styles.durationChip,
+                        isSelected && styles.durationChipSelected,
                       ]}
+                      onPress={() => handleDurationSelect(chip.hours)}
+                      accessibilityRole="button"
+                      accessibilityLabel={`${chip.label} duration`}
+                      accessibilityState={{ selected: isSelected }}
+                      android_ripple={{ color: 'rgba(13,124,61,0.2)' }}
                     >
-                      Daily
-                    </Text>
-                  </Pressable>
-
-                  <Pressable
-                    style={[
-                      styles.variantSegment,
-                      styles.variantSegmentRight,
-                      selectedVariant === 'deep' && styles.variantSegmentActive,
-                      !deepAvailable && styles.variantSegmentDisabled,
-                    ]}
-                    onPress={() => handleVariantSelect('deep')}
-                    disabled={!deepAvailable}
-                    accessibilityRole="button"
-                    accessibilityLabel="Deep variant, once per week"
-                    accessibilityState={{
-                      selected: selectedVariant === 'deep',
-                      disabled: !deepAvailable,
-                    }}
-                    android_ripple={deepAvailable ? { color: 'rgba(13,124,61,0.2)' } : undefined}
-                  >
-                    <Text
-                      style={[
-                        styles.variantLabel,
-                        selectedVariant === 'deep' && styles.variantLabelActive,
-                        !deepAvailable && styles.variantLabelDisabled,
-                      ]}
-                    >
-                      Deep (6-8h)
-                    </Text>
-                    <Text style={styles.variantBadge}>Once per week</Text>
-                  </Pressable>
-                </View>
-
-                {/* Duration chips */}
-                <View style={styles.chipsRow}>
-                  {chips.map((chip) => {
-                    const isSelected = chip.hours === effectiveDuration;
-                    return (
-                      <Pressable
-                        key={chip.hours}
+                      <Text
                         style={[
-                          styles.durationChip,
-                          isSelected && styles.durationChipSelected,
+                          styles.chipLabel,
+                          isSelected && styles.chipLabelSelected,
                         ]}
-                        onPress={() => handleDurationSelect(chip.hours)}
-                        accessibilityRole="button"
-                        accessibilityLabel={`${chip.label} duration`}
-                        accessibilityState={{ selected: isSelected }}
-                        android_ripple={{ color: 'rgba(13,124,61,0.2)' }}
                       >
-                        <Text
-                          style={[
-                            styles.chipLabel,
-                            isSelected && styles.chipLabelSelected,
-                          ]}
-                        >
-                          {chip.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-
-                {/* XP preview */}
-                <Text style={styles.xpPreview}>Complete for +{xpPreview} XP</Text>
-
-                {/* CTA button */}
-                <Pressable
-                  style={[styles.ctaButton, ctaDisabled && styles.ctaButtonDisabled]}
-                  onPress={handleEnterDungeon}
-                  disabled={ctaDisabled}
-                  accessibilityRole="button"
-                  accessibilityLabel={ctaLabel}
-                  accessibilityState={{ disabled: ctaDisabled }}
-                  android_ripple={!ctaDisabled ? { color: 'rgba(255,255,255,0.15)' } : undefined}
-                >
-                  <Text style={[styles.ctaText, ctaDisabled && styles.ctaTextDisabled]}>
-                    {loading ? 'Starting…' : ctaLabel}
-                  </Text>
-                </Pressable>
+                        {chip.label}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
               </View>
-            )}
-          </ScrollView>
-        </View>
-      </Modal>
 
-      {/* EarlyExitConfirmation rendered outside the main Modal to avoid z-index issues */}
+              {/* XP preview */}
+              <Text style={styles.xpPreview}>Complete for +{xpPreview} XP</Text>
+
+              {/* CTA button */}
+              <Pressable
+                style={[styles.ctaButton, ctaDisabled && styles.ctaButtonDisabled]}
+                onPress={handleEnterDungeon}
+                disabled={ctaDisabled}
+                accessibilityRole="button"
+                accessibilityLabel={ctaLabel}
+                accessibilityState={{ disabled: ctaDisabled }}
+                android_ripple={!ctaDisabled ? { color: 'rgba(255,255,255,0.15)' } : undefined}
+              >
+                <Text style={[styles.ctaText, ctaDisabled && styles.ctaTextDisabled]}>
+                  {loading ? 'Starting…' : ctaLabel}
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        </ScrollView>
+      </View>
+
+      {/* EarlyExitConfirmation inside the same Modal so it renders on top */}
       <EarlyExitConfirmation
         visible={showEarlyExit}
         penaltyXP={penaltyXP}
         onConfirmExit={handleConfirmExit}
         onCancel={handleCancelExit}
       />
-    </>
+    </Modal>
   );
 }
 

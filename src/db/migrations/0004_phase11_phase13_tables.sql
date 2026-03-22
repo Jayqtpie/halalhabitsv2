@@ -1,4 +1,3 @@
---> statement-breakpoint
 CREATE TABLE `buddies` (
 	`id` text PRIMARY KEY NOT NULL,
 	`user_a` text NOT NULL REFERENCES `users`(`id`),

@@ -152,6 +152,8 @@ const GLOW_EXTRA = 4; // glow ring extends 4px beyond icon edges
 const styles = StyleSheet.create({
   wrapper: {
     alignItems: 'center',
+    // Fixed height prevents layout shift when countdown badge appears/disappears
+    height: ICON_SIZE + GLOW_EXTRA * 2 + 28, // icon + glow + badge space
   },
 
   iconContainer: {

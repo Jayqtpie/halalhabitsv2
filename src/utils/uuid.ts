@@ -1,9 +1,9 @@
-import { v4 } from 'uuid';
+import { randomUUID } from 'expo-crypto';
 
 /**
  * Generate a unique identifier (UUID v4).
  * Thin wrapper for consistent ID generation across the app.
  */
 export function generateId(): string {
-  return v4();
+  return randomUUID();
 }
