@@ -15,10 +15,10 @@ Requirements for v2.0 milestone. Each maps to roadmap phases.
 
 ### Friday Power-Ups
 
-- [ ] **FRDY-01**: User receives 2x XP multiplier on all Friday habit completions (timezone-aware, stacks with streak multiplier)
+- [x] **FRDY-01**: User receives 2x XP multiplier on all Friday habit completions (timezone-aware, stacks with streak multiplier)
 - [ ] **FRDY-02**: HUD displays active Jumu'ah boost indicator on Fridays
-- [ ] **FRDY-03**: Surah Al-Kahf challenge quest card appears on Friday mornings with 100 bonus XP
-- [ ] **FRDY-04**: Rotating hadith-sourced Friday messages display (10 pre-written, vetted messages)
+- [x] **FRDY-03**: Surah Al-Kahf challenge quest card appears on Friday mornings with 100 bonus XP
+- [x] **FRDY-04**: Rotating hadith-sourced Friday messages display (10 pre-written, vetted messages)
 
 ### Dopamine Detox Dungeon
 
@@ -114,10 +114,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FOUN-01 | Phase 11 | Complete |
 | FOUN-02 | Phase 11 | Complete |
 | FOUN-03 | Phase 11 | Complete |
-| FRDY-01 | Phase 12 | Pending |
+| FRDY-01 | Phase 12 | Complete |
 | FRDY-02 | Phase 12 | Pending |
-| FRDY-03 | Phase 12 | Pending |
-| FRDY-04 | Phase 12 | Pending |
+| FRDY-03 | Phase 12 | Complete |
+| FRDY-04 | Phase 12 | Complete |
 | DTOX-01 | Phase 13 | Pending |
 | DTOX-02 | Phase 13 | Pending |
 | DTOX-03 | Phase 13 | Pending |
