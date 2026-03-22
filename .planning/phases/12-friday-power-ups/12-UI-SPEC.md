@@ -62,14 +62,12 @@ All from `src/tokens/typography.ts`. This phase uses exactly 4 roles:
 
 | Role | Token | Size | Family | Weight | Line Height | Letter Spacing |
 |------|-------|------|--------|--------|-------------|----------------|
-| Body (quest text, hadith body) | `typography.bodyMd` | 15px | Inter-Regular | 400 | 22px | 0 |
-| Label (section headers, badge text, attribution) | `typography.bodySm` | 13px | Inter-Regular | 400 | 18px | 0 |
+| Body (quest text, hadith body, card titles) | `typography.bodyMd` | 15px | Inter-Regular | 400 / 700 | 22px | 0 |
+| Label (section headers, badge text, attribution) | `typography.bodySm` | 13px | Inter-Regular | 400 / 700 | 18px | 0 |
 | Caption (progress count, deadline text, source citation) | `typography.caption` | 11px | Inter-Regular | 400 | 16px | 0.5 |
 | HUD Label (Friday badge "2x XP" pixel text) | `typography.hudLabel` | 10px | PressStart2P | 700 | 14px | 1 |
 
-Heading role: `typography.headingMd` (20px, Inter-SemiBold, weight 600, line-height 28px) is used only for the Al-Kahf quest card title "Surah Al-Kahf Challenge".
-
-**Weight rule:** Two weights only — 400 (Inter-Regular) for all body/label/caption, 700 (Inter-Bold / PressStart2P) for HUD pixel labels and the completion state "Jumu'ah Honored!" text.
+**Weight rule:** Two weights only — 400 (Inter-Regular) for default body/label/caption, 700 (Inter-Bold / PressStart2P) for emphasis elements: HUD pixel labels, card title "Surah Al-Kahf Challenge", and the completion state "Jumu'ah Honored!" text.
 
 ---
 
@@ -114,7 +112,7 @@ New components this phase introduces. All are React Native + Reanimated (no Skia
 
 - **Location:** Conditionally inserted into `HudStatBar` row when `isFriday()` returns true
 - **Layout:** Horizontal chip, flexShrink: 0. Sits between `BestStreakDisplay` and its right divider
-- **Chip anatomy:** Gold pixel label "2×XP" (`typography.hudLabel`, `colors.dark.xp`) inside a container with `backgroundColor: 'rgba(13,124,61,0.15)'`, border `colors.dark.primary` width 1, `borderRadius: radius.sm` (4px), `paddingHorizontal: 6px`, `paddingVertical: 2px`
+- **Chip anatomy:** Gold pixel label "2×XP" (`typography.hudLabel`, `colors.dark.xp`) inside a container with `backgroundColor: 'rgba(13,124,61,0.15)'`, border `colors.dark.primary` width 1, `borderRadius: radius.sm` (4px), `paddingHorizontal: 8px` (spacing.sm), `paddingVertical: 4px` (spacing.xs)
 - **Animation:** Fade-in on mount with `Animated.timing` duration 300ms, opacity 0 → 1. On Friday end (midnight): fade out over 600ms, then show inline "Friday boost ended" text for 2 seconds (same typography.bodySm, color `colors.dark.textSecondary`), then unmount
 - **Accessibility:** `accessibilityLabel="Jumu'ah 2x XP boost active"` on the chip View
 
@@ -133,12 +131,12 @@ New components this phase introduces. All are React Native + Reanimated (no Skia
 
 - **Location:** Inserted as the first card in the Quest Board on Fridays, above existing quest sections. Uses `D-08` (extra card, does not replace existing slots)
 - **Layout:** Extends existing `QuestCard` pattern (`colors.dark.surface`, `radius.md`, `spacing.md` padding, `spacing.sm` bottom margin)
-- **Header row:** "Surah Al-Kahf Challenge" title (`typography.headingMd`, `colors.dark.textPrimary`), XP badge "+100 XP" (`typography.caption`, `colors.dark.xp`, badge border `colors.dark.primary`)
+- **Header row:** "Surah Al-Kahf Challenge" title (`typography.bodyMd`, weight 700, `colors.dark.textPrimary`), XP badge "+100 XP" (`typography.caption`, `colors.dark.xp`, badge border `colors.dark.primary`)
 - **Deadline row:** Below header — clock icon (use "⏱" glyph at 12px) + "Complete by Maghrib · [HH:MM]" text (`typography.caption`, `colors.dark.textSecondary`)
 - **Progress section:** Segmented progress bar showing 18 sections (Surah Al-Kahf has 110 ayat grouped into 18 logical sections for this UX). Each segment is a 4px-tall tick mark. Progress fill: `colors.dark.primary`. Progress count text: "X / 18 sections" (`typography.caption`, `colors.dark.textSecondary`)
 - **Section tap area:** Below progress bar, a horizontally scrollable row of 18 numbered chips (28×28px, `borderRadius: radius.sm`). Completed chips: `backgroundColor: colors.dark.primary`, text `colors.dark.textPrimary`. Incomplete chips: `backgroundColor: colors.dark.surface`, border `colors.dark.border`
 - **Active card border:** `colors.dark.primary` border width 1, same glow shadow as `QuestCard.cardCompleted`: `shadowColor: colors.dark.primary`, `shadowOpacity: 0.25`, `shadowRadius: 8`
-- **Completed state:** Full QuestCard completed pattern — checkmark + "Jumu'ah honored! +100 XP" text (`typography.bodySm`, weight 600, `colors.dark.primary`)
+- **Completed state:** Full QuestCard completed pattern — checkmark + "Jumu'ah honored! +100 XP" text (`typography.bodySm`, weight 700, `colors.dark.primary`)
 - **Expired state (after Maghrib, incomplete):** Dimmed to `opacity: 0.45`, "Quest expired at Maghrib" text in `colors.dark.textMuted`, XP badge grayed out (`colors.dark.textMuted`)
 - **Accessibility:** `accessibilityRole="none"` on card; section chip taps: `accessibilityRole="checkbox"`, `accessibilityLabel="Section {n}, {completed/incomplete}"`
 
