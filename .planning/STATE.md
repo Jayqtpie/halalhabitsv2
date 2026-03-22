@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: unknown
-stopped_at: Completed 12-03-PLAN.md
-last_updated: "2026-03-22T06:38:05.040Z"
+stopped_at: Phase 13 context gathered
+last_updated: "2026-03-22T20:52:16.021Z"
 progress:
   total_phases: 7
   completed_phases: 2
@@ -65,6 +65,6 @@ Plan: Not started
 
 ## Session Continuity
 
-Last session: 2026-03-22T06:34:12.163Z
-Stopped at: Completed 12-03-PLAN.md
-Resume file: None
+Last session: 2026-03-22T20:52:16.017Z
+Stopped at: Phase 13 context gathered
+Resume file: .planning/phases/13-dopamine-detox-dungeon/13-CONTEXT.md
