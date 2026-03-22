@@ -116,8 +116,8 @@ Players build real-world Islamic discipline through game mechanics that motivate
 
 ## Current State
 
-- Phase 11 complete — v2.0 schema foundation laid (6 new Drizzle tables, 19-entry Privacy Gate, Supabase migrations for 4 SYNCABLE tables with buddy-pair RLS, XP economy model validated)
-- Next: Phase 12 — Friday Power-Ups
+- Phase 12 complete — Friday Power-Ups shipped (Jumu'ah 2× XP multiplier, Al-Kahf 18-section quest card, FridayBoostBadge/FridayMessageBanner HUD components, JumuahToggle for Dhuhr, rotating hadith notifications)
+- Next: Phase 13 — Dopamine Detox Dungeon
 
 ---
-*Last updated: 2026-03-20 after Phase 11 completion*
+*Last updated: 2026-03-22 after Phase 12 completion*
