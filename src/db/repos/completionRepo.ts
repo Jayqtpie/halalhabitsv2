@@ -26,22 +26,9 @@ export const completionRepo = {
       );
   },
 
-  /**
-   * Get completions for a habit in a date range (for calendar/heatmap view).
-   * Same as getForDate but named for clarity in calendar contexts.
-   */
+  /** Alias for getForDate — kept for calendar/heatmap call sites. */
   async getForDateRange(habitId: string, startDate: string, endDate: string) {
-    const db = getDb();
-    return db
-      .select()
-      .from(habitCompletions)
-      .where(
-        and(
-          eq(habitCompletions.habitId, habitId),
-          gte(habitCompletions.completedAt, startDate),
-          lt(habitCompletions.completedAt, endDate),
-        ),
-      );
+    return completionRepo.getForDate(habitId, startDate, endDate);
   },
 
   /**

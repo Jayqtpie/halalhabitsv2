@@ -90,7 +90,7 @@ export const questRepo = {
         assertSyncable('quests');
         syncQueueRepo.enqueue('quests', data.id, 'INSERT', data).catch(() => {});
       }
-    } catch { /* enqueue must never block local write */ }
+    } catch (e) { console.warn('[questRepo] sync enqueue failed:', e); }
 
     return result;
   },
@@ -111,22 +111,22 @@ export const questRepo = {
           syncQueueRepo.enqueue('quests', id, 'UPDATE', updated[0]).catch(() => {});
         }
       }
-    } catch {}
+    } catch (e) { console.warn('[questRepo] sync enqueue failed:', e); }
 
     return result;
   },
 
   /**
-   * Atomically increment quest progress by 1, clamped to targetValue.
-   * Uses raw SQL MIN(progress + 1, target_value) to prevent race conditions.
+   * Set quest progress to a specific value, clamped to targetValue.
+   * Uses raw SQL MIN(newProgress, target_value) to prevent exceeding target.
    * Sets status to 'in_progress' (caller should call complete() if progress reaches targetValue).
    */
-  async updateProgressAtomic(id: string, targetValue: number) {
+  async setProgress(id: string, newProgress: number, targetValue: number) {
     const db = getDb();
     const result = await db
       .update(quests)
       .set({
-        progress: sql`MIN(${quests.progress} + 1, ${targetValue})`,
+        progress: sql`MIN(${newProgress}, ${targetValue})`,
         status: 'in_progress',
       })
       .where(eq(quests.id, id))
@@ -140,7 +140,9 @@ export const questRepo = {
           syncQueueRepo.enqueue('quests', id, 'UPDATE', result[0]).catch(() => {});
         }
       }
-    } catch {}
+    } catch {
+      console.warn('[questRepo] sync enqueue failed for setProgress');
+    }
 
     return result;
   },
@@ -164,7 +166,7 @@ export const questRepo = {
           syncQueueRepo.enqueue('quests', id, 'UPDATE', updated[0]).catch(() => {});
         }
       }
-    } catch {}
+    } catch (e) { console.warn('[questRepo] sync enqueue failed:', e); }
 
     return result;
   },

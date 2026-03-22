@@ -16,13 +16,22 @@ export const xpRepo = {
     const result = await db.insert(xpLedger).values(data).returning();
 
     // Enqueue for sync (non-blocking, skip for guests)
+    // Privacy: strip sourceId and sourceType before syncing — these fields
+    // combined with the habits table could reconstruct worship completion logs
     try {
       const { isAuthenticated } = useAuthStore.getState();
       if (isAuthenticated) {
         assertSyncable('xp_ledger');
-        syncQueueRepo.enqueue('xp_ledger', data.id, 'INSERT', data).catch(() => {});
+        const { sourceId: _sid, sourceType: _stype, ...syncSafeData } = data;
+        syncQueueRepo.enqueue('xp_ledger', data.id, 'INSERT', {
+          ...syncSafeData,
+          sourceId: null,
+          sourceType: 'redacted',
+        }).catch(() => {});
       }
-    } catch { /* enqueue must never block local write */ }
+    } catch {
+      console.warn('[xpRepo] sync enqueue failed');
+    }
 
     return result;
   },

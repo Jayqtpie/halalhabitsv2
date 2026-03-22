@@ -6,7 +6,7 @@
  *
  * Follows the established store-repo-engine pattern (same as habitRepo, questRepo, etc.)
  */
-import { db } from '../client';
+import { getDb } from '../client';
 import { muhasabahEntries } from '../schema';
 import { eq, desc } from 'drizzle-orm';
 
@@ -16,6 +16,7 @@ export const muhasabahRepo = {
    * Called by muhasabahStore.submit() after user completes the reflection flow.
    */
   async create(entry: typeof muhasabahEntries.$inferInsert) {
+    const db = getDb();
     return db.insert(muhasabahEntries).values(entry).returning();
   },
 
@@ -23,6 +24,7 @@ export const muhasabahRepo = {
    * Fetch the most recent Muhasabah entries for a user.
    */
   async getByUserId(userId: string, limit = 30) {
+    const db = getDb();
     return db
       .select()
       .from(muhasabahEntries)
@@ -36,6 +38,7 @@ export const muhasabahRepo = {
    * Returns null if no entry exists for the given date string (YYYY-MM-DD).
    */
   async getTodayEntry(userId: string, todayDateStr: string) {
+    const db = getDb();
     const rows = await db
       .select()
       .from(muhasabahEntries)

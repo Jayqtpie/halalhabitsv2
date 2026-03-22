@@ -28,7 +28,7 @@ export const userRepo = {
         assertSyncable('users');
         syncQueueRepo.enqueue('users', data.id, 'INSERT', data).catch(() => {});
       }
-    } catch { /* enqueue must never block local write */ }
+    } catch (e) { console.warn('[userRepo] sync enqueue failed:', e); }
 
     return result;
   },
@@ -53,7 +53,7 @@ export const userRepo = {
           syncQueueRepo.enqueue('users', id, 'UPDATE', updated[0]).catch(() => {});
         }
       }
-    } catch {}
+    } catch (e) { console.warn('[userRepo] sync enqueue failed:', e); }
 
     return result;
   },
@@ -77,7 +77,7 @@ export const userRepo = {
           syncQueueRepo.enqueue('users', id, 'UPDATE', updated[0]).catch(() => {});
         }
       }
-    } catch {}
+    } catch (e) { console.warn('[userRepo] sync enqueue failed:', e); }
 
     return result;
   },

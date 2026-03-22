@@ -53,7 +53,7 @@ export const titleRepo = {
         assertSyncable('user_titles');
         syncQueueRepo.enqueue('user_titles', data.titleId, 'INSERT', data).catch(() => {});
       }
-    } catch { /* enqueue must never block local write */ }
+    } catch (e) { console.warn('[titleRepo] sync enqueue failed:', e); }
 
     return result;
   },

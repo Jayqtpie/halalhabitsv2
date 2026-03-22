@@ -46,7 +46,7 @@ export const habitRepo = {
         assertSyncable('habits');
         syncQueueRepo.enqueue('habits', data.id, 'INSERT', data).catch(() => {});
       }
-    } catch { /* enqueue must never block local write */ }
+    } catch (e) { console.warn('[habitRepo] sync enqueue failed:', e); }
 
     return result;
   },
@@ -67,7 +67,7 @@ export const habitRepo = {
           syncQueueRepo.enqueue('habits', id, 'UPDATE', updated[0]).catch(() => {});
         }
       }
-    } catch {}
+    } catch (e) { console.warn('[habitRepo] sync enqueue failed:', e); }
 
     return result;
   },
@@ -88,7 +88,7 @@ export const habitRepo = {
           syncQueueRepo.enqueue('habits', id, 'UPDATE', updated[0]).catch(() => {});
         }
       }
-    } catch {}
+    } catch (e) { console.warn('[habitRepo] sync enqueue failed:', e); }
 
     return result;
   },

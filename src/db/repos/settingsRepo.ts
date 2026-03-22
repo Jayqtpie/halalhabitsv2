@@ -53,6 +53,6 @@ export const settingsRepo = {
           syncQueueRepo.enqueue('settings', updated[0].id, 'UPDATE', updated[0]).catch(() => {});
         }
       }
-    } catch { /* enqueue must never block local write */ }
+    } catch (e) { console.warn('[settingsRepo] sync enqueue failed:', e); }
   },
 };

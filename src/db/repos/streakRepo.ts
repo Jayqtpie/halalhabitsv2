@@ -6,6 +6,7 @@ import { eq, and } from 'drizzle-orm';
 import { getDb } from '../client';
 import { streaks, habits } from '../schema';
 import type { NewStreak } from '../../types/database';
+import { generateId } from '../../utils/uuid';
 
 export const streakRepo = {
   /**
@@ -61,8 +62,6 @@ export const streakRepo = {
         .where(eq(streaks.habitId, habitId));
     }
 
-    // Create new streak record -- need to generate an id
-    const { generateId } = await import('../../utils/uuid');
     return db.insert(streaks).values({
       id: generateId(),
       habitId,
