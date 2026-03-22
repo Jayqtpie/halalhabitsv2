@@ -19,7 +19,10 @@ import {
   getFollowUpBody,
   getMuhasabahTitle,
   getMuhasabahBody,
+  getFridayMessage,
+  getFridayMessageTitle,
 } from '../domain/notification-copy';
+import { isFriday, getWeekNumber } from '../domain/friday-engine';
 import type { PrayerName, CalcMethodKey } from '../types/habits';
 import type { PrayerReminderConfig } from '../stores/settingsStore';
 
@@ -133,5 +136,24 @@ export async function rescheduleAll(
         minute,
       } as any,
     });
+  }
+
+  // FRDY-04: Schedule Friday morning push notification (D-01)
+  if (isFriday()) {
+    const weekNum = getWeekNumber();
+    const { text, source } = getFridayMessage(weekNum);
+    const body = source ? `${text} (${source})` : text;
+    const fridayMorning = new Date();
+    fridayMorning.setHours(8, 0, 0, 0); // 8:00 AM local
+    if (fridayMorning.getTime() > Date.now()) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: getFridayMessageTitle(),
+          body,
+          sound: true,
+        },
+        trigger: { type: 'date', date: fridayMorning } as any,
+      });
+    }
   }
 }

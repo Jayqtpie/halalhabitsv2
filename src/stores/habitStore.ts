@@ -22,6 +22,7 @@ import {
 import { sortHabitsForDisplay } from '../domain/habit-sorter';
 import { generateId } from '../utils/uuid';
 import { useGameStore } from './gameStore';
+import { isFriday, getFridayMultiplier, combinedMultiplier } from '../domain/friday-engine';
 
 // ─── Base XP Map ──────────────────────────────────────────────────────────────
 
@@ -243,10 +244,14 @@ export const useHabitStore = create<HabitState>((set, get) => ({
       // 4. Award XP via game store (before creating completion record so xpEarned is correct)
       const habit = state.habits.find(h => h.id === habitId);
       const baseXP = habit ? (habit.baseXp || getBaseXP(habit.type)) : getBaseXP('custom');
+      // FRDY-01: Friday 2x XP stacks multiplicatively with streak multiplier (D-12).
+      // Quest XP excluded (D-13) — see gameStore.updateQuestProgress which uses 1.0.
+      const fridayBonus = isFriday() ? getFridayMultiplier() : 1.0;
+      const effectiveMultiplier = combinedMultiplier(newStreakState.multiplier, fridayBonus);
       const xpResult = await useGameStore.getState().awardXP(
         userId,
         baseXP,
-        newStreakState.multiplier,
+        effectiveMultiplier,
         'habit',
         habitId,
       );

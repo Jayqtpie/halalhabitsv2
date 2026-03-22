@@ -15,7 +15,10 @@ import { checkTitleUnlocks } from '../domain/title-engine';
 import { selectQuestTemplates, evaluateQuestProgress } from '../domain/quest-engine';
 import { getLevelUpCopy } from '../domain/level-copy';
 import { TITLE_SEED_DATA } from '../domain/title-seed-data';
-import { QUEST_TEMPLATES } from '../domain/quest-templates';
+import { QUEST_TEMPLATES, ALKAHF_TEMPLATE } from '../domain/quest-templates';
+import { isFriday, getAlKahfExpiry } from '../domain/friday-engine';
+import { getPrayerWindows } from '../services/prayer-times';
+import { useSettingsStore } from './settingsStore';
 import { xpRepo, titleRepo, questRepo, userRepo, habitRepo, streakRepo, muhasabahRepo } from '../db/repos';
 import { generateId } from '../utils/uuid';
 import type { Title, UserTitle, Quest } from '../types/database';
@@ -430,7 +433,7 @@ export const useGameStore = create<GameState>((set, get) => ({
           await questRepo.updateProgressAtomic(quest.id, quest.targetValue);
           await questRepo.complete(quest.id);
 
-          // Award quest XP
+          // Award quest XP — 1.0 intentional — quest XP excluded from Friday multiplier (D-13, FRDY-01)
           await get().awardXP(userId, quest.xpReward, 1.0, 'quest', quest.id);
 
           // HUD-04: Haptic feedback on quest completion (Medium)
@@ -603,6 +606,30 @@ export const useGameStore = create<GameState>((set, get) => ({
           });
           newQuests.push(created);
         }
+      }
+
+      // FRDY-03: Generate Al-Kahf quest on Fridays (D-08: extra card, not replacing existing)
+      const hasAlKahfQuest = currentQuests.some(q => q.templateId === 'friday-alkahf');
+      if (isFriday() && !hasAlKahfQuest) {
+        const { locationLat: lat, locationLng: lng, prayerCalcMethod } = useSettingsStore.getState();
+        const expiresAt = getAlKahfExpiry(lat, lng, new Date(), prayerCalcMethod ?? 'MuslimWorldLeague', getPrayerWindows);
+        const [created] = await questRepo.create({
+          id: generateId(),
+          userId,
+          type: ALKAHF_TEMPLATE.type,
+          description: ALKAHF_TEMPLATE.description,
+          xpReward: ALKAHF_TEMPLATE.xpReward,
+          targetType: ALKAHF_TEMPLATE.targetType,
+          targetValue: ALKAHF_TEMPLATE.targetValue,
+          targetHabitId: null,
+          templateId: ALKAHF_TEMPLATE.id,
+          progress: 0,
+          status: 'available',
+          expiresAt,
+          completedAt: null,
+          createdAt: now,
+        });
+        newQuests.push(created);
       }
 
       set({ quests: [...currentQuests, ...newQuests] });
