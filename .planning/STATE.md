@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
-status: Ready to execute
-stopped_at: Completed 13-03-PLAN.md
-last_updated: "2026-03-22T22:23:54.460Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 13-04-PLAN.md Tasks 1-2; Task 3 awaiting human-verify checkpoint
+last_updated: "2026-03-22T22:26:11.782Z"
 progress:
   total_phases: 7
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -54,6 +54,8 @@ Plan: 4 of 4
 - [Phase 13-dopamine-detox-dungeon]: Title count expanded to 27 with The Unplugged (detox_completions, 10 sessions, sortOrder 27)
 - [Phase 13-dopamine-detox-dungeon]: EarlyExitConfirmation rendered as sibling Modal outside DungeonSheet to avoid z-index nesting issues
 - [Phase 13-dopamine-detox-dungeon]: DetoxCountdownTimer uses setInterval + getRemainingMs (no Reanimated per-tick) — matches UI-SPEC timer performance contract
+- [Phase 13-dopamine-detox-dungeon]: Phase-offset torches use setTimeout(200ms) to start second withRepeat at different phase for natural flicker
+- [Phase 13-dopamine-detox-dungeon]: XP count-up uses state-based setInterval (not Reanimated withTiming) to avoid worklet<->JS bridge limitation with Text children
 
 ### Pending Todos
 
@@ -72,6 +74,6 @@ Plan: 4 of 4
 
 ## Session Continuity
 
-Last session: 2026-03-22T22:23:54.456Z
-Stopped at: Completed 13-03-PLAN.md
+Last session: 2026-03-22T22:26:11.777Z
+Stopped at: Completed 13-04-PLAN.md Tasks 1-2; Task 3 awaiting human-verify checkpoint
 Resume file: None

@@ -31,7 +31,7 @@ Full details: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 
 - [x] **Phase 11: Schema & Privacy Gate Foundation** - Lay data foundation for all v2.0 features before any feature code runs (completed 2026-03-19)
 - [x] **Phase 12: Friday Power-Ups** - Make every Friday a game event with 2x XP and Al-Kahf challenge (completed 2026-03-22)
-- [ ] **Phase 13: Dopamine Detox Dungeon** - Give players a voluntary anti-doomscrolling challenge system
+- [x] **Phase 13: Dopamine Detox Dungeon** - Give players a voluntary anti-doomscrolling challenge system (completed 2026-03-22)
 - [ ] **Phase 14: Nafs Boss Arena** - Let players battle personified nafs struggles in multi-day boss fights
 - [ ] **Phase 15: Buddy Connection System** - Enable private accountability partnerships with up to 20 connections
 - [ ] **Phase 16: Shared Activities & Duo Quests** - Let buddy pairs track shared habits and complete cooperative quests
@@ -82,7 +82,7 @@ Plans:
 - [x] 13-01-PLAN.md — Domain engine (detox-engine.ts) and repository (detoxRepo.ts) with TDD
 - [x] 13-02-PLAN.md — Store wiring (detoxStore), title engine extension, streak protection, gameStore integration
 - [x] 13-03-PLAN.md — DungeonSheet, DetoxCountdownTimer, EarlyExitConfirmation, DetoxShieldBadge UI
-- [ ] 13-04-PLAN.md — HUD dungeon theme, DungeonDoorIcon, WelcomeBackToast, DungeonClearedFanfare
+- [x] 13-04-PLAN.md — HUD dungeon theme, DungeonDoorIcon, WelcomeBackToast, DungeonClearedFanfare
 
 ### Phase 14: Nafs Boss Arena
 **Goal**: Players at Level 10+ can battle one of 5 nafs archetypes over 5-7 days, dealing damage through habit completions and receiving counter-attacks for missed days, culminating in XP and title rewards
@@ -151,7 +151,7 @@ Plans:
 | 10. Title Pipeline and Integration Fixes | v1.0 | 1/1 | Complete | 2026-03-19 |
 | 11. Schema & Privacy Gate Foundation | 2/2 | Complete    | 2026-03-20 | - |
 | 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
-| 13. Dopamine Detox Dungeon | v2.0 | 3/4 | In Progress|  |
+| 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
 | 14. Nafs Boss Arena | v2.0 | 0/TBD | Not started | - |
 | 15. Buddy Connection System | v2.0 | 0/TBD | Not started | - |
 | 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |
