@@ -1,32 +1,58 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-22T06:39:35.489Z",
-  "phase": "12",
-  "phase_name": "friday-power-ups",
-  "phase_dir": ".planning/phases/12-friday-power-ups",
-  "plan": 3,
-  "task": 2,
-  "total_tasks": 2,
-  "status": "phase_complete",
+  "timestamp": "2026-03-22T20:54:24.921Z",
+  "phase": "13",
+  "phase_name": "Dopamine Detox Dungeon",
+  "phase_dir": ".planning/phases/13-dopamine-detox-dungeon",
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
+  "status": "paused",
   "completed_tasks": [
-    {"id": "12-01", "name": "Friday Domain Engine", "status": "done", "commit": "88cb262"},
-    {"id": "12-02", "name": "Store Wiring & HUD Components", "status": "done", "commit": "e9eef44"},
-    {"id": "12-03", "name": "Al-Kahf Quest Card & Jumuah Toggle", "status": "done", "commit": "2e27890"}
+    {"id": 1, "name": "Phase 13 context gathering (discuss-phase)", "status": "done", "commit": "5e4d233"}
   ],
-  "remaining_tasks": [],
+  "remaining_tasks": [
+    {"id": 2, "name": "Plan phase 13 (/gsd:plan-phase 13)", "status": "not_started"},
+    {"id": 3, "name": "Execute phase 13 (/gsd:execute-phase 13)", "status": "not_started"}
+  ],
   "blockers": [],
   "human_actions_pending": [
-    {"action": "Run 7 human UAT items on a Friday (device testing)", "context": "All items are date-gated to Friday — FridayBoostBadge, 2x XP, Al-Kahf quest, section chips, Jumuah toggle, haptics, banner auto-dismiss", "blocking": false}
+    {"action": "Phase 12 Friday UAT still pending (7 items require Friday device test)", "context": "Carried from Phase 12 — FridayBoostBadge, 2x XP, Al-Kahf quest, section chips, Jumuah toggle, haptics, banner auto-dismiss", "blocking": false}
   ],
   "decisions": [
-    {"decision": "Quest XP path left at 1.0 (no Friday multiplier on quest completion)", "rationale": "Al-Kahf quest already awards 100 XP bonus — doubling would over-reward", "phase": "12"},
-    {"decision": "FridayMessageBanner rendered as React Native sibling outside Skia Canvas", "rationale": "Skia Canvas cannot render React Native Text/accessibility — sibling approach preserves accessibilityRole='alert'", "phase": "12"}
+    {"decision": "HUD pixel dungeon door icon opens bottom sheet for session controls", "rationale": "Quick access without adding a full navigation tab", "phase": "13"},
+    {"decision": "Preset duration chips (2hr, 4hr, 6hr, 8hr) with Daily/Deep toggle", "rationale": "Fast tap selection, clear variant distinction", "phase": "13"},
+    {"decision": "Full dungeon HUD theme during active session", "rationale": "Dramatic immersive experience — HUD transforms with stone walls, torches, new palette", "phase": "13"},
+    {"decision": "Welcome-back toast on app resume during active detox", "rationale": "Acknowledges player return, shows remaining time", "phase": "13"},
+    {"decision": "Compassionate mentor voice on early exit, proportional XP penalty, one retry/day", "rationale": "No-shame philosophy, fair scaling, balanced forgiveness", "phase": "13"},
+    {"decision": "Dungeon Cleared fanfare with XP animation on completion", "rationale": "Should feel like beating a game level", "phase": "13"},
+    {"decision": "Visible shield icon on habit cards during active detox (overlapping habits only)", "rationale": "Reduces anxiety, prevents gaming by scoping to session window", "phase": "13"},
+    {"decision": "Detox-specific Identity Title (e.g., Dungeon Master)", "rationale": "Long-term motivation for repeated detox sessions", "phase": "13"}
   ],
   "uncommitted_files": [
-    ".planning/ROADMAP.md",
-    ".planning/STATE.md",
-    ".planning/phases/12-friday-power-ups/12-VERIFICATION.md"
+    "__tests__/db/muhasabahRepo.test.ts",
+    "__tests__/db/repos/syncQueueWiring.test.ts",
+    "__tests__/services/auth-service.test.ts",
+    "__tests__/stores/gameStore.test.ts",
+    "src/components/hud/HudScene.tsx",
+    "src/components/quests/AlKahfQuestCard.tsx",
+    "src/db/repos/completionRepo.ts",
+    "src/db/repos/habitRepo.ts",
+    "src/db/repos/muhasabahRepo.ts",
+    "src/db/repos/questRepo.ts",
+    "src/db/repos/settingsRepo.ts",
+    "src/db/repos/streakRepo.ts",
+    "src/db/repos/titleRepo.ts",
+    "src/db/repos/userRepo.ts",
+    "src/db/repos/xpRepo.ts",
+    "src/domain/streak-engine.ts",
+    "src/services/auth-service.ts",
+    "src/services/data-export.ts",
+    "src/stores/gameStore.ts",
+    "src/stores/habitStore.ts",
+    "src/types/habits.ts",
+    "src/stores/bridge.ts"
   ],
-  "next_action": "Commit uncommitted planning files, then either run human UAT on Friday or proceed to /gsd:plan-phase 13 (Dopamine Detox Dungeon)",
-  "context_notes": "Phase 12 fully executed and verified (13/13 must-haves passed). 7 human UAT items pending — all require a Friday device test. Phase marked complete in ROADMAP. Next phase is 13-dopamine-detox-dungeon."
+  "next_action": "Run /gsd:plan-phase 13 to create execution plans from the gathered context",
+  "context_notes": "Phase 13 context fully gathered — all 4 gray areas discussed (entry, session, exit, completion). Phase 12 Friday Power-Ups has uncommitted working tree changes from execution (plans complete per STATE.md). Ready to plan Phase 13."
 }
