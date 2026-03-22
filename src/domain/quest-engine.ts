@@ -29,7 +29,8 @@ export interface QuestTemplate {
     | 'streak_reach'
     | 'daily_complete_all'
     | 'muhasabah'
-    | 'total_completions';
+    | 'total_completions'
+    | 'alkahf_sections';
   /** Completion threshold */
   targetValue: number;
   /** For habit_type quests: the specific habit type required */
@@ -211,6 +212,10 @@ export function evaluateQuestProgress(
       );
       return hasStreak ? targetValue : progress;
     }
+
+    case 'alkahf_sections':
+      // Al-Kahf section completion -- progress manually reported via UI taps
+      return clamp(progress + (event.completionCount ?? 1));
 
     default:
       return progress; // unknown type -- unchanged
