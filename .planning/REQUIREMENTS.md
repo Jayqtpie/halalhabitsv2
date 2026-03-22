@@ -22,12 +22,12 @@ Requirements for v2.0 milestone. Each maps to roadmap phases.
 
 ### Dopamine Detox Dungeon
 
-- [ ] **DTOX-01**: User can start a voluntary detox challenge with duration selection (2-8 hours)
-- [ ] **DTOX-02**: Active session displays countdown timer that survives app backgrounding (timestamp-based)
-- [ ] **DTOX-03**: Completing a detox session awards XP based on duration (50-150 daily, 300 deep weekly)
-- [ ] **DTOX-04**: User can exit detox early with confirmation and XP cost penalty
-- [ ] **DTOX-05**: Daily variant resets daily; weekly deep variant (6-8hr) available once per week
-- [ ] **DTOX-06**: Active detox session preserves habit streaks (no penalty for missed habits during detox)
+- [x] **DTOX-01**: User can start a voluntary detox challenge with duration selection (2-8 hours)
+- [x] **DTOX-02**: Active session displays countdown timer that survives app backgrounding (timestamp-based)
+- [x] **DTOX-03**: Completing a detox session awards XP based on duration (50-150 daily, 300 deep weekly)
+- [x] **DTOX-04**: User can exit detox early with confirmation and XP cost penalty
+- [x] **DTOX-05**: Daily variant resets daily; weekly deep variant (6-8hr) available once per week
+- [x] **DTOX-06**: Active detox session preserves habit streaks (no penalty for missed habits during detox)
 
 ### Nafs Boss Arena
 
@@ -118,12 +118,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FRDY-02 | Phase 12 | Complete |
 | FRDY-03 | Phase 12 | Complete |
 | FRDY-04 | Phase 12 | Complete |
-| DTOX-01 | Phase 13 | Pending |
-| DTOX-02 | Phase 13 | Pending |
-| DTOX-03 | Phase 13 | Pending |
-| DTOX-04 | Phase 13 | Pending |
-| DTOX-05 | Phase 13 | Pending |
-| DTOX-06 | Phase 13 | Pending |
+| DTOX-01 | Phase 13 | Complete |
+| DTOX-02 | Phase 13 | Complete |
+| DTOX-03 | Phase 13 | Complete |
+| DTOX-04 | Phase 13 | Complete |
+| DTOX-05 | Phase 13 | Complete |
+| DTOX-06 | Phase 13 | Complete |
 | BOSS-01 | Phase 14 | Pending |
 | BOSS-02 | Phase 14 | Pending |
 | BOSS-03 | Phase 14 | Pending |

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
-status: unknown
-stopped_at: Phase 13 context gathered
-last_updated: "2026-03-22T20:52:16.021Z"
+status: Ready to execute
+stopped_at: Completed 13-01-PLAN.md
+last_updated: "2026-03-22T22:10:56.523Z"
 progress:
   total_phases: 7
   completed_phases: 2
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 9
+  completed_plans: 6
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Phase 12 — friday-power-ups
+**Current focus:** Phase 13 — dopamine-detox-dungeon
 
 ## Current Position
 
-Phase: 13
-Plan: Not started
+Phase: 13 (dopamine-detox-dungeon) — EXECUTING
+Plan: 2 of 4
 
 ## Accumulated Context
 
@@ -47,6 +47,8 @@ Plan: Not started
 - [Phase 12-friday-power-ups]: FridayMessageBanner rendered as React Native View sibling outside Skia Canvas — Canvas cannot host RN views
 - [Phase 12-friday-power-ups]: AlKahf section progress stored as boolean[] locally, synced via questRepo.updateProgressAtomic on each chip tap
 - [Phase 12-friday-power-ups]: JumuahToggle state is local to HabitCard — honor system toggle with no persistence, no XP awarded
+- [Phase 13-dopamine-detox-dungeon]: detox-engine daily XP formula: 50+(clampedHours-2)*25, clamp(h,2-6); deep always 300
+- [Phase 13-dopamine-detox-dungeon]: detoxRepo uses caller-supplied day/week boundaries — getTodaySessions(dayStart,dayEnd), getThisWeekDeepSessions(weekStart)
 
 ### Pending Todos
 
@@ -65,6 +67,6 @@ Plan: Not started
 
 ## Session Continuity
 
-Last session: 2026-03-22T20:52:16.017Z
-Stopped at: Phase 13 context gathered
-Resume file: .planning/phases/13-dopamine-detox-dungeon/13-CONTEXT.md
+Last session: 2026-03-22T22:10:56.519Z
+Stopped at: Completed 13-01-PLAN.md
+Resume file: None
