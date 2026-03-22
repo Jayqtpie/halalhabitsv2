@@ -8,14 +8,19 @@
  *
  * Uses FilterMode.Nearest sampling for crisp pixel art (HUD-02).
  * Guards useImage results -- returns null while assets load.
+ *
+ * HUD overlays (FridayMessageBanner) are rendered as siblings to Canvas,
+ * NOT inside it (Skia Canvas does not support React Native views).
  */
-import React from 'react';
-import { StyleSheet, Dimensions } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Dimensions, View } from 'react-native';
 import { Canvas, Image, useImage, FilterMode, MipmapMode } from '@shopify/react-native-skia';
 import { getEnvironmentForLevel } from '../../domain/hud-environment';
 import type { EnvironmentId } from '../../domain/hud-environment';
 import { DayNightOverlay } from './DayNightOverlay';
 import { CharacterSprite } from './CharacterSprite';
+import { isFriday } from '../../domain/friday-engine';
+import { FridayMessageBanner } from './FridayMessageBanner';
 
 const { width: screenW, height: screenH } = Dimensions.get('window');
 
@@ -43,28 +48,39 @@ interface HudSceneProps {
 export function HudScene({ level }: HudSceneProps) {
   const environmentId = getEnvironmentForLevel(level);
   const bg = useImage(ENVIRONMENT_IMAGES[environmentId]);
+  const [fridayFirstOpen, setFridayFirstOpen] = useState(true);
 
   // Background loads asynchronously -- render nothing until ready
   if (!bg) return null;
 
   return (
-    <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
-      {/* Layer 1: Environment background */}
-      <Image
-        image={bg}
-        x={0}
-        y={0}
-        width={screenW}
-        height={screenH}
-        fit="cover"
-        sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
-      />
+    <View style={StyleSheet.absoluteFill}>
+      <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
+        {/* Layer 1: Environment background */}
+        <Image
+          image={bg}
+          x={0}
+          y={0}
+          width={screenW}
+          height={screenH}
+          fit="cover"
+          sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
+        />
 
-      {/* Layer 2: Day/night tint overlay */}
-      <DayNightOverlay />
+        {/* Layer 2: Day/night tint overlay */}
+        <DayNightOverlay />
 
-      {/* Layer 3: Animated character sprite */}
-      <CharacterSprite x={CHAR_X} y={CHAR_Y} />
-    </Canvas>
+        {/* Layer 3: Animated character sprite */}
+        <CharacterSprite x={CHAR_X} y={CHAR_Y} />
+      </Canvas>
+
+      {/* FRDY-04: Friday message banner — rendered outside Canvas as React Native overlay */}
+      {isFriday() && (
+        <FridayMessageBanner
+          isFirstOpen={fridayFirstOpen}
+          onDismiss={() => setFridayFirstOpen(false)}
+        />
+      )}
+    </View>
   );
 }

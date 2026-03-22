@@ -17,7 +17,9 @@ import { useShallow } from 'zustand/react/shallow';
 import { LevelBadge } from '../game/LevelBadge';
 import { XPProgressBar } from '../game/XPProgressBar';
 import { PrayerCountdown } from './PrayerCountdown';
+import { FridayBoostBadge } from './FridayBoostBadge';
 import { useHabitStore } from '../../stores/habitStore';
+import { isFriday } from '../../domain/friday-engine';
 import { colors, typography, spacing, radius } from '../../tokens';
 
 function BestStreakDisplay() {
@@ -58,6 +60,12 @@ export function HudStatBar() {
       </View>
       <View style={styles.divider} />
       <BestStreakDisplay />
+      {isFriday() && (
+        <>
+          <View style={styles.divider} />
+          <FridayBoostBadge />
+        </>
+      )}
       <View style={styles.divider} />
       <PrayerCountdown />
     </View>
