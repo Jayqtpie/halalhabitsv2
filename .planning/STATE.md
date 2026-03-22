@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: unknown
-stopped_at: Completed 12-01-PLAN.md
-last_updated: "2026-03-22T06:28:28.123Z"
+stopped_at: Completed 12-02-PLAN.md
+last_updated: "2026-03-22T06:33:20.313Z"
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 12 (friday-power-ups) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 
 ## Accumulated Context
 
@@ -43,6 +43,8 @@ Plan: 2 of 3
 - [Phase 11]: Actual salah XP base values (fajr=50, others=15) differ from Blueprint template (30/20) — economy model uses actual values
 - [Phase 12-friday-power-ups]: getAlKahfExpiry uses dependency injection for getPrayerWindows to keep friday-engine.ts pure and testable
 - [Phase 12-friday-power-ups]: ALKAHF_TEMPLATE excluded from QUEST_TEMPLATES array — generated separately by gameStore when isFriday() is true
+- [Phase 12-friday-power-ups]: Friday multiplier injected at habitStore.completeHabit call site (not inside awardXP) to preserve quest XP exclusion at 1.0 per D-13
+- [Phase 12-friday-power-ups]: FridayMessageBanner rendered as React Native View sibling outside Skia Canvas — Canvas cannot host RN views
 
 ### Pending Todos
 
@@ -61,6 +63,6 @@ Plan: 2 of 3
 
 ## Session Continuity
 
-Last session: 2026-03-22T06:28:28.119Z
-Stopped at: Completed 12-01-PLAN.md
+Last session: 2026-03-22T06:33:20.309Z
+Stopped at: Completed 12-02-PLAN.md
 Resume file: None

@@ -64,7 +64,7 @@ Plans:
 **Plans**: 3 plans
 Plans:
 - [x] 12-01-PLAN.md — Friday domain engine, copy, Al-Kahf template, and unit tests
-- [ ] 12-02-PLAN.md — Store wiring (XP multiplier, quest generation, notifications) and HUD components
+- [x] 12-02-PLAN.md — Store wiring (XP multiplier, quest generation, notifications) and HUD components
 - [ ] 12-03-PLAN.md — AlKahfQuestCard and JumuahToggle UI components
 
 ### Phase 13: Dopamine Detox Dungeon
@@ -145,7 +145,7 @@ Plans:
 | 9. Verification and Audit Cleanup | v1.0 | 2/2 | Complete | 2026-03-19 |
 | 10. Title Pipeline and Integration Fixes | v1.0 | 1/1 | Complete | 2026-03-19 |
 | 11. Schema & Privacy Gate Foundation | 2/2 | Complete    | 2026-03-20 | - |
-| 12. Friday Power-Ups | v2.0 | 1/3 | In Progress|  |
+| 12. Friday Power-Ups | v2.0 | 2/3 | In Progress|  |
 | 13. Dopamine Detox Dungeon | v2.0 | 0/TBD | Not started | - |
 | 14. Nafs Boss Arena | v2.0 | 0/TBD | Not started | - |
 | 15. Buddy Connection System | v2.0 | 0/TBD | Not started | - |
