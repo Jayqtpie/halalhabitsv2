@@ -31,12 +31,12 @@ Requirements for v2.0 milestone. Each maps to roadmap phases.
 
 ### Nafs Boss Arena
 
-- [ ] **BOSS-01**: User can initiate a boss battle at Level 10+ against one of 5 nafs archetypes
-- [ ] **BOSS-02**: Boss battles last 5-7 days with HP that decreases from daily habit completions
-- [ ] **BOSS-03**: Each boss archetype has unique dialogue (intro, taunt, player winning, defeated messages)
-- [ ] **BOSS-04**: Boss counter-attacks (HP heals) when user misses habits on active battle days
-- [ ] **BOSS-05**: Defeating a boss awards 200-500 XP and contributes to boss-specific Identity Title
-- [ ] **BOSS-06**: Mercy Mode reduces boss counter-attack severity during active Mercy Mode
+- [x] **BOSS-01**: User can initiate a boss battle at Level 10+ against one of 5 nafs archetypes
+- [x] **BOSS-02**: Boss battles last 5-7 days with HP that decreases from daily habit completions
+- [x] **BOSS-03**: Each boss archetype has unique dialogue (intro, taunt, player winning, defeated messages)
+- [x] **BOSS-04**: Boss counter-attacks (HP heals) when user misses habits on active battle days
+- [x] **BOSS-05**: Defeating a boss awards 200-500 XP and contributes to boss-specific Identity Title
+- [x] **BOSS-06**: Mercy Mode reduces boss counter-attack severity during active Mercy Mode
 - [ ] **BOSS-07**: Boss battle screen renders with Skia/Skottie animations (HP bar, hit effects, phase transitions)
 - [x] **BOSS-08**: Boss battle state persists across app kills and device restarts (SQLite wall-clock timestamps)
 
@@ -124,12 +124,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DTOX-04 | Phase 13 | Complete |
 | DTOX-05 | Phase 13 | Complete |
 | DTOX-06 | Phase 13 | Complete |
-| BOSS-01 | Phase 14 | Pending |
-| BOSS-02 | Phase 14 | Pending |
-| BOSS-03 | Phase 14 | Pending |
-| BOSS-04 | Phase 14 | Pending |
-| BOSS-05 | Phase 14 | Pending |
-| BOSS-06 | Phase 14 | Pending |
+| BOSS-01 | Phase 14 | Complete |
+| BOSS-02 | Phase 14 | Complete |
+| BOSS-03 | Phase 14 | Complete |
+| BOSS-04 | Phase 14 | Complete |
+| BOSS-05 | Phase 14 | Complete |
+| BOSS-06 | Phase 14 | Complete |
 | BOSS-07 | Phase 14 | Pending |
 | BOSS-08 | Phase 14 | Complete |
 | BUDY-01 | Phase 15 | Pending |
