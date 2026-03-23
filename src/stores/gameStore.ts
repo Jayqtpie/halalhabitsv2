@@ -19,7 +19,7 @@ import { QUEST_TEMPLATES, ALKAHF_TEMPLATE } from '../domain/quest-templates';
 import { isFriday, getAlKahfExpiry } from '../domain/friday-engine';
 import { getPrayerWindows } from '../services/prayer-times';
 import { useSettingsStore } from './settingsStore';
-import { xpRepo, titleRepo, questRepo, userRepo, habitRepo, streakRepo, muhasabahRepo, detoxRepo } from '../db/repos';
+import { xpRepo, titleRepo, questRepo, userRepo, habitRepo, streakRepo, muhasabahRepo, detoxRepo, bossRepo } from '../db/repos';
 import { getHabitStoreState } from './bridge';
 import { generateId } from '../utils/uuid';
 import type { Title, UserTitle, Quest } from '../types/database';
@@ -318,11 +318,12 @@ export const useGameStore = create<GameState>((set, get) => ({
       const completedQuests = await questRepo.getCompleted(userId);
       const questCompletions = completedQuests.length;
 
-      // Query real mercy recoveries, muhasabah streak, and detox completions in parallel
-      const [allUserStreaks, muhasabahStreak, detoxCompletedCount] = await Promise.all([
+      // Query real mercy recoveries, muhasabah streak, detox completions, and boss defeats in parallel
+      const [allUserStreaks, muhasabahStreak, detoxCompletedCount, bossDefeatedCount] = await Promise.all([
         streakRepo.getAllForUser(userId),
         muhasabahRepo.getStreak(userId),
         detoxRepo.getCompletedCount(userId),
+        bossRepo.getDefeatedCount(userId),
       ]);
       const mercyRecoveries = allUserStreaks.filter(s => s.isRebuilt).length;
 
@@ -338,6 +339,7 @@ export const useGameStore = create<GameState>((set, get) => ({
         simultaneousStreaks14,
         simultaneousStreaks90,
         detoxCompletions: detoxCompletedCount,
+        bossDefeats: bossDefeatedCount,
       };
 
       // Run title unlock check
