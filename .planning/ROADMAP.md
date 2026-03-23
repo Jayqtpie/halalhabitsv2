@@ -98,7 +98,7 @@ Plans:
 **Plans**: 5 plans
 Plans:
 - [ ] 14-01-PLAN.md — Boss domain engine (boss-engine.ts) and content pack (boss-content.ts) with TDD
-- [ ] 14-02-PLAN.md — Boss repository (bossRepo.ts) with privacy invariant tests
+- [x] 14-02-PLAN.md — Boss repository (bossRepo.ts) with privacy invariant tests
 - [ ] 14-03-PLAN.md — Boss store (bossStore.ts), title engine extension, gameStore integration
 - [ ] 14-04-PLAN.md — Arena screen with Skia battle scene, archetype gallery, and RPG dialogue
 - [ ] 14-05-PLAN.md — HUD Arena Gate icon, HUD theme swap, and BossDefeatFanfare overlay
@@ -158,7 +158,7 @@ Plans:
 | 11. Schema & Privacy Gate Foundation | 2/2 | Complete    | 2026-03-20 | - |
 | 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
-| 14. Nafs Boss Arena | v2.0 | 0/5 | Not started | - |
+| 14. Nafs Boss Arena | v2.0 | 1/5 | In Progress|  |
 | 15. Buddy Connection System | v2.0 | 0/TBD | Not started | - |
 | 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |
