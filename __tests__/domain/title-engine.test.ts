@@ -16,6 +16,7 @@ function makeStats(overrides: Partial<PlayerStats> = {}): PlayerStats {
     simultaneousStreaks14: 0,
     simultaneousStreaks90: 0,
     detoxCompletions: 0,
+    bossDefeats: 0,
     ...overrides,
   };
 }
@@ -182,6 +183,29 @@ describe('checkTitleUnlocks', () => {
     const result = checkTitleUnlocks([condition], new Set(), stats);
     expect(result).toContain('the-beginner');
   });
+
+  describe('boss_defeats unlock type', () => {
+    it('unlocks the-challenger at 1 defeat', () => {
+      const condition: TitleCondition = { id: 'the-challenger', unlockType: 'boss_defeats', unlockValue: 1, unlockHabitType: null };
+      const stats = makeStats({ bossDefeats: 1 });
+      const result = checkTitleUnlocks([condition], new Set(), stats);
+      expect(result).toContain('the-challenger');
+    });
+
+    it('does not unlock the-warrior at 2 defeats', () => {
+      const condition: TitleCondition = { id: 'the-warrior-of-nafs', unlockType: 'boss_defeats', unlockValue: 3, unlockHabitType: null };
+      const stats = makeStats({ bossDefeats: 2 });
+      const result = checkTitleUnlocks([condition], new Set(), stats);
+      expect(result).not.toContain('the-warrior-of-nafs');
+    });
+
+    it('unlocks conqueror at 6 defeats', () => {
+      const condition: TitleCondition = { id: 'the-conqueror-of-nafs', unlockType: 'boss_defeats', unlockValue: 6, unlockHabitType: null };
+      const stats = makeStats({ bossDefeats: 6 });
+      const result = checkTitleUnlocks([condition], new Set(), stats);
+      expect(result).toContain('the-conqueror-of-nafs');
+    });
+  });
 });
 
 // -----------------------------------------------------------------------
@@ -189,8 +213,8 @@ describe('checkTitleUnlocks', () => {
 // -----------------------------------------------------------------------
 
 describe('TITLE_SEED_DATA', () => {
-  it('has exactly 27 entries (26 original + The Unplugged detox title)', () => {
-    expect(TITLE_SEED_DATA).toHaveLength(27);
+  it('has exactly 30 entries (27 original + 3 boss arena titles)', () => {
+    expect(TITLE_SEED_DATA).toHaveLength(30);
   });
 
   it('has exactly 10 common titles', () => {
@@ -198,14 +222,14 @@ describe('TITLE_SEED_DATA', () => {
     expect(common).toHaveLength(10);
   });
 
-  it('has exactly 11 rare titles (10 original + The Unplugged)', () => {
+  it('has exactly 12 rare titles (10 original + The Unplugged + The Challenger)', () => {
     const rare = TITLE_SEED_DATA.filter(t => t.rarity === 'rare');
-    expect(rare).toHaveLength(11);
+    expect(rare).toHaveLength(12);
   });
 
-  it('has exactly 6 legendary titles', () => {
+  it('has exactly 8 legendary titles (6 original + 2 boss arena)', () => {
     const legendary = TITLE_SEED_DATA.filter(t => t.rarity === 'legendary');
-    expect(legendary).toHaveLength(6);
+    expect(legendary).toHaveLength(8);
   });
 
   it('all entries have required fields', () => {
@@ -251,12 +275,11 @@ describe('TITLE_SEED_DATA', () => {
     }
   });
 
-  it('legendary titles have sortOrder 21-26', () => {
+  it('legendary titles have sortOrder >= 21 (original range 21-26, boss titles use higher values)', () => {
     const legendary = TITLE_SEED_DATA.filter(t => t.rarity === 'legendary');
     const orders = legendary.map(t => t.sortOrder);
     for (const order of orders) {
       expect(order).toBeGreaterThanOrEqual(21);
-      expect(order).toBeLessThanOrEqual(26);
     }
   });
 
@@ -280,6 +303,7 @@ describe('TITLE_SEED_DATA', () => {
       'muhasabah_streak',
       'habit_count',
       'detox_completions',
+      'boss_defeats',
     ]);
     for (const title of TITLE_SEED_DATA) {
       expect(validTypes.has(title.unlockType)).toBe(true);
@@ -320,6 +344,7 @@ describe('TITLE_SEED_DATA', () => {
       simultaneousStreaks14: 10,
       simultaneousStreaks90: 10,
       detoxCompletions: 10,
+      bossDefeats: 10,
     };
 
     const result = checkTitleUnlocks(conditions, new Set(), maxStats);

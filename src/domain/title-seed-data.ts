@@ -30,7 +30,8 @@ export interface TitleSeedEntry {
     | 'simultaneous_streaks'
     | 'muhasabah_streak'
     | 'habit_count'
-    | 'detox_completions';
+    | 'detox_completions'
+    | 'boss_defeats';
   /** Threshold value for the unlock condition */
   unlockValue: number;
   /**
@@ -336,11 +337,49 @@ const LEGENDARY_TITLES: TitleSeedEntry[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Combined export (26 titles total: 10 common + 10 rare + 6 legendary)
+// Boss Arena Titles (28-30) -- Unlocked by defeating nafs boss archetypes
+// ---------------------------------------------------------------------------
+
+const BOSS_TITLES: TitleSeedEntry[] = [
+  {
+    id: 'the-challenger',
+    name: 'The Challenger',
+    rarity: 'rare',
+    unlockType: 'boss_defeats',
+    unlockValue: 1,
+    unlockHabitType: null,
+    flavorText: 'You faced the nafs and did not look away. That alone takes courage.',
+    sortOrder: 28,
+  },
+  {
+    id: 'the-warrior-of-nafs',
+    name: 'The Warrior of Nafs',
+    rarity: 'legendary',
+    unlockType: 'boss_defeats',
+    unlockValue: 3,
+    unlockHabitType: null,
+    flavorText: 'Three battles. Three victories. The nafs knows your name now, and it is afraid.',
+    sortOrder: 29,
+  },
+  {
+    id: 'the-conqueror-of-nafs',
+    name: 'Conqueror of Nafs',
+    rarity: 'legendary',
+    unlockType: 'boss_defeats',
+    unlockValue: 6,
+    unlockHabitType: null,
+    flavorText: 'All six nafs archetypes defeated. Your discipline is no longer in question.',
+    sortOrder: 30,
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Combined export (30 titles total: 10 common + 12 rare + 8 legendary)
 // ---------------------------------------------------------------------------
 
 export const TITLE_SEED_DATA: TitleSeedEntry[] = [
   ...COMMON_TITLES,
   ...RARE_TITLES,
   ...LEGENDARY_TITLES,
+  ...BOSS_TITLES,
 ];

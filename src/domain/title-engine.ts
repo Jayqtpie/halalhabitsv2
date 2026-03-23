@@ -29,7 +29,8 @@ export interface TitleCondition {
     | 'simultaneous_streaks'
     | 'muhasabah_streak'
     | 'habit_count'
-    | 'detox_completions';
+    | 'detox_completions'
+    | 'boss_defeats';
   /** Numeric threshold for the condition */
   unlockValue: number;
   /** For habit_type_streak: the specific habit type required (null otherwise) */
@@ -59,6 +60,8 @@ export interface PlayerStats {
   simultaneousStreaks90: number;
   /** Total completed detox sessions */
   detoxCompletions: number;
+  /** Total boss battles defeated */
+  bossDefeats: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -121,6 +124,9 @@ function isTitleUnlocked(condition: TitleCondition, stats: PlayerStats): boolean
 
     case 'detox_completions':
       return stats.detoxCompletions >= condition.unlockValue;
+
+    case 'boss_defeats':
+      return stats.bossDefeats >= condition.unlockValue;
 
     default:
       return false;
