@@ -85,17 +85,23 @@ Plans:
 - [x] 13-04-PLAN.md — HUD dungeon theme, DungeonDoorIcon, WelcomeBackToast, DungeonClearedFanfare
 
 ### Phase 14: Nafs Boss Arena
-**Goal**: Players at Level 10+ can battle one of 5 nafs archetypes over 5-7 days, dealing damage through habit completions and receiving counter-attacks for missed days, culminating in XP and title rewards
+**Goal**: Players at Level 10+ can battle one of 6 nafs archetypes over 5-7 days, dealing damage through habit completions and receiving counter-attacks for missed days, culminating in XP and title rewards
 **Depends on**: Phase 11
 **Requirements**: BOSS-01, BOSS-02, BOSS-03, BOSS-04, BOSS-05, BOSS-06, BOSS-07, BOSS-08
 **Success Criteria** (what must be TRUE):
   1. A player at Level 10+ can enter the Boss Arena, select an archetype, and start a battle; a player below Level 10 cannot access the Arena
   2. The boss HP bar visibly decreases from daily habit completions across the 5-7 day battle window, and visibly recovers (counter-attack) when habits are missed
-  3. Each of the 5 archetypes displays unique dialogue at battle start, during taunts, when the player is winning, and when the boss is defeated
+  3. Each of the 6 archetypes displays unique dialogue at battle start, during taunts, when the player is winning, and when the boss is defeated
   4. Defeating a boss awards the correct XP (200-500) and contributes progress toward the boss-specific Identity Title
   5. Mercy Mode reduces the severity of counter-attacks when active during a battle
   6. Battle state (HP, days elapsed, archetype) survives app kills and device restarts without data loss
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 14-01-PLAN.md — Boss domain engine (boss-engine.ts) and content pack (boss-content.ts) with TDD
+- [ ] 14-02-PLAN.md — Boss repository (bossRepo.ts) with privacy invariant tests
+- [ ] 14-03-PLAN.md — Boss store (bossStore.ts), title engine extension, gameStore integration
+- [ ] 14-04-PLAN.md — Arena screen with Skia battle scene, archetype gallery, and RPG dialogue
+- [ ] 14-05-PLAN.md — HUD Arena Gate icon, HUD theme swap, and BossDefeatFanfare overlay
 
 ### Phase 15: Buddy Connection System
 **Goal**: Players can find, invite, and manage up to 20 private accountability buddies, view a buddy's public progress summary, and have all social data protected by RLS policies
@@ -152,7 +158,7 @@ Plans:
 | 11. Schema & Privacy Gate Foundation | 2/2 | Complete    | 2026-03-20 | - |
 | 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
-| 14. Nafs Boss Arena | v2.0 | 0/TBD | Not started | - |
+| 14. Nafs Boss Arena | v2.0 | 0/5 | Not started | - |
 | 15. Buddy Connection System | v2.0 | 0/TBD | Not started | - |
 | 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |
