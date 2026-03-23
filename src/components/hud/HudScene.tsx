@@ -6,12 +6,15 @@
  *   2. Stone tint (Skia Rect, dungeon mode only, #1A1410 @ 30%)
  *   3. DayNightOverlay (time-based tint Rect; swapped to dungeon shadow during dungeon mode)
  *   4. TorchLeft / TorchRight (Skia Circle, dungeon mode only, flickering amber)
- *   5. CharacterSprite (animated 4-frame idle)
+ *   5. Arena stone tint (Skia Rect, arena mode only — when boss active AND no dungeon)
+ *   6. Arena shadow overlay (Skia Rect, arena mode only)
+ *   7. Boss silhouette tint (Skia Rect, arena mode only — subtle ruby wash)
+ *   8. CharacterSprite (animated 4-frame idle)
  *
  * Uses FilterMode.Nearest sampling for crisp pixel art (HUD-02).
  * Guards useImage results -- returns null while assets load.
  *
- * HUD overlays (FridayMessageBanner, DungeonDoorIcon, WelcomeBackToast) are
+ * HUD overlays (FridayMessageBanner, DungeonDoorIcon, ArenaGateIcon, WelcomeBackToast) are
  * rendered as siblings to Canvas, NOT inside it (Skia Canvas does not support
  * React Native views).
  *
@@ -21,6 +24,13 @@
  *   - Renders DungeonDoorIcon (HUD entry point) and WelcomeBackToast outside Canvas
  *   - Opens DungeonSheet on door icon press
  *   - Triggers DungeonClearedFanfare on session completion
+ *
+ * Arena theme integration (BOSS-07, D-04):
+ *   - Reads activeBattle from useBossStore
+ *   - When arenaThemeActive (boss active AND dungeon NOT active):
+ *     adds arena stone tint + shadow + ruby boss silhouette tint layers
+ *   - Renders ArenaGateIcon outside Canvas
+ *   - Detox dungeon theme takes visual priority (D-04)
  */
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -55,8 +65,11 @@ import { DungeonDoorIcon } from './DungeonDoorIcon';
 import { WelcomeBackToast } from './WelcomeBackToast';
 import { DungeonSheet } from '../detox/DungeonSheet';
 import { DungeonClearedFanfare } from '../detox/DungeonClearedFanfare';
+import { ArenaGateIcon } from './ArenaGateIcon';
+import { BossDefeatFanfare } from '../arena/BossDefeatFanfare';
 import { useDetoxStore } from '../../stores/detoxStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useBossStore } from '../../stores/bossStore';
 
 // Require map for environment backgrounds -- static requires for Metro bundler
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -75,6 +88,11 @@ const ENVIRONMENT_IMAGES: Record<EnvironmentId, number> = {
 const DUNGEON_STONE_TINT = 'rgba(26, 20, 16, 0.30)'; // #1A1410 @ 30% opacity
 const DUNGEON_SHADOW    = 'rgba(0, 0, 0, 0.65)';     // DayNightOverlay replacement
 const TORCH_AMBER       = '#C8621A';                  // Torch flicker element
+
+// ─── Arena theme colors (14-UI-SPEC Boss Arena HUD Theme Palette) ─────────────
+const ARENA_STONE_TINT    = 'rgba(26, 20, 16, 0.35)'; // Slightly deeper than dungeon tint
+const ARENA_SHADOW        = 'rgba(0, 0, 0, 0.70)';    // Darker than dungeon shadow
+const ARENA_BOSS_TINT     = 'rgba(155, 27, 48, 0.15)'; // Subtle ruby wash (ruby-500 @ 15%)
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -104,6 +122,14 @@ export function HudScene({ level }: HudSceneProps) {
   const userId = useAuthStore((s) => s.userId);
 
   const dungeonActive = activeSession !== null && activeSession.status === 'active';
+
+  // ── Boss store ────────────────────────────────────────────────────────────
+  const activeBattle = useBossStore((s) => s.activeBattle);
+  const bossActive = activeBattle !== null && activeBattle.status === 'active';
+
+  // D-04: Arena theme only when boss is active AND dungeon is NOT active
+  // Detox dungeon takes visual priority when both are running
+  const arenaThemeActive = bossActive && !dungeonActive;
 
   // ── Torch flicker animations ───────────────────────────────────────────────
   // Two Reanimated shared values for per-torch opacity; offset by 200ms
@@ -245,7 +271,37 @@ export function HudScene({ level }: HudSceneProps) {
           </>
         )}
 
-        {/* Layer 5: Animated character sprite */}
+        {/* Layer 5-7 (arena only): Boss arena theme layers — only when bossActive && !dungeonActive */}
+        {arenaThemeActive && (
+          <>
+            {/* Layer 5: Arena stone tint overlay — slightly deeper than dungeon tint */}
+            <Rect
+              x={0}
+              y={0}
+              width={screenW}
+              height={screenH}
+              color={ARENA_STONE_TINT}
+            />
+            {/* Layer 6: Arena shadow overlay — darker than dungeon shadow */}
+            <Rect
+              x={0}
+              y={0}
+              width={screenW}
+              height={screenH}
+              color={ARENA_SHADOW}
+            />
+            {/* Layer 7: Boss silhouette tint — subtle ruby wash */}
+            <Rect
+              x={0}
+              y={0}
+              width={screenW}
+              height={screenH}
+              color={ARENA_BOSS_TINT}
+            />
+          </>
+        )}
+
+        {/* Layer 8: Animated character sprite */}
         <CharacterSprite x={charX} y={charY} />
       </Canvas>
 
@@ -266,6 +322,12 @@ export function HudScene({ level }: HudSceneProps) {
         />
       </View>
 
+      {/* BOSS-07: Arena Gate icon — top-left corner of HUD, below status bar */}
+      {/* Positioned on opposite side from DungeonDoorIcon (which is top-right) */}
+      <View style={[styles.arenaGateContainer, { top: insets.top + 8 }]}>
+        <ArenaGateIcon />
+      </View>
+
       {/* DTOX welcome-back toast (appears on app foreground during active session) */}
       <WelcomeBackToast activeSession={activeSession} />
 
@@ -284,6 +346,10 @@ export function HudScene({ level }: HudSceneProps) {
           onDismiss={() => setShowFanfare(false)}
         />
       )}
+
+      {/* BOSS-07: Boss defeat fanfare (plays on boss defeat) */}
+      {/* Reads pendingDefeatCelebration from bossStore directly */}
+      <BossDefeatFanfare />
     </View>
   );
 }
@@ -295,6 +361,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     // top is set dynamically with safe area insets
     right: 16,
+    zIndex: 10,
+  },
+
+  arenaGateContainer: {
+    position: 'absolute',
+    // top is set dynamically with safe area insets
+    left: 16,
     zIndex: 10,
   },
 });
