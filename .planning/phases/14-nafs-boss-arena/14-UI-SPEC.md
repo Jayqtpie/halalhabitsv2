@@ -6,7 +6,7 @@ shadcn_initialized: false
 preset: none
 created: 2026-03-23
 revised: 2026-03-23
-revision_reason: Typography consolidated to 4 Inter sizes; aria-label added for header close icon
+revision_reason: "Second revision — removed Inter-SemiBold (600) weight (hard cap 2 weights: 400+700); replaced 12px hudCardPadding with 8px; removed 12px buttonPaddingVertical preset (CTA uses fixed 52px height)"
 ---
 
 # Phase 14 — UI Design Contract: Nafs Boss Arena
@@ -24,7 +24,7 @@ revision_reason: Typography consolidated to 4 Inter sizes; aria-label added for 
 | Preset | not applicable | detected |
 | Component library | Custom token system (src/tokens/) | codebase scan |
 | Icon library | Custom pixel-art SVG components (see PixelGearIcon.tsx, DungeonDoorIcon.tsx pattern) | codebase scan |
-| Font — body | Inter-Regular / Inter-SemiBold / Inter-Bold (loaded via Expo) | src/tokens/typography.ts |
+| Font — body | Inter-Regular / Inter-Bold (loaded via Expo) | src/tokens/typography.ts |
 | Font — pixel/game | PressStart2P-Regular (loaded via Expo) | src/tokens/typography.ts |
 | Rendering | Skia Canvas (FilterMode.Nearest for all pixel art) | RESEARCH.md, HudScene.tsx |
 
@@ -50,9 +50,10 @@ Component-level presets (from src/tokens/spacing.ts — componentSpacing):
 | cardPadding | 16px | ArchetypeCard inner padding, BossStatusCard padding |
 | modalPadding | 24px | ArenaScreen outer horizontal padding |
 | modalElementGap | 16px | Between sections on Arena screen |
-| hudCardPadding | 12px | HUD Arena Gate icon overlay |
-| buttonPaddingVertical | 12px | Primary and secondary CTA buttons |
+| hudCardPadding | 8px | HUD Arena Gate icon overlay |
 | buttonPaddingHorizontal | 24px | Primary and secondary CTA buttons |
+
+Notes on buttonPaddingVertical removal: Primary and secondary CTA buttons use a fixed height of 52px. Vertical padding is not declared as a separate preset — the fixed height fully controls the button's vertical dimension. Implementors reference the 52px height directly.
 
 Exceptions:
 - Touch targets: minimum 44x44px for all interactive elements (ui-ux-pro-max touch-target-size rule). This includes archetype selection cards, CTA buttons, and the HUD Arena Gate icon.
@@ -65,28 +66,35 @@ Exceptions:
 
 ### Inter Ramp (4 sizes — maximum)
 
-All roles map to existing tokens in src/tokens/typography.ts. The Inter ramp is capped at 4 sizes. PressStart2P is declared separately as the pixel/game font ramp and does not count toward the Inter cap.
+All roles map to existing tokens in src/tokens/typography.ts. The Inter ramp is capped at 4 sizes and 2 weights. PressStart2P is declared separately as the pixel/game font ramp and does not count toward either cap.
 
 | Role | Token | Size | Weight | Line Height | Font | Usage in this phase |
 |------|-------|------|--------|-------------|------|---------------------|
 | Display | headingXl | 28px | 700 | 36px (1.29) | Inter-Bold | Arena screen title, boss defeat celebration heading, XP award figure in BossDefeatFanfare |
-| Heading | headingMd | 20px | 600 | 28px (1.4) | Inter-SemiBold | Archetype name in gallery cards, section headers, BossEscapedNotice heading |
+| Heading | headingMd | 20px | 700 | 28px (1.4) | Inter-Bold | Archetype name in gallery cards, section headers, BossEscapedNotice heading |
 | Body | bodyMd | 16px | 400 | 24px (1.5) | Inter-Regular | Archetype lore text, cooldown notice, battle history, error messages, BossEscapedNotice body |
 | Label | bodySm | 13px | 400 | 18px (1.38) | Inter-Regular | XP preview labels, day counter ("Day 3 of 7"), Mercy Mode indicator copy, HP percentage readout, cooldown remaining hours |
 
-Notes on consolidation (vs previous draft):
+Weight contract (Inter — 2 weights declared):
+- **Inter-Regular (400):** All body and label roles (bodyMd, bodySm)
+- **Inter-Bold (700):** All heading and display roles (headingXl, headingMd). Inter-SemiBold (600) is not used — previously declared 600-weight usages are mapped to 700.
+
+Notes on consolidation (vs first revision):
+- Inter-SemiBold (600) removed — was applied to headingMd. Now headingMd uses Inter-Bold (700). The weight delta between 600 and 700 is visually minor at 20px; the bolder weight reads well in card headers and section titles.
 - 15px body retired — replaced with standard 16px (bodyMd). Line height adjusted to 24px (1.5).
 - 11px caption retired — merged into 13px label (bodySm). Where visual de-emphasis is needed (HP percentage readout, cooldown remaining hours), apply `opacity: 0.6` to the bodySm text rather than introducing a fifth size.
 - 24px headingLg (used in BossDefeatFanfare XP award line) retired — mapped to 28px headingXl. The fanfare context (full-screen overlay, large gold text) suits the display size equally well.
 
 ### PressStart2P Ramp (pixel/game font — outside Inter cap)
 
-PressStart2P is a distinct font family reserved exclusively for game-layer elements. Its sizes are declared separately and do not count toward the Inter 4-size cap. Justification: pixel fonts at small sizes are not interchangeable with Inter at equivalent sizes — the rasterisation grid of PressStart2P makes sub-14px Inter sizes inappropriate substitutes.
+PressStart2P is a distinct font family reserved exclusively for game-layer elements. Its sizes are declared separately and do not count toward the Inter 4-size or 2-weight caps. Justification: pixel fonts at small sizes are not interchangeable with Inter at equivalent sizes — the rasterisation grid of PressStart2P makes sub-14px Inter sizes inappropriate substitutes.
 
 | Role | Token | Size | Weight | Line Height | Font | Usage in this phase |
 |------|-------|------|--------|-------------|------|---------------------|
 | Pixel — HUD | hudLabel | 10px | 700 | 14px | PressStart2P | HUD Arena Gate icon label (active battle indicator) |
 | Pixel — Dialogue | hudXp | 12px | 700 | 16px | PressStart2P | Boss dialogue text box (RPG text box typewriter output) |
+
+Total declared weights across both font families: 2 (400 for Inter-Regular; 700 for Inter-Bold and PressStart2P).
 
 ---
 
@@ -134,7 +142,7 @@ Layout (top to bottom):
 
 1. **Screen header bar** (React Native View, height 56px)
    - Left: back/close icon (44x44px touch target, `aria-label="Close Arena"`)
-   - Center: "Nafs Boss Arena" in headingMd (Inter-SemiBold, 20px)
+   - Center: "Nafs Boss Arena" in headingMd (Inter-Bold, 20px)
    - Right: empty (no menu)
 
 2. **Skia Canvas battle scene** (full-width, height = screen width × 0.65, max 280px)
@@ -159,7 +167,8 @@ Layout (top to bottom):
    - Mercy Mode indicator (renders only when mercyModeActive): "Mercy Mode active — counter-attacks halved" — bodySm, mercy color (#FFB347)
 
 5. **Primary CTA button** (React Native Pressable, full-width minus lg padding)
-   - Idle (no active battle): "Challenge Boss" — emerald background, white text, bodyMd weight 600, height 52px, radius.xl (16px)
+   - Fixed height: 52px (vertical dimension fully controlled by height — no vertical padding preset)
+   - Idle (no active battle): "Challenge Boss" — emerald background, white text, bodyMd weight 700, height 52px, radius.xl (16px)
    - Active battle: "View Battle Status" — same styling but secondary (surface background, emerald border 1.5px)
    - Disabled state: opacity 0.45, no press feedback
    - Loading state: button disabled with activity indicator replacing text
@@ -182,7 +191,7 @@ Rendered as a vertical ScrollView below the dialogue box when no active battle.
 | Border radius | radius.lg (12px) |
 | Padding | cardPadding (16px) |
 | Min touch target | 44px height (card is taller in practice) |
-| Archetype name | headingMd (20px, Inter-SemiBold), textPrimary |
+| Archetype name | headingMd (20px, Inter-Bold), textPrimary |
 | Arabic title | bodySm (13px, Inter-Regular), textSecondary |
 | Lore blurb | bodyMd (16px, Inter-Regular), textSecondary, max 2 lines with ellipsis |
 | "Recommended" badge | bodySm, emerald-500 border 1px, emerald-900 background, emerald-400 text |
@@ -225,6 +234,7 @@ Parallel to DungeonDoorIcon.tsx pattern. Rendered as React Native View sibling o
 | Icon | Pixel-art arena gate / crossed swords SVG (PixelGearIcon pattern) |
 | Idle state (no battle) | Icon at 70% opacity, no badge |
 | Active battle indicator | 2px emerald ring pulse (Reanimated withRepeat withTiming opacity 0.4→1.0→0.4, duration 1600ms) + ruby-500 HP dot badge (12px circle, top-right of icon) |
+| Overlay padding | spacing.sm (8px) — hudCardPadding |
 | Press action | Opens Arena screen |
 | Accessibility | aria-label="Boss Arena — battle active" (battle) / "Boss Arena" (idle) |
 
@@ -239,7 +249,7 @@ Modeled on DungeonClearedFanfare.tsx pattern.
 | Trigger | bossStore.pendingDefeatCelebration truthy |
 | Overlay background | rgba(0, 0, 0, 0.85) full-screen |
 | Heading | "Boss Defeated!" — headingXl (28px, Inter-Bold), gold-500 (#FFD700) |
-| Subheading | Archetype name — headingMd (20px), textPrimary |
+| Subheading | Archetype name — headingMd (20px, Inter-Bold), textPrimary |
 | XP award | "+X XP" — headingXl (28px, Inter-Bold), gold-500, count-up via state setInterval (not Reanimated — same worklet limitation) |
 | Dismiss | Tap anywhere — Pressable wrapping entire overlay |
 | Animation | Reanimated withTiming opacity 0→1 (duration 300ms) on mount |
@@ -257,9 +267,9 @@ Shown when battle window expires without defeat. Not a modal — rendered inline
 | Background | surface (#1E293B), border 1px gold-500 (not ruby — this is positive framing) |
 | Border radius | radius.lg (12px) |
 | Padding | cardPadding (16px) |
-| Heading | "The battle is over" — headingMd (20px), textPrimary |
-| Body | "You dealt X% damage and earned Y XP for your effort." — bodyMd (16px), textSecondary |
-| CTA | "Challenge Again" — secondary button style, emerald border |
+| Heading | "The battle is over" — headingMd (20px, Inter-Bold), textPrimary |
+| Body | "You dealt X% damage and earned Y XP for your effort." — bodyMd (16px, Inter-Regular), textSecondary |
+| CTA | "Challenge Again" — secondary button style, emerald border, fixed 52px height |
 | Cooldown sub-note | "Available in X days" — bodySm (13px) at opacity 0.6, textMuted |
 
 ---
