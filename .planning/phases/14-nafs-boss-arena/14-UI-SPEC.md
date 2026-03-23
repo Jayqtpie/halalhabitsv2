@@ -5,6 +5,8 @@ status: draft
 shadcn_initialized: false
 preset: none
 created: 2026-03-23
+revised: 2026-03-23
+revision_reason: Typography consolidated to 4 Inter sizes; aria-label added for header close icon
 ---
 
 # Phase 14 — UI Design Contract: Nafs Boss Arena
@@ -61,15 +63,28 @@ Exceptions:
 
 ## Typography
 
-All roles map to existing tokens in src/tokens/typography.ts. Pixel font reserved for game-layer elements only.
+### Inter Ramp (4 sizes — maximum)
+
+All roles map to existing tokens in src/tokens/typography.ts. The Inter ramp is capped at 4 sizes. PressStart2P is declared separately as the pixel/game font ramp and does not count toward the Inter cap.
 
 | Role | Token | Size | Weight | Line Height | Font | Usage in this phase |
 |------|-------|------|--------|-------------|------|---------------------|
-| Display | headingXl | 28px | 700 | 36px (1.29) | Inter-Bold | Arena screen title ("Nafs Boss Arena"), boss defeat celebration heading |
-| Heading | headingMd | 20px | 600 | 28px (1.4) | Inter-SemiBold | Archetype name in gallery cards, section headers |
-| Body | bodyMd | 15px | 400 | 22px (1.47) | Inter-Regular | Archetype lore text, cooldown notice, battle history, error messages |
-| Label | bodySm | 13px | 400 | 18px (1.38) | Inter-Regular | XP preview labels, day counter ("Day 3 of 7"), Mercy Mode indicator copy |
-| Caption | caption | 11px | 400 | 16px (1.45) | Inter-Regular | HP percentage readout, cooldown remaining hours |
+| Display | headingXl | 28px | 700 | 36px (1.29) | Inter-Bold | Arena screen title, boss defeat celebration heading, XP award figure in BossDefeatFanfare |
+| Heading | headingMd | 20px | 600 | 28px (1.4) | Inter-SemiBold | Archetype name in gallery cards, section headers, BossEscapedNotice heading |
+| Body | bodyMd | 16px | 400 | 24px (1.5) | Inter-Regular | Archetype lore text, cooldown notice, battle history, error messages, BossEscapedNotice body |
+| Label | bodySm | 13px | 400 | 18px (1.38) | Inter-Regular | XP preview labels, day counter ("Day 3 of 7"), Mercy Mode indicator copy, HP percentage readout, cooldown remaining hours |
+
+Notes on consolidation (vs previous draft):
+- 15px body retired — replaced with standard 16px (bodyMd). Line height adjusted to 24px (1.5).
+- 11px caption retired — merged into 13px label (bodySm). Where visual de-emphasis is needed (HP percentage readout, cooldown remaining hours), apply `opacity: 0.6` to the bodySm text rather than introducing a fifth size.
+- 24px headingLg (used in BossDefeatFanfare XP award line) retired — mapped to 28px headingXl. The fanfare context (full-screen overlay, large gold text) suits the display size equally well.
+
+### PressStart2P Ramp (pixel/game font — outside Inter cap)
+
+PressStart2P is a distinct font family reserved exclusively for game-layer elements. Its sizes are declared separately and do not count toward the Inter 4-size cap. Justification: pixel fonts at small sizes are not interchangeable with Inter at equivalent sizes — the rasterisation grid of PressStart2P makes sub-14px Inter sizes inappropriate substitutes.
+
+| Role | Token | Size | Weight | Line Height | Font | Usage in this phase |
+|------|-------|------|--------|-------------|------|---------------------|
 | Pixel — HUD | hudLabel | 10px | 700 | 14px | PressStart2P | HUD Arena Gate icon label (active battle indicator) |
 | Pixel — Dialogue | hudXp | 12px | 700 | 16px | PressStart2P | Boss dialogue text box (RPG text box typewriter output) |
 
@@ -118,7 +133,7 @@ Route: `/(tabs)/arena` or modal stack from HUD icon — planner decides exact Ex
 Layout (top to bottom):
 
 1. **Screen header bar** (React Native View, height 56px)
-   - Left: back/close icon (44x44px touch target)
+   - Left: back/close icon (44x44px touch target, `aria-label="Close Arena"`)
    - Center: "Nafs Boss Arena" in headingMd (Inter-SemiBold, 20px)
    - Right: empty (no menu)
 
@@ -140,7 +155,7 @@ Layout (top to bottom):
 
 4. **Battle status section** (React Native View, spacing.lg padding each side)
    - Day counter: "Day X of Y" — bodySm (13px), textSecondary
-   - HP percentage readout: "Boss HP: 63%" — caption (11px), textMuted
+   - HP percentage readout: "Boss HP: 63%" — bodySm (13px) at opacity 0.6, textMuted
    - Mercy Mode indicator (renders only when mercyModeActive): "Mercy Mode active — counter-attacks halved" — bodySm, mercy color (#FFB347)
 
 5. **Primary CTA button** (React Native Pressable, full-width minus lg padding)
@@ -150,7 +165,7 @@ Layout (top to bottom):
    - Loading state: button disabled with activity indicator replacing text
 
 6. **Cooldown notice** (renders only when cooldown active, sits below CTA)
-   - "Next challenge available in X days" — bodySm (13px), textMuted
+   - "Next challenge available in X days" — bodySm (13px) at opacity 0.6, textMuted
    - No icon — text only, centered
 
 ---
@@ -169,7 +184,7 @@ Rendered as a vertical ScrollView below the dialogue box when no active battle.
 | Min touch target | 44px height (card is taller in practice) |
 | Archetype name | headingMd (20px, Inter-SemiBold), textPrimary |
 | Arabic title | bodySm (13px, Inter-Regular), textSecondary |
-| Lore blurb | bodyMd (15px, Inter-Regular), textSecondary, max 2 lines with ellipsis |
+| Lore blurb | bodyMd (16px, Inter-Regular), textSecondary, max 2 lines with ellipsis |
 | "Recommended" badge | bodySm, emerald-500 border 1px, emerald-900 background, emerald-400 text |
 | Selected state | 2px solid border emerald-500, backgroundDeep fill |
 | Unselected state | 1px solid border border-default (#1E293B) |
@@ -225,9 +240,11 @@ Modeled on DungeonClearedFanfare.tsx pattern.
 | Overlay background | rgba(0, 0, 0, 0.85) full-screen |
 | Heading | "Boss Defeated!" — headingXl (28px, Inter-Bold), gold-500 (#FFD700) |
 | Subheading | Archetype name — headingMd (20px), textPrimary |
-| XP award | "+X XP" — headingLg (24px), gold-500, count-up via state setInterval (not Reanimated — same worklet limitation) |
+| XP award | "+X XP" — headingXl (28px, Inter-Bold), gold-500, count-up via state setInterval (not Reanimated — same worklet limitation) |
 | Dismiss | Tap anywhere — Pressable wrapping entire overlay |
 | Animation | Reanimated withTiming opacity 0→1 (duration 300ms) on mount |
+
+Note: XP award uses headingXl (28px) — mapped from the previously undeclared 24px headingLg. The fanfare context (full-screen overlay, gold celebratory text) is visually appropriate at display scale.
 
 ---
 
@@ -241,9 +258,9 @@ Shown when battle window expires without defeat. Not a modal — rendered inline
 | Border radius | radius.lg (12px) |
 | Padding | cardPadding (16px) |
 | Heading | "The battle is over" — headingMd (20px), textPrimary |
-| Body | "You dealt X% damage and earned Y XP for your effort." — bodyMd (15px), textSecondary |
+| Body | "You dealt X% damage and earned Y XP for your effort." — bodyMd (16px), textSecondary |
 | CTA | "Challenge Again" — secondary button style, emerald border |
-| Cooldown sub-note | "Available in X days" — caption (11px), textMuted |
+| Cooldown sub-note | "Available in X days" — bodySm (13px) at opacity 0.6, textMuted |
 
 ---
 
@@ -304,10 +321,12 @@ Aligned with ui-ux-pro-max CRITICAL rules:
 |------|---------------|
 | Touch target minimum | All Pressable elements 44x44px minimum — buttons, cards, HUD icon, dialogue tap |
 | Color contrast | textPrimary (#F1F5F9) on surface (#1E293B): passes 4.5:1. Gold (#FFD700) on dark (#0F172A): passes. Ruby (#DC2626) on dark: passes |
-| Color not sole indicator | HP bar uses both color (ruby fill) AND numerical percentage readout in caption below |
-| Aria labels | HUD Arena Gate icon: aria-label set. Icon-only buttons: aria-label required |
+| Color not sole indicator | HP bar uses both color (ruby fill) AND numerical percentage readout in bodySm below |
+| Aria labels — header close | Arena screen header back/close icon: `aria-label="Close Arena"` (icon-only button) |
+| Aria labels — HUD icon | HUD Arena Gate icon: `aria-label="Boss Arena — battle active"` (battle) / `aria-label="Boss Arena"` (idle) |
+| Aria labels — general | All icon-only interactive elements must have aria-label |
 | Reduce motion | AccessibilityInfo.isReduceMotionEnabled check — disable pulse animations, typewriter uses instant text reveal |
-| Screen reader | Boss HP bar accessible value: accessibilityValue={{ min: 0, max: 100, now: hpPercent }} |
+| Screen reader | Boss HP bar accessible value: `accessibilityValue={{ min: 0, max: 100, now: hpPercent }}` |
 | Loading state | CTA disabled during async ops with ActivityIndicator replacing text |
 | Destructive confirmation | Abandon Battle always requires two-tap confirmation — never single destructive action |
 
