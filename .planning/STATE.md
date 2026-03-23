@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Ready to execute
-stopped_at: Completed 14-03-PLAN.md
-last_updated: "2026-03-23T20:18:31.465Z"
+stopped_at: Completed 14-04-PLAN.md
+last_updated: "2026-03-23T20:26:06.477Z"
 progress:
   total_phases: 7
   completed_phases: 3
   total_plans: 14
-  completed_plans: 12
+  completed_plans: 13
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 14 (nafs-boss-arena) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 
 ## Accumulated Context
 
@@ -61,6 +61,7 @@ Plan: 4 of 5
 - [Phase 14]: suggestArchetype returns procrastinator as safe fallback when no data provided
 - [Phase 14]: bossStore uses habitStore.mercyModes for mercy mode detection at battle start (not settingsStore)
 - [Phase 14]: BOSS_TITLES added as separate array in title-seed-data.ts (sortOrder 28-30) expanding TITLE_SEED_DATA to 30 entries
+- [Phase 14-nafs-boss-arena]: BossHpBar inside parent Canvas using RoundedRect pair; archetype silhouette as absolute View overlay outside Canvas (Canvas cannot host RN views)
 
 ### Pending Todos
 
@@ -79,6 +80,6 @@ Plan: 4 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-23T20:18:31.461Z
-Stopped at: Completed 14-03-PLAN.md
+Last session: 2026-03-23T20:26:06.473Z
+Stopped at: Completed 14-04-PLAN.md
 Resume file: None

@@ -37,7 +37,7 @@ Requirements for v2.0 milestone. Each maps to roadmap phases.
 - [x] **BOSS-04**: Boss counter-attacks (HP heals) when user misses habits on active battle days
 - [x] **BOSS-05**: Defeating a boss awards 200-500 XP and contributes to boss-specific Identity Title
 - [x] **BOSS-06**: Mercy Mode reduces boss counter-attack severity during active Mercy Mode
-- [ ] **BOSS-07**: Boss battle screen renders with Skia/Skottie animations (HP bar, hit effects, phase transitions)
+- [x] **BOSS-07**: Boss battle screen renders with Skia/Skottie animations (HP bar, hit effects, phase transitions)
 - [x] **BOSS-08**: Boss battle state persists across app kills and device restarts (SQLite wall-clock timestamps)
 
 ### Buddy System
@@ -130,7 +130,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOSS-04 | Phase 14 | Complete |
 | BOSS-05 | Phase 14 | Complete |
 | BOSS-06 | Phase 14 | Complete |
-| BOSS-07 | Phase 14 | Pending |
+| BOSS-07 | Phase 14 | Complete |
 | BOSS-08 | Phase 14 | Complete |
 | BUDY-01 | Phase 15 | Pending |
 | BUDY-02 | Phase 15 | Pending |
