@@ -32,7 +32,7 @@ Full details: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 - [x] **Phase 11: Schema & Privacy Gate Foundation** - Lay data foundation for all v2.0 features before any feature code runs (completed 2026-03-19)
 - [x] **Phase 12: Friday Power-Ups** - Make every Friday a game event with 2x XP and Al-Kahf challenge (completed 2026-03-22)
 - [x] **Phase 13: Dopamine Detox Dungeon** - Give players a voluntary anti-doomscrolling challenge system (completed 2026-03-22)
-- [ ] **Phase 14: Nafs Boss Arena** - Let players battle personified nafs struggles in multi-day boss fights
+- [x] **Phase 14: Nafs Boss Arena** - Let players battle personified nafs struggles in multi-day boss fights (completed 2026-03-24)
 - [ ] **Phase 15: Buddy Connection System** - Enable private accountability partnerships with up to 20 connections
 - [ ] **Phase 16: Shared Activities & Duo Quests** - Let buddy pairs track shared habits and complete cooperative quests
 - [ ] **Phase 17: Messaging & Content Moderation** - Enable filtered 1:1 chat between connected buddies
@@ -101,7 +101,7 @@ Plans:
 - [x] 14-02-PLAN.md — Boss repository (bossRepo.ts) with privacy invariant tests
 - [x] 14-03-PLAN.md — Boss store (bossStore.ts), title engine extension, gameStore integration
 - [x] 14-04-PLAN.md — Arena screen with Skia battle scene, archetype gallery, and RPG dialogue
-- [ ] 14-05-PLAN.md — HUD Arena Gate icon, HUD theme swap, and BossDefeatFanfare overlay
+- [x] 14-05-PLAN.md — HUD Arena Gate icon, HUD theme swap, and BossDefeatFanfare overlay
 
 ### Phase 15: Buddy Connection System
 **Goal**: Players can find, invite, and manage up to 20 private accountability buddies, view a buddy's public progress summary, and have all social data protected by RLS policies
@@ -158,7 +158,7 @@ Plans:
 | 11. Schema & Privacy Gate Foundation | 2/2 | Complete    | 2026-03-20 | - |
 | 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
-| 14. Nafs Boss Arena | v2.0 | 4/5 | In Progress|  |
+| 14. Nafs Boss Arena | v2.0 | 5/5 | Complete | 2026-03-24 |
 | 15. Buddy Connection System | v2.0 | 0/TBD | Not started | - |
 | 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |

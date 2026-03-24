@@ -11,7 +11,7 @@
  * Adab-safety: no shame copy, level gate uses positive encouraging language.
  * Reduced motion: BossHpBar and RpgDialogueBox respect AccessibilityInfo.isReduceMotionEnabled.
  */
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -19,6 +19,7 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  Animated,
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -28,6 +29,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useBossStore } from '../../stores/bossStore';
 import { useGameStore } from '../../stores/gameStore';
 import { useAuthStore } from '../../stores/authStore';
+import { useHabitStore } from '../../stores/habitStore';
 import { BOSS_ARCHETYPES } from '../../domain/boss-content';
 import { suggestArchetype } from '../../domain/boss-engine';
 import { colors, typography, spacing, componentSpacing, radius } from '../../tokens';
@@ -35,6 +37,7 @@ import { ArchetypeCard } from './ArchetypeCard';
 import { BossHpBar } from './BossHpBar';
 import { RpgDialogueBox } from './RpgDialogueBox';
 import { AbandonConfirmation } from './AbandonConfirmation';
+import { BossDefeatFanfare } from './BossDefeatFanfare';
 import type { ArchetypeId, BossArchetype } from '../../domain/boss-content';
 import { getBossDialoguePhase } from '../../domain/boss-engine';
 import { calculatePartialXp, calculateBossXpReward } from '../../domain/boss-engine';
@@ -80,6 +83,13 @@ export default function ArenaScreen() {
 
   const currentLevel = useGameStore((s) => s.currentLevel);
   const userId = useAuthStore((s) => s.userId);
+  const habits = useHabitStore((s) => s.habits);
+  const completions = useHabitStore((s) => s.completions);
+  const completeHabit = useHabitStore((s) => s.completeHabit);
+  const habitsForDisplay = useMemo(
+    () => habits.map((h) => ({ ...h, completedToday: completions[h.id] || false })),
+    [habits, completions],
+  );
 
   // Local state
   const [selectedArchetype, setSelectedArchetype] = useState<ArchetypeId | null>(null);
@@ -88,9 +98,16 @@ export default function ArenaScreen() {
   const [showAbandon, setShowAbandon] = useState<boolean>(false);
   const [startingBattle, setStartingBattle] = useState<boolean>(false);
 
+  // Visual HP tracking — shows damage in real-time before end-of-day sync
+  const [visualHpOffset, setVisualHpOffset] = useState(0);
+  const [lastDmg, setLastDmg] = useState<number | null>(null);
+  const dmgAnim = useRef(new Animated.Value(0)).current;
+  const dmgOpacity = useRef(new Animated.Value(0)).current;
+
   // Load active battle and check eligibility on mount
   useEffect(() => {
     const init = async () => {
+      await useHabitStore.getState().loadHabits(userId);
       await useBossStore.getState().loadActiveBattle(userId);
       const canStart = await useBossStore.getState().canStart(userId);
       setCanStartBattle(canStart);
@@ -99,11 +116,11 @@ export default function ArenaScreen() {
       setSuggestedArchetype(suggested);
     };
     init();
-  }, [userId]);
+  }, [userId, currentLevel]);
 
-  // Derived battle values
+  // Derived battle values — visualHpOffset makes HP bar respond instantly to habit completions
   const hpRatio = activeBattle
-    ? activeBattle.bossHp / activeBattle.bossMaxHp
+    ? Math.max(0, (activeBattle.bossHp - visualHpOffset) / activeBattle.bossMaxHp)
     : 1;
   const hpPercent = Math.round(hpRatio * 100);
   const archetype = activeBattle ? BOSS_ARCHETYPES[activeBattle.archetype as ArchetypeId] : null;
@@ -136,6 +153,7 @@ export default function ArenaScreen() {
   // Gate checks
   const isUnderLevel = currentLevel < 10;
   const ctaDisabled = isUnderLevel || !canStartBattle || !selectedArchetype || startingBattle;
+
 
   const handleBeginBattle = useCallback(async () => {
     if (!selectedArchetype || startingBattle) return;
@@ -178,7 +196,6 @@ export default function ArenaScreen() {
             <Text style={styles.closeIcon}>✕</Text>
           </Pressable>
           <Text style={styles.headerTitle}>Nafs Boss Arena</Text>
-          {/* Spacer for symmetry */}
           <View style={styles.headerSpacer} />
         </View>
 
@@ -216,12 +233,133 @@ export default function ArenaScreen() {
                   },
                 ]}
                 pointerEvents="none"
-              />
+              >
+                {archetype && (
+                  <View style={styles.bossIdentity}>
+                    <Text style={styles.bossName}>{archetype.name}</Text>
+                    <Text style={styles.bossArabic}>{archetype.arabicName}</Text>
+                  </View>
+                )}
+              </View>
             </View>
+
+            {/* Floating damage number */}
+            {lastDmg !== null && (
+              <Animated.Text
+                style={[
+                  styles.dmgFloat,
+                  {
+                    transform: [{ translateY: dmgAnim }],
+                    opacity: dmgOpacity,
+                  },
+                ]}
+              >
+                -{lastDmg} HP
+              </Animated.Text>
+            )}
 
             {/* RPG Dialogue Box */}
             <View style={styles.dialogueContainer}>
               <RpgDialogueBox text={dialogueText} isActive={true} />
+            </View>
+
+            {/* Instruction hint */}
+            <Text style={styles.battleHint}>
+              Complete your daily habits to deal damage. Return tomorrow to see your progress.
+            </Text>
+
+            {/* Habit checklist — deal damage inline */}
+            <View style={styles.habitChecklist}>
+              <Text style={styles.habitChecklistTitle}>Today&apos;s Attacks</Text>
+              {habitsForDisplay.length === 0 ? (
+                <Text style={styles.habitChecklistEmpty}>No habits yet — add some to deal damage!</Text>
+              ) : (
+                habitsForDisplay.map((habit) => (
+                  <Pressable
+                    key={habit.id}
+                    style={[
+                      styles.habitChecklistRow,
+                      habit.completedToday && styles.habitChecklistRowDone,
+                    ]}
+                    onPress={() => {
+                      if (!habit.completedToday && activeBattle) {
+                        completeHabit(habit.id, userId);
+                        // Calculate per-habit damage and show it
+                        const totalHabits = habitsForDisplay.length;
+                        const perHitDmg = totalHabits > 0
+                          ? Math.round(activeBattle.bossMaxHp * 0.20 / totalHabits)
+                          : 0;
+                        setVisualHpOffset((prev) => prev + perHitDmg);
+                        setLastDmg(perHitDmg);
+                        // Animate the damage number
+                        dmgAnim.setValue(0);
+                        dmgOpacity.setValue(1);
+                        Animated.parallel([
+                          Animated.timing(dmgAnim, {
+                            toValue: -40,
+                            duration: 800,
+                            useNativeDriver: true,
+                          }),
+                          Animated.timing(dmgOpacity, {
+                            toValue: 0,
+                            duration: 800,
+                            useNativeDriver: true,
+                          }),
+                        ]).start();
+                        // Check if this hit would defeat the boss
+                        const newVisualHp = activeBattle.bossHp - (visualHpOffset + perHitDmg);
+                        if (newVisualHp <= 0) {
+                          // Trigger defeat after a short delay for the animation to play
+                          setTimeout(async () => {
+                            const { bossRepo } = await import('../../db/repos/bossRepo');
+                            const battle = useBossStore.getState().activeBattle;
+                            if (!battle) return;
+                            const now = new Date().toISOString();
+                            await bossRepo.updateDailyOutcome(
+                              battle.id, 0, battle.currentDay, battle.dailyLog, now,
+                            );
+                            await bossRepo.defeat(battle.id, now);
+                            const playerLevel = useGameStore.getState().currentLevel;
+                            const fullXp = calculateBossXpReward(playerLevel);
+                            await useGameStore.getState().awardXP(userId, fullXp, 1.0, 'boss_defeat', battle.id);
+                            await useGameStore.getState().checkTitles(userId);
+                            useBossStore.setState({
+                              activeBattle: null,
+                              pendingDefeatCelebration: {
+                                archetype: battle.archetype as ArchetypeId,
+                                xpAwarded: fullXp,
+                              },
+                            });
+                          }, 600);
+                        }
+                      }
+                    }}
+                    disabled={habit.completedToday}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: habit.completedToday }}
+                    accessibilityLabel={`${habit.name}${habit.completedToday ? ' — completed' : ''}`}
+                  >
+                    <Text style={[
+                      styles.habitChecklistCheck,
+                      habit.completedToday && styles.habitChecklistCheckDone,
+                    ]}>
+                      {habit.completedToday ? '⚔️' : '○'}
+                    </Text>
+                    <Text
+                      style={[
+                        styles.habitChecklistName,
+                        habit.completedToday && styles.habitChecklistNameDone,
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {habit.name}
+                    </Text>
+                    {habit.completedToday && (
+                      <Text style={styles.habitChecklistDmg}>DMG!</Text>
+                    )}
+                  </Pressable>
+                ))
+              )}
             </View>
 
             {/* Battle status */}
@@ -350,6 +488,9 @@ export default function ArenaScreen() {
         damagePercent={damagePercent}
         partialXp={partialXp}
       />
+
+      {/* Boss Defeat celebration overlay */}
+      <BossDefeatFanfare />
     </SafeAreaView>
   );
 }
@@ -416,11 +557,111 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     borderRadius: radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bossIdentity: {
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  bossName: {
+    fontSize: typography.headingLg.fontSize,
+    lineHeight: typography.headingLg.lineHeight,
+    fontFamily: 'PressStart2P',
+    color: colors.dark.textPrimary,
+    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.7)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 0,
+  },
+  bossArabic: {
+    fontSize: typography.bodySm.fontSize,
+    lineHeight: typography.bodySm.lineHeight,
+    color: colors.dark.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 
   // ── Dialogue box container ───────────────────────────────────────────────
   dialogueContainer: {
     // no extra margin — gap from scrollContent handles it
+  },
+
+  // ── Battle hint ─────────────────────────────────────────────────────────
+  battleHint: {
+    fontSize: typography.bodySm.fontSize,
+    lineHeight: typography.bodySm.lineHeight,
+    color: colors.dark.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    paddingHorizontal: spacing.md,
+  },
+
+  // ── Habit checklist ─────────────────────────────────────────────────────
+  dmgFloat: {
+    textAlign: 'center',
+    fontFamily: 'PressStart2P',
+    fontSize: 20,
+    color: '#ef4444',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 0,
+  },
+
+  habitChecklist: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    gap: spacing.xs,
+  },
+  habitChecklistTitle: {
+    fontSize: typography.bodySm.fontSize,
+    lineHeight: typography.bodySm.lineHeight,
+    fontFamily: 'PressStart2P',
+    color: colors.dark.textSecondary,
+    marginBottom: spacing.xs,
+  },
+  habitChecklistEmpty: {
+    fontSize: typography.bodySm.fontSize,
+    lineHeight: typography.bodySm.lineHeight,
+    color: colors.dark.textSecondary,
+    fontStyle: 'italic',
+  },
+  habitChecklistRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.sm,
+    backgroundColor: 'rgba(255,255,255,0.03)',
+    gap: spacing.sm,
+  },
+  habitChecklistRowDone: {
+    opacity: 0.5,
+  },
+  habitChecklistCheck: {
+    fontSize: 18,
+    width: 24,
+    textAlign: 'center',
+    color: colors.dark.textSecondary,
+  },
+  habitChecklistCheckDone: {
+    color: colors.dark.textPrimary,
+  },
+  habitChecklistName: {
+    flex: 1,
+    fontSize: typography.bodyMd.fontSize,
+    lineHeight: typography.bodyMd.lineHeight,
+    color: colors.dark.textPrimary,
+  },
+  habitChecklistNameDone: {
+    textDecorationLine: 'line-through',
+    color: colors.dark.textSecondary,
+  },
+  habitChecklistDmg: {
+    fontSize: typography.bodySm.fontSize,
+    fontFamily: 'PressStart2P',
+    color: '#ef4444',
   },
 
   // ── Battle status ────────────────────────────────────────────────────────
