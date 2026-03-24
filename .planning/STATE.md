@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Phase 14 complete
-stopped_at: Phase 14 UAT verified
-last_updated: "2026-03-24T22:00:00.000Z"
+stopped_at: Phase 15 context gathered
+last_updated: "2026-03-24T22:00:51.966Z"
 progress:
   total_phases: 7
   completed_phases: 4
@@ -85,6 +85,6 @@ Next: Phase 15 (buddy-connection-system)
 
 ## Session Continuity
 
-Last session: 2026-03-24T22:00:00.000Z
-Stopped at: Phase 14 UAT verified, ready for Phase 15
-Resume file: None
+Last session: 2026-03-24T22:00:51.962Z
+Stopped at: Phase 15 context gathered
+Resume file: .planning/phases/15-buddy-connection-system/15-CONTEXT.md
