@@ -1,30 +1,34 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-22T23:08:50.779Z",
-  "phase": "13",
-  "phase_name": "Dopamine Detox Dungeon",
-  "phase_dir": ".planning/phases/13-dopamine-detox-dungeon",
-  "plan": 4,
+  "timestamp": "2026-03-24T04:09:37.263Z",
+  "phase": "14",
+  "phase_name": "nafs-boss-arena",
+  "phase_dir": ".planning/phases/14-nafs-boss-arena",
+  "plan": 5,
   "task": 3,
   "total_tasks": 3,
-  "status": "complete",
+  "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "Phase 13 all plans executed (13-01 through 13-04)", "status": "done", "commit": "494393c"},
-    {"id": 2, "name": "Bugfix session: migration crash, UUID, session hydration, modal stacking, icon layout", "status": "done", "commit": "010739f"},
-    {"id": 3, "name": "Commit outstanding working-tree changes (repo refactors, parameterized SQL, tests, plan docs)", "status": "done", "commit": "3827f18"}
+    {"id": 1, "name": "14-01 Boss Engine & Content (6 archetypes, 9 domain functions, 98 tests)", "status": "done", "commit": "5f53e55"},
+    {"id": 2, "name": "14-02 Boss SQLite Repository (9 CRUD methods, privacy invariant)", "status": "done", "commit": "b8c91df"},
+    {"id": 3, "name": "14-03 Store Integration & Title System (bossStore, 30 titles, gameStore)", "status": "done", "commit": "a70ef6a"},
+    {"id": 4, "name": "14-04 Arena Screen UI (5 components, Skia battle scene, RPG dialogue)", "status": "done", "commit": "3a2cae3"},
+    {"id": 5, "name": "14-05 HUD Integration & Fanfare (ArenaGateIcon, theme, BossDefeatFanfare)", "status": "done", "commit": "29f3dc0"}
   ],
-  "remaining_tasks": [],
+  "remaining_tasks": [
+    {"id": 6, "name": "Visual verification on device (7 UAT items)", "status": "not_started"},
+    {"id": 7, "name": "Mark phase complete in ROADMAP/STATE after UAT approval", "status": "not_started"}
+  ],
   "blockers": [],
   "human_actions_pending": [
-    {"action": "Phase 12 Friday UAT still pending (7 items require Friday device test)", "context": "Carried from Phase 12 -- FridayBoostBadge, 2x XP, Al-Kahf quest, section chips, Jumuah toggle, haptics, banner auto-dismiss", "blocking": false}
+    {"action": "Run visual verification on device/emulator for 7 UAT items", "context": "All automated checks pass (142 tests, BOSS-01 through BOSS-08 all verified). Visual items need device testing: Arena Gate icon, archetype gallery, HP bar animation, RPG dialogue typewriter, HUD arena theme, BossDefeatFanfare, reduce motion fallbacks.", "blocking": true}
   ],
   "decisions": [
-    {"decision": "Replaced uuid.v4() with expo-crypto randomUUID() globally", "rationale": "React Native lacks crypto.getRandomValues; expo-crypto is already a dependency", "phase": "13"},
-    {"decision": "EarlyExitConfirmation moved inside DungeonSheet Modal", "rationale": "Android modal stacking renders sibling Modals behind each other", "phase": "13"},
-    {"decision": "DungeonSheet must call loadActiveSession on open", "rationale": "Store activeSession was never hydrated from DB -- caused stale idle view and Available Tomorrow bug", "phase": "13"},
-    {"decision": "DungeonDoorIcon wrapper uses fixed height", "rationale": "Countdown badge toggling caused layout shift", "phase": "13"}
+    {"decision": "mercyModeActive reads from habitStore.mercyModes instead of non-existent settingsStore.mercyModeActive", "rationale": "Plan spec referenced wrong store — habitStore has the actual mercy mode data", "phase": "14"},
+    {"decision": "BossDefeatFanfare is self-contained (reads bossStore internally, no props)", "rationale": "Follows DungeonClearedFanfare pattern — simpler HudScene integration", "phase": "14"},
+    {"decision": "6 archetypes (not 5) — glutton added per blueprint update", "rationale": "Blueprint 15-content-pack.md includes glutton archetype", "phase": "14"}
   ],
-  "uncommitted_files": [],
-  "next_action": "Start Phase 14: Nafs Boss Arena -- run /gsd:discuss-phase to gather requirements",
-  "context_notes": "Phase 13 is fully complete and verified on device. All working-tree changes committed in clean logical groups. 542 tests passing. Working tree is clean. Next milestone phase is Phase 14 (Nafs Boss Arena)."
+  "uncommitted_files": [".planning/phases/14-nafs-boss-arena/14-VERIFICATION.md"],
+  "next_action": "Run `npx expo start --go`, test 7 UAT items on device, then say 'approved' to mark phase complete",
+  "context_notes": "All 5 plans executed via 3-wave parallel swarm. Worktree merge conflicts resolved manually for HudScene.tsx (14-04 + 14-05 both modified it). Verification passed with human_needed status. UAT file at 14-HUMAN-UAT.md. VERIFICATION.md is untracked — commit it on resume."
 }
