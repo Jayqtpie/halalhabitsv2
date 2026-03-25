@@ -52,6 +52,10 @@ interface SettingsState {
   // ── Phase 6: App settings ──────────────────────────────────────────
   arabicTermsEnabled: boolean;
 
+  // ── Phase 15: Buddy discoverability ───────────────────────────────
+  /** Whether the discoverability prompt has been shown at least once */
+  discoverabilityPrompted: boolean;
+
   // ── Phase 6: Notification preferences ─────────────────────────────
   prayerReminders: Record<PrayerName, PrayerReminderConfig>;
   muhasabahNotifEnabled: boolean;
@@ -77,6 +81,7 @@ interface SettingsState {
   toggleStreakMilestones: () => void;
   toggleQuestExpiring: () => void;
   toggleMorningMotivation: () => void;
+  setDiscoverabilityPrompted: (value: boolean) => void;
 }
 
 // ─── Store ────────────────────────────────────────────────────────────
@@ -100,6 +105,7 @@ export const useSettingsStore = create<SettingsState>()(
       selectedNiyyahs: [],
       characterPresetId: null,
       arabicTermsEnabled: true,
+      discoverabilityPrompted: false,
       prayerReminders: DEFAULT_PRAYER_REMINDERS,
       muhasabahNotifEnabled: true,
       streakMilestonesEnabled: false,
@@ -134,6 +140,7 @@ export const useSettingsStore = create<SettingsState>()(
         set((state) => ({ questExpiringEnabled: !state.questExpiringEnabled })),
       toggleMorningMotivation: () =>
         set((state) => ({ morningMotivationEnabled: !state.morningMotivationEnabled })),
+      setDiscoverabilityPrompted: (value) => set({ discoverabilityPrompted: value }),
     }),
     {
       name: 'settings-storage',
@@ -158,6 +165,7 @@ export const useSettingsStore = create<SettingsState>()(
         streakMilestonesEnabled: state.streakMilestonesEnabled,
         questExpiringEnabled: state.questExpiringEnabled,
         morningMotivationEnabled: state.morningMotivationEnabled,
+        discoverabilityPrompted: state.discoverabilityPrompted,
       }),
       onRehydrateStorage: () => (state) => {
         if (state) {
