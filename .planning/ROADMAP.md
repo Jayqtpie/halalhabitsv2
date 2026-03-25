@@ -33,7 +33,7 @@ Full details: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 - [x] **Phase 12: Friday Power-Ups** - Make every Friday a game event with 2x XP and Al-Kahf challenge (completed 2026-03-22)
 - [x] **Phase 13: Dopamine Detox Dungeon** - Give players a voluntary anti-doomscrolling challenge system (completed 2026-03-22)
 - [x] **Phase 14: Nafs Boss Arena** - Let players battle personified nafs struggles in multi-day boss fights (completed 2026-03-24)
-- [ ] **Phase 15: Buddy Connection System** - Enable private accountability partnerships with up to 20 connections
+- [x] **Phase 15: Buddy Connection System** - Enable private accountability partnerships with up to 20 connections (completed 2026-03-25)
 - [ ] **Phase 16: Shared Activities & Duo Quests** - Let buddy pairs track shared habits and complete cooperative quests
 - [ ] **Phase 17: Messaging & Content Moderation** - Enable filtered 1:1 chat between connected buddies
 
@@ -119,7 +119,7 @@ Plans:
 - [x] 15-01-PLAN.md — Buddy domain engine (buddy-engine.ts) with TDD
 - [x] 15-02-PLAN.md — Schema additions, buddyRepo, Supabase migrations, RLS updates
 - [x] 15-03-PLAN.md — buddyStore, habitStore streak sync
-- [ ] 15-04-PLAN.md — Buddy list tab screen, buddy components, navigation wiring
+- [x] 15-04-PLAN.md — Buddy list tab screen, buddy components, navigation wiring
 - [x] 15-05-PLAN.md — Buddy profile screen, stat cards, remove/block actions
 
 ### Phase 16: Shared Activities & Duo Quests
@@ -165,6 +165,6 @@ Plans:
 | 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
 | 14. Nafs Boss Arena | v2.0 | 5/5 | Complete | 2026-03-24 |
-| 15. Buddy Connection System | v2.0 | 4/5 | In Progress|  |
+| 15. Buddy Connection System | v2.0 | 5/5 | Complete   | 2026-03-25 |
 | 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |

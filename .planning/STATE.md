@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Ready to execute
-stopped_at: Completed 15-05-PLAN.md
-last_updated: "2026-03-25T19:26:28.601Z"
+stopped_at: Completed 15-04-PLAN.md
+last_updated: "2026-03-25T19:29:58.776Z"
 progress:
   total_phases: 7
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 19
-  completed_plans: 18
+  completed_plans: 19
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 15 (buddy-connection-system) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 
 ## Accumulated Context
 
@@ -70,6 +70,8 @@ Plan: 4 of 5
 - [Phase 15]: OnlineStatusDot created in Plan 05 to unblock profile screen (Plan 04 will reuse)
 - [Phase 15]: Avatar color derived from name hash — 5-color palette, no network dependency
 - [Phase 15]: Three-dot menu as Modal dropdown avoids adding a bottom-sheet library
+- [Phase 15-buddy-connection-system]: discoverabilityPrompted persisted in settingsStore to prevent repeat prompt after app restart
+- [Phase 15-buddy-connection-system]: BuddyCard adapts to existing OnlineStatusDot interface (status+label) from Plan 05
 
 ### Pending Todos
 
@@ -90,6 +92,6 @@ Plan: 4 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-25T19:26:28.597Z
-Stopped at: Completed 15-05-PLAN.md
+Last session: 2026-03-25T19:29:58.772Z
+Stopped at: Completed 15-04-PLAN.md
 Resume file: None
