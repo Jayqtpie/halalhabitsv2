@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { colors, typography, spacing, componentSpacing } from '../../tokens';
+import { useBuddyStore } from '../../stores/buddyStore';
 
 /** Placeholder icon shapes - swap for pixel art icons in Phase 5 */
 function TabIcon({ routeName, focused }: { routeName: string; focused: boolean }) {
@@ -42,6 +43,31 @@ function TabIcon({ routeName, focused }: { routeName: string; focused: boolean }
     case 'profile':
       // Profile: rounded square
       return <View style={[shapeStyle, { borderRadius: size / 4 }]} />;
+    case 'buddies':
+      // Buddies: two overlapping circles (representing connection)
+      return (
+        <View style={{ width: size, height: size, flexDirection: 'row', alignItems: 'center' }}>
+          <View
+            style={{
+              width: size * 0.65,
+              height: size * 0.65,
+              borderColor: color,
+              borderWidth: 2,
+              borderRadius: (size * 0.65) / 2,
+            }}
+          />
+          <View
+            style={{
+              width: size * 0.65,
+              height: size * 0.65,
+              borderColor: color,
+              borderWidth: 2,
+              borderRadius: (size * 0.65) / 2,
+              marginLeft: -(size * 0.25),
+            }}
+          />
+        </View>
+      );
     default:
       return <View style={[shapeStyle, { borderRadius: 2 }]} />;
   }
@@ -52,12 +78,14 @@ const routeLabels: Record<string, string> = {
   index: 'tabs.home',
   habits: 'tabs.habits',
   quests: 'tabs.quests',
+  buddies: 'tabs.buddies',
   profile: 'tabs.profile',
 };
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const pendingBadgeCount = useBuddyStore((s) => s.pendingBadgeCount);
 
   return (
     <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, spacing.sm) }]}>
@@ -102,6 +130,13 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
               <View style={styles.iconContainer}>
                 <TabIcon routeName={route.name} focused={isFocused} />
                 {isFocused && <View style={styles.activeGlow} />}
+                {route.name === 'buddies' && pendingBadgeCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {pendingBadgeCount > 9 ? '9+' : String(pendingBadgeCount)}
+                    </Text>
+                  </View>
+                )}
               </View>
               <Text
                 style={[
@@ -163,5 +198,23 @@ const styles = StyleSheet.create({
     lineHeight: typography.bodySm.lineHeight,
     fontFamily: typography.bodySm.fontFamily,
     letterSpacing: typography.bodySm.letterSpacing,
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -6,
+    backgroundColor: colors.dark.primary,
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontFamily: 'PressStart2P-Regular',
+    lineHeight: 14,
   },
 });

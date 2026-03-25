@@ -15,6 +15,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="habits" />
       <Tabs.Screen name="quests" />
+      <Tabs.Screen name="buddies" />
       <Tabs.Screen name="profile" />
     </Tabs>
   );
