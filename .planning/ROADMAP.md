@@ -165,6 +165,6 @@ Plans:
 | 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
 | 14. Nafs Boss Arena | v2.0 | 5/5 | Complete | 2026-03-24 |
-| 15. Buddy Connection System | v2.0 | 5/5 | Complete   | 2026-03-25 |
+| 15. Buddy Connection System | v2.0 | 6/6 | Complete   | 2026-03-25 |
 | 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |

@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
-status: Ready to execute
-stopped_at: Completed 15-04-PLAN.md
-last_updated: "2026-03-25T19:29:58.776Z"
+status: Phase complete — ready for verification
+stopped_at: Completed 15-06-PLAN.md
+last_updated: "2026-03-25T20:11:10.632Z"
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 19
-  completed_plans: 19
+  total_plans: 20
+  completed_plans: 20
 ---
 
 # Project State
@@ -72,6 +72,7 @@ Plan: 5 of 5
 - [Phase 15]: Three-dot menu as Modal dropdown avoids adding a bottom-sheet library
 - [Phase 15-buddy-connection-system]: discoverabilityPrompted persisted in settingsStore to prevent repeat prompt after app restart
 - [Phase 15-buddy-connection-system]: BuddyCard adapts to existing OnlineStatusDot interface (status+label) from Plan 05
+- [Phase 15]: profileCache gap closed: setProfileCache setter + useEffect added to buddies.tsx to populate cache after loadBuddies resolves
 
 ### Pending Todos
 
@@ -92,6 +93,6 @@ Plan: 5 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-25T19:29:58.772Z
-Stopped at: Completed 15-04-PLAN.md
+Last session: 2026-03-25T20:11:10.628Z
+Stopped at: Completed 15-06-PLAN.md
 Resume file: None
