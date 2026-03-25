@@ -120,7 +120,7 @@ Plans:
 - [x] 15-02-PLAN.md — Schema additions, buddyRepo, Supabase migrations, RLS updates
 - [x] 15-03-PLAN.md — buddyStore, habitStore streak sync
 - [ ] 15-04-PLAN.md — Buddy list tab screen, buddy components, navigation wiring
-- [ ] 15-05-PLAN.md — Buddy profile screen, stat cards, remove/block actions
+- [x] 15-05-PLAN.md — Buddy profile screen, stat cards, remove/block actions
 
 ### Phase 16: Shared Activities & Duo Quests
 **Goal**: Buddy pairs can track a shared habit together and complete cooperative duo quests that reward both players individually and with bonus XP upon joint completion
@@ -165,6 +165,6 @@ Plans:
 | 12. Friday Power-Ups | v2.0 | 3/3 | Complete    | 2026-03-22 |
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
 | 14. Nafs Boss Arena | v2.0 | 5/5 | Complete | 2026-03-24 |
-| 15. Buddy Connection System | v2.0 | 3/5 | In Progress|  |
+| 15. Buddy Connection System | v2.0 | 4/5 | In Progress|  |
 | 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |
