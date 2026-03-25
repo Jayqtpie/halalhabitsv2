@@ -72,6 +72,7 @@ export default function BuddiesScreen() {
     declineRequest,
     searchUsers,
     sendHeartbeat,
+    getBuddyProfile,
   } = useBuddyStore();
 
   const { discoverabilityPrompted, setDiscoverabilityPrompted } = useSettingsStore();
@@ -88,7 +89,7 @@ export default function BuddiesScreen() {
 
   // ── Profile cache — maps buddyUserId -> PublicBuddyProfile ────────
   // In a real app this would come from the store; for now we load lazily.
-  const [profileCache] = useState<Map<string, PublicBuddyProfile>>(new Map());
+  const [profileCache, setProfileCache] = useState<Map<string, PublicBuddyProfile>>(new Map());
 
   // ── Mount effects ──────────────────────────────────────────────────
 
@@ -107,6 +108,30 @@ export default function BuddiesScreen() {
       return () => clearTimeout(timer);
     }
   }, [discoverabilityPrompted]);
+
+  // Load profiles for accepted buddies and pending-incoming requests
+  useEffect(() => {
+    if (!userId) return;
+    const allBuddies = [...accepted, ...pendingIncoming];
+    if (allBuddies.length === 0) return;
+
+    const partnerIds = allBuddies.map((b) => getBuddyUserId(b, userId));
+    // De-duplicate in case same user appears in both lists
+    const uniqueIds = [...new Set(partnerIds)];
+
+    void Promise.all(
+      uniqueIds.map(async (partnerId) => {
+        const profile = await getBuddyProfile(partnerId);
+        if (profile) {
+          setProfileCache((prev) => {
+            const next = new Map(prev);
+            next.set(partnerId, profile);
+            return next;
+          });
+        }
+      }),
+    );
+  }, [accepted, pendingIncoming, userId, getBuddyProfile]);
 
   // ── Search handling ────────────────────────────────────────────────
 
