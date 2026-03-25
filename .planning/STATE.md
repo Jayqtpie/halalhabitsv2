@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Ready to execute
-stopped_at: Phase 15 UI-SPEC approved
-last_updated: "2026-03-25T04:40:00.708Z"
+stopped_at: Completed 15-03-PLAN.md
+last_updated: "2026-03-25T19:20:23.369Z"
 progress:
   total_phases: 7
   completed_phases: 4
   total_plans: 19
-  completed_plans: 15
+  completed_plans: 17
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 15 (buddy-connection-system) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 
 ## Accumulated Context
 
@@ -65,6 +65,8 @@ Plan: 2 of 5
 - [Phase 14-UAT]: Inline habit checklist added to Arena — damage dealt without leaving screen
 - [Phase 14-UAT]: Visual HP offset tracks per-habit damage in real-time
 - [Phase 14-UAT]: BossDefeatFanfare renders in both HudScene and ArenaScreen
+- [Phase 15]: buddyStore uses no persist middleware — SQLite via buddyRepo is the source of truth
+- [Phase 15]: syncStreakToUser is non-fatal — buddy streak display lag never breaks core habit flow
 
 ### Pending Todos
 
@@ -85,6 +87,6 @@ Plan: 2 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-25T02:07:17.600Z
-Stopped at: Phase 15 UI-SPEC approved
-Resume file: .planning/phases/15-buddy-connection-system/15-UI-SPEC.md
+Last session: 2026-03-25T19:20:23.365Z
+Stopped at: Completed 15-03-PLAN.md
+Resume file: None

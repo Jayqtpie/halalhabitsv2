@@ -42,12 +42,12 @@ Requirements for v2.0 milestone. Each maps to roadmap phases.
 
 ### Buddy System
 
-- [ ] **BUDY-01**: User can generate a single-use invite code (expires in 48 hours) to share with a friend
-- [ ] **BUDY-02**: User can connect by entering a buddy's invite code
-- [ ] **BUDY-03**: User can search for buddies by username (only finds users who opted into discoverability)
-- [ ] **BUDY-04**: User can accept, decline, remove, or block buddy requests
-- [ ] **BUDY-05**: User can view buddy list showing up to 20 connections with online status
-- [ ] **BUDY-06**: User can view a buddy's public progress summary (XP total, streak count — never worship details)
+- [x] **BUDY-01**: User can generate a single-use invite code (expires in 48 hours) to share with a friend
+- [x] **BUDY-02**: User can connect by entering a buddy's invite code
+- [x] **BUDY-03**: User can search for buddies by username (only finds users who opted into discoverability)
+- [x] **BUDY-04**: User can accept, decline, remove, or block buddy requests
+- [x] **BUDY-05**: User can view buddy list showing up to 20 connections with online status
+- [x] **BUDY-06**: User can view a buddy's public progress summary (XP total, streak count — never worship details)
 - [ ] **BUDY-07**: Supabase RLS policies enforce buddy-pair scoping on all social tables
 
 ### Shared Activities & Duo Quests
@@ -132,12 +132,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BOSS-06 | Phase 14 | Complete |
 | BOSS-07 | Phase 14 | Complete |
 | BOSS-08 | Phase 14 | Complete |
-| BUDY-01 | Phase 15 | Pending |
-| BUDY-02 | Phase 15 | Pending |
-| BUDY-03 | Phase 15 | Pending |
-| BUDY-04 | Phase 15 | Pending |
-| BUDY-05 | Phase 15 | Pending |
-| BUDY-06 | Phase 15 | Pending |
+| BUDY-01 | Phase 15 | Complete |
+| BUDY-02 | Phase 15 | Complete |
+| BUDY-03 | Phase 15 | Complete |
+| BUDY-04 | Phase 15 | Complete |
+| BUDY-05 | Phase 15 | Complete |
+| BUDY-06 | Phase 15 | Complete |
 | BUDY-07 | Phase 15 | Pending |
 | DUOQ-01 | Phase 16 | Pending |
 | DUOQ-02 | Phase 16 | Pending |
