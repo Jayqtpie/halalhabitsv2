@@ -16,3 +16,4 @@ export { muhasabahRepo } from './muhasabahRepo';
 export { syncQueueRepo } from './syncQueueRepo';
 export { detoxRepo } from './detoxRepo';
 export { bossRepo } from './bossRepo';
+export { buddyRepo } from './buddyRepo';

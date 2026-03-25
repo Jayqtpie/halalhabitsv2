@@ -20,6 +20,9 @@ export const users = sqliteTable('users', {
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
   expoPushToken: text('expo_push_token'),
+  isDiscoverable: integer('is_discoverable', { mode: 'boolean' }).notNull().default(false),
+  lastActiveAt: text('last_active_at'),
+  currentStreakCount: integer('current_streak_count').notNull().default(0),
 }, (table) => ([
   index('idx_user_level').on(table.currentLevel),
 ]));
