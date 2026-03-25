@@ -30,7 +30,8 @@ describe('buddyStore -- zustand wiring', () => {
   });
 
   it('does NOT use persist middleware', () => {
-    expect(storeContent).not.toMatch(/persist/);
+    // Match actual middleware call `persist(` not the word "persist" in comments
+    expect(storeContent).not.toMatch(/\bpersist\s*\(/);
   });
 });
 
