@@ -10,9 +10,12 @@
  *   const { habits, loading } = useHabitStore(useShallow(s => ({ habits: s.habits, loading: s.loading })));
  */
 import { create } from 'zustand';
+import { eq } from 'drizzle-orm';
 import type { Habit, NewHabit } from '../types/database';
 import type { StreakState, MercyModeState, HabitWithStatus } from '../types/habits';
 import { habitRepo, completionRepo, streakRepo } from '../db/repos';
+import { getDb } from '../db/client';
+import { users } from '../db/schema';
 import {
   processCompletion,
   detectStreakBreak,
@@ -65,6 +68,34 @@ function getDayBoundaries(date?: string): { dayStart: string; dayEnd: string } {
     dayStart: start.toISOString(),
     dayEnd: end.toISOString(),
   };
+}
+
+// ─── Denormalized Streak Sync ─────────────────────────────────────────
+
+/**
+ * Update the denormalized current_streak_count on the users table.
+ *
+ * Privacy Gate note: the streaks table is PRIVATE and never syncs.
+ * The users.current_streak_count field is SYNCABLE and safely surfaces
+ * an aggregated streak count for buddy profiles without exposing PRIVATE
+ * streak details (habit names, completion timestamps, etc).
+ *
+ * Called after every streak mutation so buddy profile views stay current.
+ */
+async function syncStreakToUser(userId: string, streakCount: number): Promise<void> {
+  try {
+    const db = getDb();
+    await db
+      .update(users)
+      .set({
+        currentStreakCount: streakCount,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(users.id, userId));
+  } catch (e) {
+    // Non-fatal: buddy streak display may lag, but core habit data is safe
+    console.warn('[habitStore] syncStreakToUser error:', e);
+  }
 }
 
 // ─── Store Interface ──────────────────────────────────────────────────
@@ -293,7 +324,11 @@ export const useHabitStore = create<HabitState>((set, get) => ({
         isRebuilt: newStreakState.isRebuilt,
       });
 
-      // 6. Handle mercy mode completion
+      // 6a. Sync denormalized streak count to users table for buddy profiles
+      // Privacy: streaks table is PRIVATE; users.current_streak_count is SYNCABLE
+      await syncStreakToUser(userId, newStreakState.currentCount);
+
+      // 6b. Handle mercy mode completion
       let updatedMercyModes = { ...state.mercyModes };
       if (newStreakState.mercyMode?.active) {
         const recovery = processRecovery(newStreakState.mercyMode);
