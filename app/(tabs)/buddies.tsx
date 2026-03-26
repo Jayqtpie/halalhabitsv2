@@ -4,6 +4,7 @@
  * Primary screen for the Buddy Connection System (BUDY-01, 02, 03, 05).
  * Per UI-SPEC S-01:
  *   - Search bar at top (debounced 300ms via useRef + setTimeout)
+ *   - Sub-tabs: "Buddies" and "Activities" (per D-12)
  *   - Pending Requests section when pendingIncoming.length > 0
  *   - My Buddies FlatList with pull-to-refresh
  *   - Empty state when no buddies and no pending
@@ -26,6 +27,7 @@ import {
   ScrollView,
   Platform,
 } from 'react-native';
+import { ActivitiesTab } from '../../src/components/activities/ActivitiesTab';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useBuddyStore } from '../../src/stores/buddyStore';
@@ -77,6 +79,9 @@ export default function BuddiesScreen() {
 
   const { discoverabilityPrompted, setDiscoverabilityPrompted } = useSettingsStore();
 
+  // ── Sub-tab state ─────────────────────────────────────────────────
+  const [activeTab, setActiveTab] = useState<'buddies' | 'activities'>('buddies');
+
   // ── Modal visibility ──────────────────────────────────────────────
   const [showInviteSheet, setShowInviteSheet] = useState(false);
   const [showEnterCodeSheet, setShowEnterCodeSheet] = useState(false);
@@ -90,6 +95,11 @@ export default function BuddiesScreen() {
   // ── Profile cache — maps buddyUserId -> PublicBuddyProfile ────────
   // In a real app this would come from the store; for now we load lazily.
   const [profileCache, setProfileCache] = useState<Map<string, PublicBuddyProfile>>(new Map());
+
+  // ── Pair profile map — maps buddyPairId -> { name } for ActivitiesTab ────
+  // ActivitiesTab needs to display buddy names by pair ID (not user ID).
+  // We derive this from accepted buddies: pair.id -> partner display name.
+  const [pairProfileMap, setPairProfileMap] = useState<Map<string, { name: string }>>(new Map());
 
   // ── Mount effects ──────────────────────────────────────────────────
 
@@ -109,7 +119,8 @@ export default function BuddiesScreen() {
     }
   }, [discoverabilityPrompted]);
 
-  // Load profiles for accepted buddies and pending-incoming requests
+  // Load profiles for accepted buddies and pending-incoming requests.
+  // Also builds pairProfileMap (buddyPairId -> { name }) for ActivitiesTab.
   useEffect(() => {
     if (!userId) return;
     const allBuddies = [...accepted, ...pendingIncoming];
@@ -128,6 +139,19 @@ export default function BuddiesScreen() {
             next.set(partnerId, profile);
             return next;
           });
+
+          // Also update pair profile map: accepted buddies only
+          // map buddyPairId -> { name } using the partner's display name
+          const pairRows = accepted.filter((b) => getBuddyUserId(b, userId) === partnerId);
+          if (pairRows.length > 0) {
+            setPairProfileMap((prev) => {
+              const next = new Map(prev);
+              for (const pairRow of pairRows) {
+                next.set(pairRow.id, { name: profile.displayName });
+              }
+              return next;
+            });
+          }
         }
       }),
     );
@@ -263,23 +287,71 @@ export default function BuddiesScreen() {
 
   // ── Render ─────────────────────────────────────────────────────────
 
+  // ── Derived buddy pair IDs for ActivitiesTab ──────────────────────
+  const buddyPairIds = accepted.map((b) => b.id);
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      {/* Search bar */}
-      <View style={styles.searchBarWrap}>
-        <TextInput
-          style={styles.searchBar}
-          placeholder="Search by username..."
-          placeholderTextColor={colors.dark.textMuted}
-          value={searchQuery}
-          onChangeText={handleSearchChange}
-          autoCorrect={false}
-          autoCapitalize="none"
-          returnKeyType="search"
-          accessibilityLabel="Search buddies by username"
-        />
+      {/* Search bar — only shown in Buddies sub-tab */}
+      {activeTab === 'buddies' && (
+        <View style={styles.searchBarWrap}>
+          <TextInput
+            style={styles.searchBar}
+            placeholder="Search by username..."
+            placeholderTextColor={colors.dark.textMuted}
+            value={searchQuery}
+            onChangeText={handleSearchChange}
+            autoCorrect={false}
+            autoCapitalize="none"
+            returnKeyType="search"
+            accessibilityLabel="Search buddies by username"
+          />
+        </View>
+      )}
+
+      {/* Sub-tab bar: Buddies | Activities (per D-12) */}
+      <View style={styles.subTabBar}>
+        <TouchableOpacity
+          style={styles.subTabItem}
+          onPress={() => setActiveTab('buddies')}
+          activeOpacity={0.7}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'buddies' }}
+          accessibilityLabel="Buddies tab"
+        >
+          <Text style={[styles.subTabLabel, activeTab === 'buddies' && styles.subTabLabelActive]}>
+            Buddies
+          </Text>
+          {activeTab === 'buddies' && <View style={styles.subTabUnderline} />}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.subTabItem}
+          onPress={() => setActiveTab('activities')}
+          activeOpacity={0.7}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'activities' }}
+          accessibilityLabel="Activities tab"
+        >
+          <Text style={[styles.subTabLabel, activeTab === 'activities' && styles.subTabLabelActive]}>
+            Activities
+          </Text>
+          {activeTab === 'activities' && <View style={styles.subTabUnderline} />}
+        </TouchableOpacity>
       </View>
 
+      {/* Activities tab content */}
+      {activeTab === 'activities' && (
+        <ActivitiesTab
+          userId={userId}
+          buddyPairIds={buddyPairIds}
+          buddyProfiles={pairProfileMap}
+        />
+      )}
+
+      {/* Buddies tab content */}
+      {activeTab === 'buddies' && (
+        <>
       {/* Search results */}
       {isSearchActive ? (
         <FlatList
@@ -390,6 +462,8 @@ export default function BuddiesScreen() {
           <View style={{ height: insets.bottom + spacing.lg }} />
         </ScrollView>
       )}
+        </>
+      )}
 
       {/* Modals */}
       <InviteCodeSheet
@@ -434,6 +508,38 @@ const styles = StyleSheet.create({
     ...typography.bodyMd,
     color: colors.dark.textPrimary,
     minHeight: 44,
+  },
+  // Sub-tab bar
+  subTabBar: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.dark.border,
+    marginBottom: spacing.sm,
+  },
+  subTabItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
+    position: 'relative',
+  },
+  subTabLabel: {
+    ...typography.bodyMd,
+    color: colors.dark.textMuted,
+  },
+  subTabLabelActive: {
+    fontFamily: 'Inter-Bold',
+    fontWeight: '700',
+    color: colors.dark.primary,
+  },
+  subTabUnderline: {
+    position: 'absolute',
+    bottom: 0,
+    left: '20%',
+    right: '20%',
+    height: 2,
+    borderRadius: 1,
+    backgroundColor: colors.dark.primary,
   },
   listContent: {
     paddingHorizontal: spacing.md,

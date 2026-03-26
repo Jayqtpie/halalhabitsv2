@@ -35,6 +35,7 @@ import { TITLE_SEED_DATA } from '../../src/domain/title-seed-data';
 import { BuddyProfileCard } from '../../src/components/buddy/BuddyProfileCard';
 import { OnlineStatusDot, type OnlineStatus } from '../../src/components/buddy/OnlineStatusDot';
 import { ConfirmActionSheet } from '../../src/components/buddy/ConfirmActionSheet';
+import { ProposeSharedHabitSheet } from '../../src/components/activities/ProposeSharedHabitSheet';
 import { colors, palette } from '../../src/tokens/colors';
 import { typography } from '../../src/tokens/typography';
 import { componentSpacing, spacing } from '../../src/tokens/spacing';
@@ -117,6 +118,7 @@ export default function BuddyProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [menuVisible, setMenuVisible] = useState(false);
   const [actionSheet, setActionSheet] = useState<ActionSheet>(null);
+  const [showProposeSheet, setShowProposeSheet] = useState(false);
 
   // Find the buddy row from the accepted list using the route param id
   const buddyRow: Buddy | undefined = accepted.find((b) => b.id === id);
@@ -275,6 +277,34 @@ export default function BuddyProfileScreen() {
 
           {/* Privacy Notice */}
           <Text style={styles.privacyNotice}>Only public progress is shared</Text>
+
+          {/* Activity Actions — only shown if this is an accepted buddy (buddyRow exists) */}
+          {buddyRow && (
+            <View style={styles.activityActions}>
+              {/* Propose Shared Habit button per D-01 */}
+              <TouchableOpacity
+                style={styles.proposeButton}
+                onPress={() => setShowProposeSheet(true)}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Propose a shared habit"
+              >
+                <Text style={styles.proposeButtonText}>Propose Shared Habit</Text>
+              </TouchableOpacity>
+
+              {/* Start Duo Quest — placeholder, wired in Plan 05 */}
+              <TouchableOpacity
+                style={styles.duoQuestButton}
+                disabled
+                activeOpacity={1}
+                accessibilityRole="button"
+                accessibilityLabel="Start a duo quest (coming soon)"
+                accessibilityState={{ disabled: true }}
+              >
+                <Text style={styles.duoQuestButtonText}>Start Duo Quest</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </ScrollView>
       )}
 
@@ -336,6 +366,16 @@ export default function BuddyProfileScreen() {
         onCancel={() => setActionSheet(null)}
         destructive
       />
+
+      {/* Propose Shared Habit sheet — only rendered when we have a buddy pair ID */}
+      {buddyRow && (
+        <ProposeSharedHabitSheet
+          visible={showProposeSheet}
+          onClose={() => setShowProposeSheet(false)}
+          buddyPairId={buddyRow.id}
+          buddyName={displayName}
+        />
+      )}
     </View>
   );
 }
@@ -445,6 +485,44 @@ const styles = StyleSheet.create({
     opacity: 0.6,
     textAlign: 'center',
     marginTop: spacing.sm,
+  },
+
+  // Activity Actions
+  activityActions: {
+    width: '100%',
+    gap: spacing.sm,
+    marginTop: spacing.lg,
+  },
+  proposeButton: {
+    borderWidth: 1.5,
+    borderColor: colors.dark.primary,
+    borderRadius: 12,
+    paddingVertical: componentSpacing.buttonPaddingVertical,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
+  },
+  proposeButtonText: {
+    ...typography.bodyMd,
+    fontFamily: 'Inter-SemiBold',
+    fontWeight: '600',
+    color: colors.dark.primary,
+  },
+  duoQuestButton: {
+    borderWidth: 1.5,
+    borderColor: colors.dark.border,
+    borderRadius: 12,
+    paddingVertical: componentSpacing.buttonPaddingVertical,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 48,
+    opacity: 0.4,
+  },
+  duoQuestButtonText: {
+    ...typography.bodyMd,
+    fontFamily: 'Inter-SemiBold',
+    fontWeight: '600',
+    color: colors.dark.textMuted,
   },
 
   // Three-dot dropdown menu
