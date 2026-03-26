@@ -18,3 +18,4 @@ export { detoxRepo } from './detoxRepo';
 export { bossRepo } from './bossRepo';
 export { buddyRepo } from './buddyRepo';
 export { sharedHabitRepo } from './sharedHabitRepo';
+export { duoQuestRepo } from './duoQuestRepo';
