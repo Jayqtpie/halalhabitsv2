@@ -44,6 +44,8 @@ interface BuddyState {
   pendingOutgoing: Buddy[];
   loading: boolean;
   pendingBadgeCount: number;
+  /** Count of incoming shared habit proposals (set by sharedHabitStore after load, per D-03). */
+  pendingProposalCount: number;
   lastGeneratedCode: string | null;
 
   loadBuddies: (userId: string) => Promise<void>;
@@ -56,6 +58,12 @@ interface BuddyState {
   searchUsers: (query: string) => Promise<PublicBuddyProfile[]>;
   getBuddyProfile: (buddyUserId: string) => Promise<PublicBuddyProfile | null>;
   sendHeartbeat: (userId: string) => Promise<void>;
+  /**
+   * Set the pending shared habit proposal count so the Buddy tab badge
+   * includes incoming shared habit proposals per D-03.
+   * Called by sharedHabitStore.loadSharedHabits after loading proposals.
+   */
+  setPendingProposalCount: (count: number) => void;
 }
 
 // ─── Store ──────────────────────────────────────────────────────────────────────
@@ -66,6 +74,7 @@ export const useBuddyStore = create<BuddyState>((set, get) => ({
   pendingOutgoing: [],
   loading: false,
   pendingBadgeCount: 0,
+  pendingProposalCount: 0,
   lastGeneratedCode: null,
 
   // ─── loadBuddies ─────────────────────────────────────────────────────────
@@ -78,11 +87,13 @@ export const useBuddyStore = create<BuddyState>((set, get) => ({
         buddyRepo.getPending(userId),
         buddyRepo.getPendingOutbound(userId),
       ]);
+      // pendingBadgeCount includes buddy requests AND shared habit proposals (D-03)
+      const { pendingProposalCount } = get();
       set({
         accepted,
         pendingIncoming,
         pendingOutgoing,
-        pendingBadgeCount: pendingIncoming.length,
+        pendingBadgeCount: pendingIncoming.length + pendingProposalCount,
         loading: false,
       });
     } catch (e) {
@@ -230,5 +241,16 @@ export const useBuddyStore = create<BuddyState>((set, get) => ({
     } catch (e) {
       console.warn('[buddyStore] sendHeartbeat error:', e);
     }
+  },
+
+  // ─── setPendingProposalCount ─────────────────────────────────────────────
+
+  setPendingProposalCount: (count: number) => {
+    // Update the proposal count and recalculate the total badge count (D-03)
+    const { pendingIncoming } = get();
+    set({
+      pendingProposalCount: count,
+      pendingBadgeCount: pendingIncoming.length + count,
+    });
   },
 }));
