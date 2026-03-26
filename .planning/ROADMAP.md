@@ -132,7 +132,13 @@ Plans:
   3. Each player receives individual XP when they complete their part; when both complete, both receive additional bonus shared XP
   4. If a partner is inactive for 48 hours the quest pauses with a visible notice; after 72 hours of inactivity the active player can exit with partial XP credit
   5. Duo quest progress display shows aggregate completion percentage only — never reveals whether the partner completed a specific worship act
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 16-01-PLAN.md — Duo quest and shared habit domain engines with TDD
+- [ ] 16-02-PLAN.md — sharedHabitRepo and duoQuestRepo with privacy invariant tests
+- [ ] 16-03-PLAN.md — sharedHabitStore, duoQuestStore, gameStore XP integration, buddyStore badge
+- [ ] 16-04-PLAN.md — Activities sub-tab, shared habit UI, proposal flow, buddy profile integration
+- [ ] 16-05-PLAN.md — Duo quest cards, creation sheet, inactivity banner, detail view
 
 ### Phase 17: Messaging & Content Moderation
 **Goal**: Connected buddies can send and receive text messages that are filtered on both client and server, with offline queuing, message history, and report/block tools
@@ -166,5 +172,5 @@ Plans:
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
 | 14. Nafs Boss Arena | v2.0 | 5/5 | Complete | 2026-03-24 |
 | 15. Buddy Connection System | v2.0 | 6/6 | Complete    | 2026-03-25 |
-| 16. Shared Activities & Duo Quests | v2.0 | 0/TBD | Not started | - |
+| 16. Shared Activities & Duo Quests | v2.0 | 0/5 | Not started | - |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |
