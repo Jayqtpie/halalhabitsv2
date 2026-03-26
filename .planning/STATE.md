@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Ready to execute
-stopped_at: Completed 16-02-PLAN.md (sharedHabitRepo + duoQuestRepo)
-last_updated: "2026-03-26T21:43:32.680Z"
+stopped_at: Completed 16-03-PLAN.md (sharedHabitStore + duoQuestStore)
+last_updated: "2026-03-26T21:49:38.427Z"
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 25
-  completed_plans: 22
+  completed_plans: 23
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 16 (shared-activities-duo-quests) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 
 ## Accumulated Context
 
@@ -78,6 +78,8 @@ Plan: 3 of 5
 - [Phase 16]: calculatePartialXP floors result (Math.floor) — no fractional XP awarded
 - [Phase 16]: getProposalsForUser takes (buddyPairIds, userId) — caller supplies pair IDs to avoid cross-table JOIN in repo
 - [Phase 16]: duoQuestRepo stores raw userA/userB progress; domain engine getAggregateProgress aggregates for UI display
+- [Phase 16]: setPendingProposalCount is a plain setter on buddyStore — sharedHabitStore calls it after loadSharedHabits to avoid circular dependency
+- [Phase 16]: recordMyProgress awards bonus XP to the player who triggers both-complete in duoQuestStore
 
 ### Pending Todos
 
@@ -98,6 +100,6 @@ Plan: 3 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-26T21:43:32.675Z
-Stopped at: Completed 16-02-PLAN.md (sharedHabitRepo + duoQuestRepo)
+Last session: 2026-03-26T21:49:38.423Z
+Stopped at: Completed 16-03-PLAN.md (sharedHabitStore + duoQuestStore)
 Resume file: None
