@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Ready to execute
-stopped_at: Completed 16-01-PLAN.md (shared-habit-engine + duo-quest-engine + templates)
-last_updated: "2026-03-26T21:37:24.123Z"
+stopped_at: Completed 16-02-PLAN.md (sharedHabitRepo + duoQuestRepo)
+last_updated: "2026-03-26T21:43:32.680Z"
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 25
-  completed_plans: 21
+  completed_plans: 22
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-19)
 ## Current Position
 
 Phase: 16 (shared-activities-duo-quests) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 
 ## Accumulated Context
 
@@ -76,6 +76,8 @@ Plan: 2 of 5
 - [Phase 16]: WORSHIP_HABIT_TYPES=['salah','muhasabah'] as const for Privacy Gate enforcement in shared-habit-engine
 - [Phase 16]: getAggregateProgress returns no userA/userB keys by design — privacy pattern for duo quest progress (D-05/D-13)
 - [Phase 16]: calculatePartialXP floors result (Math.floor) — no fractional XP awarded
+- [Phase 16]: getProposalsForUser takes (buddyPairIds, userId) — caller supplies pair IDs to avoid cross-table JOIN in repo
+- [Phase 16]: duoQuestRepo stores raw userA/userB progress; domain engine getAggregateProgress aggregates for UI display
 
 ### Pending Todos
 
@@ -96,6 +98,6 @@ Plan: 2 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-26T21:37:24.119Z
-Stopped at: Completed 16-01-PLAN.md (shared-habit-engine + duo-quest-engine + templates)
+Last session: 2026-03-26T21:43:32.675Z
+Stopped at: Completed 16-02-PLAN.md (sharedHabitRepo + duoQuestRepo)
 Resume file: None
