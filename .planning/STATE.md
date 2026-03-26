@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
 status: Ready to execute
-stopped_at: Completed 16-03-PLAN.md (sharedHabitStore + duoQuestStore)
-last_updated: "2026-03-26T21:49:38.427Z"
+stopped_at: "Paused at 16-04 checkpoint:human-verify (Tasks 1+2 complete)"
+last_updated: "2026-03-26T21:58:37.939Z"
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 25
-  completed_plans: 23
+  completed_plans: 24
 ---
 
 # Project State
@@ -80,6 +80,7 @@ Plan: 4 of 5
 - [Phase 16]: duoQuestRepo stores raw userA/userB progress; domain engine getAggregateProgress aggregates for UI display
 - [Phase 16]: setPendingProposalCount is a plain setter on buddyStore — sharedHabitStore calls it after loadSharedHabits to avoid circular dependency
 - [Phase 16]: recordMyProgress awards bonus XP to the player who triggers both-complete in duoQuestStore
+- [Phase 16]: pairProfileMap is a separate Map<pairId, { name }> derived from profileCache to give ActivitiesTab buddy names by pair ID rather than user ID
 
 ### Pending Todos
 
@@ -100,6 +101,6 @@ Plan: 4 of 5
 
 ## Session Continuity
 
-Last session: 2026-03-26T21:49:38.423Z
-Stopped at: Completed 16-03-PLAN.md (sharedHabitStore + duoQuestStore)
+Last session: 2026-03-26T21:58:33.859Z
+Stopped at: Paused at 16-04 checkpoint:human-verify (Tasks 1+2 complete)
 Resume file: None
