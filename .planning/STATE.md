@@ -2,14 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: Social & Battle Systems
-status: Ready to plan
-stopped_at: Phase 16 context gathered
-last_updated: "2026-03-26T21:16:38.815Z"
+status: Ready to execute
+stopped_at: Completed 16-01-PLAN.md (shared-habit-engine + duo-quest-engine + templates)
+last_updated: "2026-03-26T21:37:24.123Z"
 progress:
   total_phases: 7
   completed_phases: 5
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 25
+  completed_plans: 21
 ---
 
 # Project State
@@ -19,12 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-19)
 
 **Core value:** Players build real-world Islamic discipline through game mechanics that motivate behavior without claiming to measure spiritual worth.
-**Current focus:** Phase 15 — buddy-connection-system
+**Current focus:** Phase 16 — shared-activities-duo-quests
 
 ## Current Position
 
-Phase: 16
-Plan: Not started
+Phase: 16 (shared-activities-duo-quests) — EXECUTING
+Plan: 2 of 5
 
 ## Accumulated Context
 
@@ -73,6 +73,9 @@ Plan: Not started
 - [Phase 15-buddy-connection-system]: discoverabilityPrompted persisted in settingsStore to prevent repeat prompt after app restart
 - [Phase 15-buddy-connection-system]: BuddyCard adapts to existing OnlineStatusDot interface (status+label) from Plan 05
 - [Phase 15]: profileCache gap closed: setProfileCache setter + useEffect added to buddies.tsx to populate cache after loadBuddies resolves
+- [Phase 16]: WORSHIP_HABIT_TYPES=['salah','muhasabah'] as const for Privacy Gate enforcement in shared-habit-engine
+- [Phase 16]: getAggregateProgress returns no userA/userB keys by design — privacy pattern for duo quest progress (D-05/D-13)
+- [Phase 16]: calculatePartialXP floors result (Math.floor) — no fractional XP awarded
 
 ### Pending Todos
 
@@ -93,6 +96,6 @@ Plan: Not started
 
 ## Session Continuity
 
-Last session: 2026-03-26T21:16:38.810Z
-Stopped at: Phase 16 context gathered
-Resume file: .planning/phases/16-shared-activities-duo-quests/16-CONTEXT.md
+Last session: 2026-03-26T21:37:24.119Z
+Stopped at: Completed 16-01-PLAN.md (shared-habit-engine + duo-quest-engine + templates)
+Resume file: None

@@ -134,7 +134,7 @@ Plans:
   5. Duo quest progress display shows aggregate completion percentage only — never reveals whether the partner completed a specific worship act
 **Plans**: 5 plans
 Plans:
-- [ ] 16-01-PLAN.md — Duo quest and shared habit domain engines with TDD
+- [x] 16-01-PLAN.md — Duo quest and shared habit domain engines with TDD
 - [ ] 16-02-PLAN.md — sharedHabitRepo and duoQuestRepo with privacy invariant tests
 - [ ] 16-03-PLAN.md — sharedHabitStore, duoQuestStore, gameStore XP integration, buddyStore badge
 - [ ] 16-04-PLAN.md — Activities sub-tab, shared habit UI, proposal flow, buddy profile integration
@@ -172,5 +172,5 @@ Plans:
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
 | 14. Nafs Boss Arena | v2.0 | 5/5 | Complete | 2026-03-24 |
 | 15. Buddy Connection System | v2.0 | 6/6 | Complete    | 2026-03-25 |
-| 16. Shared Activities & Duo Quests | v2.0 | 0/5 | Not started | - |
+| 16. Shared Activities & Duo Quests | v2.0 | 1/5 | In Progress|  |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |

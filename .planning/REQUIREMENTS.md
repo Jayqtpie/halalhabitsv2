@@ -52,11 +52,11 @@ Requirements for v2.0 milestone. Each maps to roadmap phases.
 
 ### Shared Activities & Duo Quests
 
-- [ ] **DUOQ-01**: User can create a shared habit goal with a buddy (both track the same habit)
-- [ ] **DUOQ-02**: User can create a duo quest that requires both buddies to complete their part
-- [ ] **DUOQ-03**: Completing individual part of duo quest awards individual XP; both completing awards bonus shared XP
-- [ ] **DUOQ-04**: Duo quest pauses after 48 hours of partner inactivity; user can exit after 72 hours with partial credit
-- [ ] **DUOQ-05**: Duo quest progress shows aggregate completion only (never reveals individual worship details)
+- [x] **DUOQ-01**: User can create a shared habit goal with a buddy (both track the same habit)
+- [x] **DUOQ-02**: User can create a duo quest that requires both buddies to complete their part
+- [x] **DUOQ-03**: Completing individual part of duo quest awards individual XP; both completing awards bonus shared XP
+- [x] **DUOQ-04**: Duo quest pauses after 48 hours of partner inactivity; user can exit after 72 hours with partial credit
+- [x] **DUOQ-05**: Duo quest progress shows aggregate completion only (never reveals individual worship details)
 
 ### Messaging
 
@@ -139,11 +139,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUDY-05 | Phase 15 | Complete |
 | BUDY-06 | Phase 15 | Complete |
 | BUDY-07 | Phase 15 | Pending |
-| DUOQ-01 | Phase 16 | Pending |
-| DUOQ-02 | Phase 16 | Pending |
-| DUOQ-03 | Phase 16 | Pending |
-| DUOQ-04 | Phase 16 | Pending |
-| DUOQ-05 | Phase 16 | Pending |
+| DUOQ-01 | Phase 16 | Complete |
+| DUOQ-02 | Phase 16 | Complete |
+| DUOQ-03 | Phase 16 | Complete |
+| DUOQ-04 | Phase 16 | Complete |
+| DUOQ-05 | Phase 16 | Complete |
 | MSSG-01 | Phase 17 | Pending |
 | MSSG-02 | Phase 17 | Pending |
 | MSSG-03 | Phase 17 | Pending |
