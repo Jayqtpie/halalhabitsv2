@@ -14,23 +14,27 @@
  * Per CLAUDE.md: No shame copy, no addiction dark patterns.
  * Per project memory: Pull-to-refresh keeps the UI snappy.
  */
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { useSharedHabitStore } from '../../stores/sharedHabitStore';
 import { useDuoQuestStore } from '../../stores/duoQuestStore';
 import { useAuthStore } from '../../stores/authStore';
+import { checkInactivity, type InactivityStatus } from '../../domain/duo-quest-engine';
 import { SharedHabitCard } from './SharedHabitCard';
 import { SharedHabitProposalCard } from './SharedHabitProposalCard';
+import { DuoQuestCard } from './DuoQuestCard';
+import { DuoQuestDetailSheet } from './DuoQuestDetailSheet';
 import { colors } from '../../tokens/colors';
 import { typography } from '../../tokens/typography';
 import { componentSpacing, spacing } from '../../tokens/spacing';
-import type { SharedHabit } from '../../types/database';
+import type { SharedHabit, DuoQuest } from '../../types/database';
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
@@ -68,7 +72,12 @@ export function ActivitiesTab({ userId, buddyPairIds, buddyProfiles }: Activitie
     getSharedStreak,
   } = useSharedHabitStore();
 
-  const { loading: questLoading, loadAllDuoQuests } = useDuoQuestStore();
+  const { activeQuests, completedQuests, loading: questLoading, loadAllDuoQuests, exitQuest } = useDuoQuestStore();
+
+  // Detail sheet state
+  const [selectedQuest, setSelectedQuest] = useState<DuoQuest | null>(null);
+  // Collapsed completed quests
+  const [showCompleted, setShowCompleted] = useState(false);
 
   const loading = sharedLoading || questLoading;
 
@@ -117,7 +126,21 @@ export function ActivitiesTab({ userId, buddyPairIds, buddyProfiles }: Activitie
 
   const hasProposals = proposals.length > 0;
   const hasSharedHabits = activeSharedHabits.length > 0;
-  const isEmpty = !hasProposals && !hasSharedHabits;
+  const hasActiveQuests = activeQuests.length > 0;
+  const hasCompletedQuests = completedQuests.length > 0;
+  const isEmpty = !hasProposals && !hasSharedHabits && !hasActiveQuests;
+
+  /** Determine current user's side in a quest (creator is 'a'). */
+  const getSide = (quest: DuoQuest): 'a' | 'b' =>
+    quest.createdByUserId === userId ? 'a' : 'b';
+
+  /** Get buddy name for a quest from buddy pair profiles. */
+  const getQuestBuddyName = (quest: DuoQuest): string =>
+    buddyProfiles.get(quest.buddyPairId)?.name ?? 'Buddy';
+
+  /** Pure inactivity check from timestamps — no async needed. */
+  const getInactivityStatus = (quest: DuoQuest): InactivityStatus =>
+    checkInactivity(quest.updatedAt);
 
   // ── Render ─────────────────────────────────────────────────────────────
 
@@ -186,16 +209,65 @@ export function ActivitiesTab({ userId, buddyPairIds, buddyProfiles }: Activitie
         </View>
       )}
 
-      {/* Duo Quests section — placeholder for Plan 05 */}
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Duo Quests</Text>
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderText}>Duo quest cards coming soon</Text>
+      {/* Duo Quests section — real cards per Plan 05 */}
+      {hasActiveQuests && (
+        <View style={styles.section}>
+          <Text style={styles.sectionHeader}>Duo Quests</Text>
+          <View style={styles.cardList}>
+            {activeQuests.map((quest) => (
+              <DuoQuestCard
+                key={quest.id}
+                quest={quest}
+                buddyName={getQuestBuddyName(quest)}
+                onPress={() => setSelectedQuest(quest)}
+                onExit={() => void exitQuest(quest.id, getSide(quest), userId)}
+                inactivityStatus={getInactivityStatus(quest)}
+                side={getSide(quest)}
+              />
+            ))}
+          </View>
         </View>
-      </View>
+      )}
+
+      {/* Completed Quests (collapsed) */}
+      {hasCompletedQuests && (
+        <View style={styles.section}>
+          <TouchableOpacity onPress={() => setShowCompleted(!showCompleted)}>
+            <Text style={styles.sectionHeader}>
+              Completed Quests ({completedQuests.length}) {showCompleted ? '▾' : '▸'}
+            </Text>
+          </TouchableOpacity>
+          {showCompleted && (
+            <View style={styles.cardList}>
+              {completedQuests.map((quest) => (
+                <DuoQuestCard
+                  key={quest.id}
+                  quest={quest}
+                  buddyName={getQuestBuddyName(quest)}
+                  onPress={() => setSelectedQuest(quest)}
+                  inactivityStatus="ok"
+                  side={getSide(quest)}
+                />
+              ))}
+            </View>
+          )}
+        </View>
+      )}
 
       {/* Bottom padding */}
       <View style={{ height: spacing.xl }} />
+
+      {/* Duo Quest detail sheet */}
+      {selectedQuest && (
+        <DuoQuestDetailSheet
+          visible={!!selectedQuest}
+          onClose={() => setSelectedQuest(null)}
+          quest={selectedQuest}
+          buddyName={getQuestBuddyName(selectedQuest)}
+          side={getSide(selectedQuest)}
+          userId={userId}
+        />
+      )}
     </ScrollView>
   );
 }
@@ -240,18 +312,5 @@ const styles = StyleSheet.create({
   },
   cardList: {
     gap: componentSpacing.listItemGap,
-  },
-  placeholder: {
-    backgroundColor: colors.dark.surface,
-    borderRadius: 12,
-    padding: componentSpacing.cardPadding,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.dark.border,
-    borderStyle: 'dashed',
-  },
-  placeholderText: {
-    ...typography.bodySm,
-    color: colors.dark.textMuted,
   },
 });

@@ -36,6 +36,7 @@ import { BuddyProfileCard } from '../../src/components/buddy/BuddyProfileCard';
 import { OnlineStatusDot, type OnlineStatus } from '../../src/components/buddy/OnlineStatusDot';
 import { ConfirmActionSheet } from '../../src/components/buddy/ConfirmActionSheet';
 import { ProposeSharedHabitSheet } from '../../src/components/activities/ProposeSharedHabitSheet';
+import { CreateDuoQuestSheet } from '../../src/components/activities/CreateDuoQuestSheet';
 import { colors, palette } from '../../src/tokens/colors';
 import { typography } from '../../src/tokens/typography';
 import { componentSpacing, spacing } from '../../src/tokens/spacing';
@@ -119,6 +120,7 @@ export default function BuddyProfileScreen() {
   const [menuVisible, setMenuVisible] = useState(false);
   const [actionSheet, setActionSheet] = useState<ActionSheet>(null);
   const [showProposeSheet, setShowProposeSheet] = useState(false);
+  const [showCreateQuest, setShowCreateQuest] = useState(false);
 
   // Find the buddy row from the accepted list using the route param id
   const buddyRow: Buddy | undefined = accepted.find((b) => b.id === id);
@@ -292,14 +294,13 @@ export default function BuddyProfileScreen() {
                 <Text style={styles.proposeButtonText}>Propose Shared Habit</Text>
               </TouchableOpacity>
 
-              {/* Start Duo Quest — placeholder, wired in Plan 05 */}
+              {/* Start Duo Quest — per D-07 */}
               <TouchableOpacity
                 style={styles.duoQuestButton}
-                disabled
-                activeOpacity={1}
+                onPress={() => setShowCreateQuest(true)}
+                activeOpacity={0.8}
                 accessibilityRole="button"
-                accessibilityLabel="Start a duo quest (coming soon)"
-                accessibilityState={{ disabled: true }}
+                accessibilityLabel="Start a duo quest"
               >
                 <Text style={styles.duoQuestButtonText}>Start Duo Quest</Text>
               </TouchableOpacity>
@@ -374,6 +375,17 @@ export default function BuddyProfileScreen() {
           onClose={() => setShowProposeSheet(false)}
           buddyPairId={buddyRow.id}
           buddyName={displayName}
+        />
+      )}
+
+      {/* Create Duo Quest sheet — per D-07 */}
+      {buddyRow && (
+        <CreateDuoQuestSheet
+          visible={showCreateQuest}
+          onClose={() => setShowCreateQuest(false)}
+          buddyPairId={buddyRow.id}
+          buddyName={displayName}
+          userId={userId}
         />
       )}
     </View>
@@ -510,19 +522,18 @@ const styles = StyleSheet.create({
   },
   duoQuestButton: {
     borderWidth: 1.5,
-    borderColor: colors.dark.border,
+    borderColor: palette['sapphire-800'],
     borderRadius: 12,
     paddingVertical: componentSpacing.buttonPaddingVertical,
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 48,
-    opacity: 0.4,
   },
   duoQuestButtonText: {
     ...typography.bodyMd,
     fontFamily: 'Inter-SemiBold',
     fontWeight: '600',
-    color: colors.dark.textMuted,
+    color: palette['sapphire-800'],
   },
 
   // Three-dot dropdown menu
