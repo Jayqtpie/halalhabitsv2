@@ -1,27 +1,45 @@
 {
   "version": "1.0",
-  "timestamp": "2026-03-25T20:43:56.415Z",
+  "timestamp": "2026-03-27T03:27:54.090Z",
   "phase": "16",
-  "phase_name": "Shared Activities & Duo Quests",
+  "phase_name": "shared-activities-duo-quests",
   "phase_dir": ".planning/phases/16-shared-activities-duo-quests",
-  "plan": 0,
-  "task": 0,
-  "total_tasks": 0,
+  "plan": 5,
+  "task": 3,
+  "total_tasks": 3,
   "status": "paused",
-  "completed_tasks": [],
+  "completed_tasks": [
+    {"id": 1, "name": "Duo Quest Components (DuoQuestCard, DuoQuestDetailSheet, InactivityBanner, CreateDuoQuestSheet)", "status": "done", "commit": "a1eddfb"},
+    {"id": 2, "name": "Activities Tab Completion + Profile Integration", "status": "done", "commit": "0a170d3"},
+    {"id": 3, "name": "Human Verification (Plan 05)", "status": "deferred", "progress": "Code complete, visual testing deferred"}
+  ],
   "remaining_tasks": [
-    {"id": 1, "name": "discuss-phase gray area selection", "status": "in_progress", "progress": "Gray areas identified and presented, awaiting user selection"}
+    {"id": "16-04-T3", "name": "Human Verification (Plan 04 — shared habit UI)", "status": "deferred"},
+    {"id": "16-05-T3", "name": "Human Verification (Plan 05 — duo quest UI)", "status": "deferred"},
+    {"id": "phase-verify", "name": "Phase 16 verification (gsd-verifier)", "status": "not_started"}
   ],
   "blockers": [],
-  "human_actions_pending": [],
+  "human_actions_pending": [
+    {"action": "Visual testing of Buddies|Activities sub-tabs and shared habit proposal flow", "context": "Plan 04 checkpoint: verify sub-tab switching, ProposeSharedHabitSheet filters worship habits, streak display", "blocking": false},
+    {"action": "Visual testing of duo quest cards, creation sheet, and inactivity banners", "context": "Plan 05 checkpoint: verify aggregate-only progress, template/custom creation, profanity filter, 48h/72h banners", "blocking": false}
+  ],
   "decisions": [
-    {"decision": "Phase 16 gray areas identified: (1) Shared habit proposal flow, (2) Duo quest creation & catalog, (3) Inactivity & timeout handling, (4) Progress display & privacy", "rationale": "Derived from DUOQ-01 through DUOQ-05 requirements and existing schema", "phase": "16"}
+    {"decision": "WORSHIP_HABIT_TYPES=['salah','muhasabah'] for Privacy Gate", "rationale": "Per D-02, worship data never shared", "phase": "16"},
+    {"decision": "getAggregateProgress returns no userA/userB keys", "rationale": "Privacy pattern for DUOQ-05/D-13", "phase": "16"},
+    {"decision": "calculatePartialXP floors result", "rationale": "No fractional XP", "phase": "16"},
+    {"decision": "setPendingProposalCount plain setter on buddyStore", "rationale": "Avoid circular dependency with sharedHabitStore", "phase": "16"},
+    {"decision": "Creator is side 'a', non-creator is side 'b'", "rationale": "Follows schema convention", "phase": "16"},
+    {"decision": "Inactivity computed via pure checkInactivity() in card render", "rationale": "No async needed, timestamps available", "phase": "16"},
+    {"decision": "Custom quest XP = Math.min(150, Math.max(50, targetValue * 15))", "rationale": "Keep within XP economy bounds", "phase": "16"}
   ],
   "uncommitted_files": [
+    "package.json",
+    "package-lock.json",
+    ".planning/phases/16-shared-activities-duo-quests/16-02-SUMMARY.md",
     "src/components/arena/ArenaScreen.tsx",
     "src/stores/bossStore.ts",
     "src/stores/gameStore.ts"
   ],
-  "next_action": "Run /gsd:discuss-phase 16 — gray areas already identified. User needs to select which areas to discuss (1-4), then discuss each, then CONTEXT.md gets written.",
-  "context_notes": "discuss-phase workflow reached the present_gray_areas step. Four gray areas were presented to the user but they paused before selecting. Prior context from phases 11-15 loaded. Schema for shared_habits and duo_quests already exists in schema.ts. No CONTEXT.md or plans exist yet for phase 16. Advisor mode is OFF (no USER-PROFILE.md). No matching todos found. Three uncommitted files from Phase 14 UAT work exist but are unrelated to Phase 16."
+  "next_action": "Run app and approve both human-verify checkpoints (Plans 04 and 05), then run phase verification via /gsd:execute-phase 16",
+  "context_notes": "All 5 plans executed across 5 sequential waves. Plans 01-03 (domain, repos, stores) fully complete with tests passing. Plans 04-05 (UI) code complete but human-verify checkpoints deferred. Phase verification blocked on checkpoint approval. Some uncommitted files from prior phases (ArenaScreen, bossStore, gameStore) are unrelated to Phase 16."
 }
