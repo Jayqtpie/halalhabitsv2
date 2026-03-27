@@ -34,7 +34,7 @@ Full details: [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)
 - [x] **Phase 13: Dopamine Detox Dungeon** - Give players a voluntary anti-doomscrolling challenge system (completed 2026-03-22)
 - [x] **Phase 14: Nafs Boss Arena** - Let players battle personified nafs struggles in multi-day boss fights (completed 2026-03-24)
 - [x] **Phase 15: Buddy Connection System** - Enable private accountability partnerships with up to 20 connections (completed 2026-03-25)
-- [ ] **Phase 16: Shared Activities & Duo Quests** - Let buddy pairs track shared habits and complete cooperative quests
+- [x] **Phase 16: Shared Activities & Duo Quests** - Let buddy pairs track shared habits and complete cooperative quests (completed 2026-03-27)
 - [ ] **Phase 17: Messaging & Content Moderation** - Enable filtered 1:1 chat between connected buddies
 
 ## Phase Details
@@ -137,8 +137,8 @@ Plans:
 - [x] 16-01-PLAN.md — Duo quest and shared habit domain engines with TDD
 - [x] 16-02-PLAN.md — sharedHabitRepo and duoQuestRepo with privacy invariant tests
 - [x] 16-03-PLAN.md — sharedHabitStore, duoQuestStore, gameStore XP integration, buddyStore badge
-- [ ] 16-04-PLAN.md — Activities sub-tab, shared habit UI, proposal flow, buddy profile integration
-- [ ] 16-05-PLAN.md — Duo quest cards, creation sheet, inactivity banner, detail view
+- [x] 16-04-PLAN.md — Activities sub-tab, shared habit UI, proposal flow, buddy profile integration
+- [x] 16-05-PLAN.md — Duo quest cards, creation sheet, inactivity banner, detail view
 
 ### Phase 17: Messaging & Content Moderation
 **Goal**: Connected buddies can send and receive text messages that are filtered on both client and server, with offline queuing, message history, and report/block tools
@@ -172,5 +172,5 @@ Plans:
 | 13. Dopamine Detox Dungeon | v2.0 | 4/4 | Complete   | 2026-03-22 |
 | 14. Nafs Boss Arena | v2.0 | 5/5 | Complete | 2026-03-24 |
 | 15. Buddy Connection System | v2.0 | 6/6 | Complete    | 2026-03-25 |
-| 16. Shared Activities & Duo Quests | v2.0 | 3/5 | In Progress|  |
+| 16. Shared Activities & Duo Quests | v2.0 | 5/5 | Complete   | 2026-03-27 |
 | 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |
