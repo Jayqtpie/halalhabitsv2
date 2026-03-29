@@ -151,7 +151,13 @@ Plans:
   4. Full conversation history per buddy is viewable when the player opens the chat screen
   5. Player can report a specific message or block a buddy from within the chat screen; both actions take effect immediately
   6. Messages composed while offline are queued locally and automatically sent when connectivity is restored, in order
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 17-01-PLAN.md — Message domain engine (message-engine.ts) with TDD
+- [ ] 17-02-PLAN.md — messageRepo, message_reports schema, privacy gate, Supabase migration
+- [ ] 17-03-PLAN.md — messageStore, offline message queue service
+- [ ] 17-04-PLAN.md — Supabase Edge Function (moderate-message) for server-side filtering
+- [ ] 17-05-PLAN.md — Chat UI (ChatScreen, MessageBubble, ChatComposer, ReportMessageSheet) + navigation
 
 ## Progress
 
@@ -173,4 +179,4 @@ Plans:
 | 14. Nafs Boss Arena | v2.0 | 5/5 | Complete | 2026-03-24 |
 | 15. Buddy Connection System | v2.0 | 6/6 | Complete    | 2026-03-25 |
 | 16. Shared Activities & Duo Quests | v2.0 | 5/5 | Complete   | 2026-03-27 |
-| 17. Messaging & Content Moderation | v2.0 | 0/TBD | Not started | - |
+| 17. Messaging & Content Moderation | v2.0 | 0/5 | Not started | - |
