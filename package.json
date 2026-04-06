@@ -66,6 +66,7 @@
   },
   "overrides": {
     "node-forge": "^1.4.0",
-    "xmldom": "^0.8.12"
+    "xmldom": "^0.8.12",
+    "@xmldom/xmldom": "^0.8.12"
   }
 }
